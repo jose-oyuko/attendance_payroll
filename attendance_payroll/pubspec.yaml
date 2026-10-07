@@ -1,0 +1,24 @@
+name: attendance_payroll
+description: Offline-first employee attendance and payroll application.
+publish_to: none
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.12.0
+  flutter: ">=3.44.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  # State management and dependency injection (Notifier API, no code generation).
+  flutter_riverpod: ^3.4.3
+  # Declarative routing, including the stateful admin shell.
+  go_router: ^18.0.2
+
+dev_dependencies:
+  flutter_lints: ^6.0.0
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true

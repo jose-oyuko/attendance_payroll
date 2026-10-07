@@ -1,0 +1,48 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.build/
+.buildlog/
+.history
+.svn/
+.swiftpm/
+migrate_working_dir/
+
+# IDE
+*.iml
+*.ipr
+*.iws
+.idea/
+.vscode/
+
+# Flutter / Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+coverage/
+pubspec.lock.bak
+
+# Android
+**/android/**/gradle-wrapper.jar
+**/android/.gradle
+**/android/captures/
+**/android/gradlew
+**/android/gradlew.bat
+**/android/key.properties
+**/android/local.properties
+**/android/**/GeneratedPluginRegistrant.*
+*.jks
+*.keystore
+
+# Never commit secrets or local backups
+.env
+*.db
+*.sqlite
