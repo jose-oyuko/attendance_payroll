@@ -82,7 +82,15 @@ name the phase delivering them.
 - Repositories with validation, optimistic concurrency and friendly errors
 - Tests against real SQLite, including persistence across a restart
 
-There is no employee UI yet (Phase 2); the repositories are exercised by tests.
+## What Phase 2 adds
+
+- First-run setup (company and owner account) and administrator sign-in/out
+- Employee list with search and archived filter, create/edit form, detail page
+- Activate, deactivate, suspend, archive and restore, each confirmed
+- Pay rate history: set and change rates (old rates are kept)
+- Employee PINs: issue/reset a temporary PIN shown once; hashing, lockout
+- Audit log of employee, PIN and sign-in events; stable device identity
+- Database schema version 2, with a tested migration from version 1
 
 ## Project layout
 

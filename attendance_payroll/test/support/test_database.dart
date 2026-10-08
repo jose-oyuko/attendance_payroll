@@ -24,6 +24,9 @@ class TestClock {
     _next = _next.add(const Duration(seconds: 1));
     return now;
   }
+
+  /// Jumps forward, for example past a lockout.
+  void advance(Duration duration) => _next = _next.add(duration);
 }
 
 /// Deterministic ids: `<prefix>-1`, `<prefix>-2`, ...

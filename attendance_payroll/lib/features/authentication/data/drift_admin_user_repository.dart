@@ -91,6 +91,20 @@ final class DriftAdminUserRepository implements AdminUserRepository {
     });
   }
 
+  @override
+  Future<Result<AdminUser>> recordSignIn(String id, DateTime at) {
+    return guardDatabase(() async {
+      final rows =
+          await (_db.update(_db.adminUsers)
+                ..where((u) => u.id.equals(id) & u.deletedAt.isNull()))
+              .writeReturning(AdminUsersCompanion(lastLoginAt: Value(at)));
+      if (rows.isEmpty) {
+        throw const NotFoundFailure(entity: 'administrator');
+      }
+      return _toDomain(rows.single);
+    });
+  }
+
   AdminUser _toDomain(AdminUserRow row) {
     return AdminUser(
       id: row.id,

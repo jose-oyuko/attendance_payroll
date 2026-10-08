@@ -16,7 +16,6 @@ enum AdminDestination {
     label: 'Employees',
     icon: Icons.people_outline,
     selectedIcon: Icons.people,
-    plannedPhase: 2,
   ),
   attendance(
     path: '/attendance',

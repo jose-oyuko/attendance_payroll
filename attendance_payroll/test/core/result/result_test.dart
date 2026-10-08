@@ -22,6 +22,16 @@ void main() {
       expect(result.failureOrNull, same(failure));
     });
 
+    test('unwrap returns the value or throws the failure', () {
+      const failure = NotFoundFailure(entity: 'employee');
+
+      expect(const Result<int>.ok(7).unwrap(), 7);
+      expect(
+        () => const Result<int>.err(failure).unwrap(),
+        throwsA(same(failure)),
+      );
+    });
+
     test('fold selects the matching branch', () {
       const ok = Result<int>.ok(2);
       const err = Result<int>.err(UnexpectedFailure());

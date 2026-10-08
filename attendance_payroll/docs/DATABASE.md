@@ -24,6 +24,7 @@ tables are in `lib/core/database/tables.dart`. Only repositories in feature
 | Version | App phase | Changes |
 |---|---|---|
 | 1 | Phase 1 | `companies`, `admin_users`, `employees`, `employee_rates` |
+| 2 | Phase 2 | `credentials`, `audit_log`, `device_identity` |
 
 ### Version 1
 
@@ -41,6 +42,22 @@ tables are in `lib/core/database/tables.dart`. Only repositories in feature
   Adding a rate closes the current one on the previous day; back-dated rates are
   rejected so history is never rewritten.
 
+### Version 2
+
+- **credentials** — hashed administrator passwords and employee PINs.
+  Exactly one of `admin_user_id` / `employee_id` is set (CHECK), each unique.
+  `kind`, `secret_hash` (self-describing PBKDF2 hash, never the secret),
+  `is_temporary`, `failed_attempts`, `locked_until`, `changed_at`. Device-local
+  security state, so no sync metadata.
+- **audit_log** — append-only: `company_id`, `actor_type`, `actor_id`,
+  `action` (stable dotted code), `entity_type`, `entity_id`, `occurred_at`,
+  `device_id`, `metadata` (JSON, never secrets), `sync_state`. Indexed by
+  `(company_id, occurred_at)` and `(entity_type, entity_id)`.
+- **device_identity** — one row: this installation's stable id.
+
+Migration 1 → 2 only creates these tables and indexes; existing rows are
+untouched (verified by a data-integrity migration test).
+
 Indexes come from the unique keys: `(company_id, employee_number)` serves
 lookups by company and by number; `(company_id, username)` and
 `(employee_id, effective_from)` likewise. Further indexes are added with the
@@ -53,9 +70,16 @@ Never delete a user's database to get past a schema change.
 1. Change the tables and increment `schemaVersion` in `app_database.dart`.
 2. `dart run build_runner build`
 3. `dart run drift_dev make-migrations` — exports
-   `drift_schemas/app_database/drift_schema_vN.json`, generates
-   `app_database.steps.dart` and step-by-step migration tests.
+   `drift_schemas/app_database/drift_schema_vN.json`, regenerates
+   `app_database.steps.dart` and the schema helpers in
+   `test/core/database/migrations/app_database/generated/`.
 4. Write the step in `migration` using `stepByStep(...)`, keeping existing data.
-5. Add a row to the table above, then run `flutter test`.
+5. Extend the data-integrity test in
+   `test/core/database/migrations/app_database/migration_test.dart` for the new
+   version (the command does not overwrite that file).
+6. Add a row to the table above, then run `flutter test`.
+
+Write the step only after step 3: `app_database.steps.dart` must exist for
+`stepByStep` to compile.
 
 Commit the schema snapshots and generated files together with the change.

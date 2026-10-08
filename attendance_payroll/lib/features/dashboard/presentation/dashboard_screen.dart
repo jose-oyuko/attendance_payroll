@@ -2,6 +2,7 @@ import 'package:attendance_payroll/app/configuration/app_config.dart';
 import 'package:attendance_payroll/app/theme/semantic_colors.dart';
 import 'package:attendance_payroll/core/constants/app_spacing.dart';
 import 'package:attendance_payroll/core/extensions/build_context_extensions.dart';
+import 'package:attendance_payroll/features/company/presentation/current_company_provider.dart';
 import 'package:attendance_payroll/features/settings/presentation/theme_mode_provider.dart';
 import 'package:attendance_payroll/shared/responsive/adaptive_grid.dart';
 import 'package:attendance_payroll/shared/responsive/window_size.dart';
@@ -9,8 +10,8 @@ import 'package:attendance_payroll/shared/widgets/page_container.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// Phase 0 dashboard: shows the state of the foundation. Attendance and
-/// payroll cards are added in the phases that build those features.
+/// Dashboard: company and environment summary for now. Attendance and payroll
+/// cards are added in the phases that build those features.
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
 
@@ -19,14 +20,15 @@ class DashboardScreen extends ConsumerWidget {
     final config = ref.watch(appConfigProvider);
     final themeMode = ref.watch(themeModeProvider);
     final semantic = context.semanticColors;
+    final company = ref.watch(currentCompanyProvider).value;
 
     return PageContainer(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'The application foundation is ready. Attendance and payroll '
-            'summaries will appear here as those features are built.',
+            'Attendance and payroll summaries will appear here as those '
+            'features are built.',
             style: context.textStyles.bodyLarge,
           ),
           const SizedBox(height: AppSpacing.lg),
@@ -51,11 +53,14 @@ class DashboardScreen extends ConsumerWidget {
                 accent: semantic.neutral,
               ),
               _StatusCard(
-                icon: Icons.storage_outlined,
-                title: 'Database',
-                value: 'Not connected yet',
-                caption: 'Added in Phase 1',
-                accent: semantic.warning,
+                icon: Icons.business_outlined,
+                title: 'Company',
+                value: company?.details.name ?? '…',
+                caption: company == null
+                    ? null
+                    : '${company.details.currencyCode} · '
+                          '${company.details.timezone}',
+                accent: semantic.info,
               ),
             ],
           ),

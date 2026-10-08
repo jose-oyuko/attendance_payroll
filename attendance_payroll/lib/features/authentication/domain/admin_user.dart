@@ -1,11 +1,20 @@
 import 'package:attendance_payroll/core/errors/app_failure.dart';
 import 'package:attendance_payroll/core/utils/validators.dart';
 
+/// Operations that require authorisation. Services check these, not roles.
+enum Permission { viewEmployees, manageEmployees, manageEmployeePins }
+
 /// What an administrator may do. V1 has a single all-powerful role; finer
 /// roles (payroll administrator, HR administrator, attendance manager,
-/// supervisor, auditor) are added here when permissions are introduced. Roles
-/// are stored by name, so adding one needs no migration.
-enum AdminRole { owner }
+/// supervisor, auditor) are added here with their permission sets. Roles are
+/// stored by name, so adding one needs no migration.
+enum AdminRole {
+  owner;
+
+  Set<Permission> get permissions => switch (this) {
+    AdminRole.owner => Permission.values.toSet(),
+  };
+}
 
 /// A person who administers the application. Not an employee.
 final class AdminUser {

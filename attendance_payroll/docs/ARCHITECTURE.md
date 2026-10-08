@@ -22,8 +22,12 @@ presentation  ->  domain  ->  repository interfaces  <-  data (Drift / platform)
 - `app/` only wires things together (router, theme, configuration, shell).
 - `core/` contains framework-agnostic building blocks and must not depend on
   `app/`, `features/` or `shared/`.
-- Features do not import each other's `data/` or `presentation/`. Shared UI
-  goes in `shared/`.
+- Features may use another feature's `domain/` (entities, repository
+  interfaces, services) and its public providers (`data/*_providers.dart`).
+  They never use another feature's Drift classes or widgets. The one shared
+  piece of presentation state is the signed-in session
+  (`authentication/presentation/auth_controller.dart`). Shared UI goes in
+  `shared/`.
 
 Riverpod providers are the dependency-injection container. Anything
 environment-specific (configuration, logger, later the database and device id)
@@ -85,6 +89,30 @@ administrative navigation.
 and the phase that builds them. The router creates one `StatefulShellBranch` per
 destination so each area keeps its navigation state.
 
+## Authentication and authorisation (Phase 2)
+
+- **Administrators** sign in with a username and password. First run creates
+  the company and its owner (`AdminAuthService.setUp`); afterwards the router
+  only shows administrator screens to a signed-in session.
+- **Employees** authenticate with a PIN through `EmployeePinService`, separate
+  from administrator sign-in, with its own lockout policy. Administrators can
+  issue a temporary PIN (shown once, must be changed on first use) but can
+  never read a PIN.
+- **Secrets** are hashed with PBKDF2-HMAC-SHA256 (`SecretHasher`, verified
+  against RFC 7914) with a random salt, on a background isolate. Each hash
+  records its work factor, so it can be raised later. Unknown accounts take the
+  same time as wrong passwords.
+- **Lockout**: five failures lock the credential; each further lock doubles
+  (passwords up to 1 hour, PINs up to 1 day). A locked credential is not even
+  checked.
+- **Authorisation** lives in application services: each takes an
+  `AdminSession`, checks a `Permission` and keeps the session inside its own
+  company. Hiding UI is never the only protection. Roles map to permission
+  sets (`AdminRole.permissions`); V1 has only `owner`.
+- **Audit**: changes and their `AuditLogRepository.record` entry are written in
+  one transaction (`TransactionRunner`), so neither exists without the other.
+  Metadata records which fields changed, never secrets or values.
+
 ## Database
 
 Drift over SQLite with versioned, tested migrations. Conventions (UUIDv7 keys,
@@ -129,8 +157,8 @@ Nothing in V1 talks to a server, but the design leaves room:
 | Phase | Scope |
 |---|---|
 | 0 | Foundation |
-| 1 | Database foundation (current) |
-| 2 | Authentication and employee management |
+| 1 | Database foundation |
+| 2 | Authentication and employee management (current) |
 | 3 | Attendance engine |
 | 4 | Attendance UI and kiosk mode |
 | 5 | Exceptions and corrections |
@@ -145,8 +173,8 @@ Nothing in V1 talks to a server, but the design leaves room:
 
 ## Current boundaries
 
-Phase 1 adds persistence and repositories but no screens that use them:
-employee management UI and authentication are Phase 2. Still deferred: settings
-persistence (the theme choice is in memory only), device identity (introduced
-with attendance events in Phase 3, where records first need it), and any
-attendance or payroll logic.
+After Phase 2: administrators sign in and manage employees, PINs and pay
+rates. Still deferred: the kiosk and employee-facing PIN entry and PIN change
+screens (Phase 4; the domain service exists and is tested), administrator
+password change and recovery, session timeout, settings persistence (the theme
+choice is in memory only), and any attendance or payroll logic.

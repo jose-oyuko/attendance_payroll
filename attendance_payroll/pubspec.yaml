@@ -18,6 +18,8 @@ dependencies:
   flutter_riverpod: ^3.4.3
   # Declarative routing, including the stateful admin shell.
   go_router: ^18.0.2
+  # PBKDF2-HMAC-SHA256 for hashing PINs and passwords (Bouncy Castle port).
+  pointycastle: ^4.0.0
   # SqliteException and its error codes, to map constraint violations.
   sqlite3: ^3.5.2
   # UUIDv7 identifiers that devices can generate independently.

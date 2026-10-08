@@ -138,3 +138,79 @@ class EmployeeRates extends Table with EntityColumns {
     'CHECK (effective_to IS NULL OR effective_to >= effective_from)',
   ];
 }
+
+/// Hashed secrets: administrator passwords and employee PINs. Exactly one
+/// owner column is set. Plain secrets are never stored.
+///
+/// This is device-local security state (attempt counters, locks), so it has no
+/// sync metadata.
+@DataClassName('CredentialRow')
+class Credentials extends Table {
+  TextColumn get id => text()();
+
+  /// `adminPassword` or `employeePin`.
+  TextColumn get kind => text()();
+  TextColumn get adminUserId =>
+      text().nullable().unique().references(AdminUsers, #id)();
+  TextColumn get employeeId =>
+      text().nullable().unique().references(Employees, #id)();
+
+  /// Self-describing hash; see `SecretHasher`.
+  TextColumn get secretHash => text()();
+
+  /// Issued by an administrator; the owner must replace it on first use.
+  BoolColumn get isTemporary => boolean().withDefault(const Constant(false))();
+  IntColumn get failedAttempts => integer().withDefault(const Constant(0))();
+  DateTimeColumn get lockedUntil => dateTime().nullable()();
+  DateTimeColumn get changedAt => dateTime()();
+  DateTimeColumn get updatedAt => dateTime()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+
+  @override
+  List<String> get customConstraints => [
+    'CHECK ((admin_user_id IS NULL) <> (employee_id IS NULL))',
+    'CHECK (failed_attempts >= 0)',
+  ];
+}
+
+/// Append-only record of significant business actions. Rows are never
+/// updated, so there is no `version` or `updatedAt`; they do sync later.
+@DataClassName('AuditLogRow')
+@TableIndex(name: 'audit_log_company_time', columns: {#companyId, #occurredAt})
+@TableIndex(name: 'audit_log_entity', columns: {#entityType, #entityId})
+class AuditLog extends Table {
+  TextColumn get id => text()();
+  TextColumn get companyId => text().references(Companies, #id)();
+
+  /// `admin`, `employee` or `system`.
+  TextColumn get actorType => text()();
+  TextColumn get actorId => text().nullable()();
+
+  /// Stable dotted code, for example `employee.pin_reset`.
+  TextColumn get action => text()();
+  TextColumn get entityType => text()();
+  TextColumn get entityId => text().nullable()();
+  DateTimeColumn get occurredAt => dateTime()();
+  TextColumn get deviceId => text()();
+
+  /// JSON object with non-sensitive details, or null.
+  TextColumn get metadata => text().nullable()();
+  TextColumn get syncState =>
+      textEnum<SyncState>().withDefault(Constant(SyncState.localOnly.name))();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+/// The stable identity of this installation (one row), recorded on audit
+/// entries and, later, attendance events and synchronised records.
+@DataClassName('DeviceIdentityRow')
+class DeviceIdentity extends Table {
+  TextColumn get id => text()();
+  DateTimeColumn get createdAt => dateTime()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}

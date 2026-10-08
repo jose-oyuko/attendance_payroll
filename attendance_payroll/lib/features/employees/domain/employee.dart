@@ -61,6 +61,48 @@ final class EmployeeDetails {
     );
   }
 
+  /// A copy with a different [status].
+  EmployeeDetails withStatus(EmploymentStatus status) {
+    return EmployeeDetails(
+      employeeNumber: employeeNumber,
+      firstName: firstName,
+      middleName: middleName,
+      lastName: lastName,
+      displayName: displayName,
+      phone: phone,
+      email: email,
+      jobTitle: jobTitle,
+      employmentStatus: status,
+      employmentStartDate: employmentStartDate,
+      employmentEndDate: employmentEndDate,
+    );
+  }
+
+  /// Names of the fields that differ from [other], for audit records that
+  /// must say what changed without copying personal data.
+  List<String> changedFieldsFrom(EmployeeDetails other) {
+    final mine = _fields;
+    final theirs = other._fields;
+    return [
+      for (final name in mine.keys)
+        if (mine[name] != theirs[name]) name,
+    ];
+  }
+
+  Map<String, Object?> get _fields => {
+    'employeeNumber': employeeNumber,
+    'firstName': firstName,
+    'middleName': middleName,
+    'lastName': lastName,
+    'displayName': displayName,
+    'phone': phone,
+    'email': email,
+    'jobTitle': jobTitle,
+    'employmentStatus': employmentStatus,
+    'employmentStartDate': employmentStartDate,
+    'employmentEndDate': employmentEndDate,
+  };
+
   /// The first rule these details break, or `null` when they are valid.
   ValidationFailure? validate() {
     if (Validators.isBlank(employeeNumber)) {

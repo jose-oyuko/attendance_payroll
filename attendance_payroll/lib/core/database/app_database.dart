@@ -1,3 +1,4 @@
+import 'package:attendance_payroll/core/database/app_database.steps.dart';
 import 'package:attendance_payroll/core/database/converters.dart';
 import 'package:attendance_payroll/core/database/sync_state.dart';
 import 'package:attendance_payroll/core/database/tables.dart';
@@ -12,7 +13,17 @@ part 'app_database.g.dart';
 ///
 /// Only repositories in feature `data/` folders use this class; presentation
 /// and domain code never see it.
-@DriftDatabase(tables: [Companies, AdminUsers, Employees, EmployeeRates])
+@DriftDatabase(
+  tables: [
+    Companies,
+    AdminUsers,
+    Employees,
+    EmployeeRates,
+    Credentials,
+    AuditLog,
+    DeviceIdentity,
+  ],
+)
 class AppDatabase extends _$AppDatabase {
   AppDatabase(super.executor);
 
@@ -28,13 +39,23 @@ class AppDatabase extends _$AppDatabase {
   /// step; see docs/DATABASE.md.
   ///
   /// 1 — companies, admin users, employees, employee rates.
+  /// 2 — credentials, audit log, device identity.
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration {
     return MigrationStrategy(
       onCreate: (m) => m.createAll(),
+      onUpgrade: stepByStep(
+        from1To2: (m, schema) async {
+          await m.createTable(schema.credentials);
+          await m.createTable(schema.auditLog);
+          await m.createIndex(schema.auditLogCompanyTime);
+          await m.createIndex(schema.auditLogEntity);
+          await m.createTable(schema.deviceIdentity);
+        },
+      ),
       beforeOpen: (details) async {
         // SQLite leaves foreign keys off unless enabled per connection.
         await customStatement('PRAGMA foreign_keys = ON');

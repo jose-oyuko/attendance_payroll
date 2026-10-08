@@ -24,7 +24,7 @@ void main() {
       await tester.tap(find.text('Employees'));
       await tester.pumpAndSettle();
 
-      expect(find.textContaining('Phase 2'), findsOneWidget);
+      expect(find.text('No employees yet.'), findsOneWidget);
       expect(find.byType(NavigationDrawer), findsNothing);
     });
 

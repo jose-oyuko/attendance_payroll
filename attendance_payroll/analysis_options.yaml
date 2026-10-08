@@ -10,7 +10,7 @@ analyzer:
     - "**/*.g.dart"
     - "**/*.freezed.dart"
     # Drift schema snapshots for migration tests (drift_dev schema generate).
-    - test/core/database/migrations/generated/**
+    - test/core/database/migrations/*/generated/**
     - android/**
     - web/**
   errors:

@@ -36,6 +36,17 @@ sealed class Result<T> {
     Err<T>(:final failure) => failure,
   };
 
+  /// The value when successful; otherwise throws the [AppFailure].
+  ///
+  /// Use inside a transaction, where a failed step must throw so that the
+  /// whole transaction rolls back. Everywhere else, handle both cases.
+  T unwrap() {
+    return switch (this) {
+      Ok<T>(:final value) => value,
+      Err<T>(:final failure) => throw failure,
+    };
+  }
+
   /// Collapses the result into a single value.
   R fold<R>(R Function(T value) onOk, R Function(AppFailure failure) onErr) {
     return switch (this) {

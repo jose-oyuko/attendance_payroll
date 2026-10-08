@@ -3378,6 +3378,1536 @@ class EmployeeRatesCompanion extends UpdateCompanion<EmployeeRateRow> {
   }
 }
 
+class $CredentialsTable extends Credentials
+    with TableInfo<$CredentialsTable, CredentialRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CredentialsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _kindMeta = const VerificationMeta('kind');
+  @override
+  late final GeneratedColumn<String> kind = GeneratedColumn<String>(
+    'kind',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _adminUserIdMeta = const VerificationMeta(
+    'adminUserId',
+  );
+  @override
+  late final GeneratedColumn<String> adminUserId = GeneratedColumn<String>(
+    'admin_user_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'UNIQUE REFERENCES admin_users (id)',
+    ),
+  );
+  static const VerificationMeta _employeeIdMeta = const VerificationMeta(
+    'employeeId',
+  );
+  @override
+  late final GeneratedColumn<String> employeeId = GeneratedColumn<String>(
+    'employee_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'UNIQUE REFERENCES employees (id)',
+    ),
+  );
+  static const VerificationMeta _secretHashMeta = const VerificationMeta(
+    'secretHash',
+  );
+  @override
+  late final GeneratedColumn<String> secretHash = GeneratedColumn<String>(
+    'secret_hash',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _isTemporaryMeta = const VerificationMeta(
+    'isTemporary',
+  );
+  @override
+  late final GeneratedColumn<bool> isTemporary = GeneratedColumn<bool>(
+    'is_temporary',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_temporary" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _failedAttemptsMeta = const VerificationMeta(
+    'failedAttempts',
+  );
+  @override
+  late final GeneratedColumn<int> failedAttempts = GeneratedColumn<int>(
+    'failed_attempts',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _lockedUntilMeta = const VerificationMeta(
+    'lockedUntil',
+  );
+  @override
+  late final GeneratedColumn<DateTime> lockedUntil = GeneratedColumn<DateTime>(
+    'locked_until',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _changedAtMeta = const VerificationMeta(
+    'changedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> changedAt = GeneratedColumn<DateTime>(
+    'changed_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    kind,
+    adminUserId,
+    employeeId,
+    secretHash,
+    isTemporary,
+    failedAttempts,
+    lockedUntil,
+    changedAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'credentials';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<CredentialRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('kind')) {
+      context.handle(
+        _kindMeta,
+        kind.isAcceptableOrUnknown(data['kind']!, _kindMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_kindMeta);
+    }
+    if (data.containsKey('admin_user_id')) {
+      context.handle(
+        _adminUserIdMeta,
+        adminUserId.isAcceptableOrUnknown(
+          data['admin_user_id']!,
+          _adminUserIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('employee_id')) {
+      context.handle(
+        _employeeIdMeta,
+        employeeId.isAcceptableOrUnknown(data['employee_id']!, _employeeIdMeta),
+      );
+    }
+    if (data.containsKey('secret_hash')) {
+      context.handle(
+        _secretHashMeta,
+        secretHash.isAcceptableOrUnknown(data['secret_hash']!, _secretHashMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_secretHashMeta);
+    }
+    if (data.containsKey('is_temporary')) {
+      context.handle(
+        _isTemporaryMeta,
+        isTemporary.isAcceptableOrUnknown(
+          data['is_temporary']!,
+          _isTemporaryMeta,
+        ),
+      );
+    }
+    if (data.containsKey('failed_attempts')) {
+      context.handle(
+        _failedAttemptsMeta,
+        failedAttempts.isAcceptableOrUnknown(
+          data['failed_attempts']!,
+          _failedAttemptsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('locked_until')) {
+      context.handle(
+        _lockedUntilMeta,
+        lockedUntil.isAcceptableOrUnknown(
+          data['locked_until']!,
+          _lockedUntilMeta,
+        ),
+      );
+    }
+    if (data.containsKey('changed_at')) {
+      context.handle(
+        _changedAtMeta,
+        changedAt.isAcceptableOrUnknown(data['changed_at']!, _changedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_changedAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  CredentialRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CredentialRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      kind: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}kind'],
+      )!,
+      adminUserId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}admin_user_id'],
+      ),
+      employeeId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}employee_id'],
+      ),
+      secretHash: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}secret_hash'],
+      )!,
+      isTemporary: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_temporary'],
+      )!,
+      failedAttempts: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}failed_attempts'],
+      )!,
+      lockedUntil: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}locked_until'],
+      ),
+      changedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}changed_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $CredentialsTable createAlias(String alias) {
+    return $CredentialsTable(attachedDatabase, alias);
+  }
+}
+
+class CredentialRow extends DataClass implements Insertable<CredentialRow> {
+  final String id;
+
+  /// `adminPassword` or `employeePin`.
+  final String kind;
+  final String? adminUserId;
+  final String? employeeId;
+
+  /// Self-describing hash; see `SecretHasher`.
+  final String secretHash;
+
+  /// Issued by an administrator; the owner must replace it on first use.
+  final bool isTemporary;
+  final int failedAttempts;
+  final DateTime? lockedUntil;
+  final DateTime changedAt;
+  final DateTime updatedAt;
+  const CredentialRow({
+    required this.id,
+    required this.kind,
+    this.adminUserId,
+    this.employeeId,
+    required this.secretHash,
+    required this.isTemporary,
+    required this.failedAttempts,
+    this.lockedUntil,
+    required this.changedAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['kind'] = Variable<String>(kind);
+    if (!nullToAbsent || adminUserId != null) {
+      map['admin_user_id'] = Variable<String>(adminUserId);
+    }
+    if (!nullToAbsent || employeeId != null) {
+      map['employee_id'] = Variable<String>(employeeId);
+    }
+    map['secret_hash'] = Variable<String>(secretHash);
+    map['is_temporary'] = Variable<bool>(isTemporary);
+    map['failed_attempts'] = Variable<int>(failedAttempts);
+    if (!nullToAbsent || lockedUntil != null) {
+      map['locked_until'] = Variable<DateTime>(lockedUntil);
+    }
+    map['changed_at'] = Variable<DateTime>(changedAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  CredentialsCompanion toCompanion(bool nullToAbsent) {
+    return CredentialsCompanion(
+      id: Value(id),
+      kind: Value(kind),
+      adminUserId: adminUserId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(adminUserId),
+      employeeId: employeeId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(employeeId),
+      secretHash: Value(secretHash),
+      isTemporary: Value(isTemporary),
+      failedAttempts: Value(failedAttempts),
+      lockedUntil: lockedUntil == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lockedUntil),
+      changedAt: Value(changedAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory CredentialRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CredentialRow(
+      id: serializer.fromJson<String>(json['id']),
+      kind: serializer.fromJson<String>(json['kind']),
+      adminUserId: serializer.fromJson<String?>(json['adminUserId']),
+      employeeId: serializer.fromJson<String?>(json['employeeId']),
+      secretHash: serializer.fromJson<String>(json['secretHash']),
+      isTemporary: serializer.fromJson<bool>(json['isTemporary']),
+      failedAttempts: serializer.fromJson<int>(json['failedAttempts']),
+      lockedUntil: serializer.fromJson<DateTime?>(json['lockedUntil']),
+      changedAt: serializer.fromJson<DateTime>(json['changedAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'kind': serializer.toJson<String>(kind),
+      'adminUserId': serializer.toJson<String?>(adminUserId),
+      'employeeId': serializer.toJson<String?>(employeeId),
+      'secretHash': serializer.toJson<String>(secretHash),
+      'isTemporary': serializer.toJson<bool>(isTemporary),
+      'failedAttempts': serializer.toJson<int>(failedAttempts),
+      'lockedUntil': serializer.toJson<DateTime?>(lockedUntil),
+      'changedAt': serializer.toJson<DateTime>(changedAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  CredentialRow copyWith({
+    String? id,
+    String? kind,
+    Value<String?> adminUserId = const Value.absent(),
+    Value<String?> employeeId = const Value.absent(),
+    String? secretHash,
+    bool? isTemporary,
+    int? failedAttempts,
+    Value<DateTime?> lockedUntil = const Value.absent(),
+    DateTime? changedAt,
+    DateTime? updatedAt,
+  }) => CredentialRow(
+    id: id ?? this.id,
+    kind: kind ?? this.kind,
+    adminUserId: adminUserId.present ? adminUserId.value : this.adminUserId,
+    employeeId: employeeId.present ? employeeId.value : this.employeeId,
+    secretHash: secretHash ?? this.secretHash,
+    isTemporary: isTemporary ?? this.isTemporary,
+    failedAttempts: failedAttempts ?? this.failedAttempts,
+    lockedUntil: lockedUntil.present ? lockedUntil.value : this.lockedUntil,
+    changedAt: changedAt ?? this.changedAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  CredentialRow copyWithCompanion(CredentialsCompanion data) {
+    return CredentialRow(
+      id: data.id.present ? data.id.value : this.id,
+      kind: data.kind.present ? data.kind.value : this.kind,
+      adminUserId: data.adminUserId.present
+          ? data.adminUserId.value
+          : this.adminUserId,
+      employeeId: data.employeeId.present
+          ? data.employeeId.value
+          : this.employeeId,
+      secretHash: data.secretHash.present
+          ? data.secretHash.value
+          : this.secretHash,
+      isTemporary: data.isTemporary.present
+          ? data.isTemporary.value
+          : this.isTemporary,
+      failedAttempts: data.failedAttempts.present
+          ? data.failedAttempts.value
+          : this.failedAttempts,
+      lockedUntil: data.lockedUntil.present
+          ? data.lockedUntil.value
+          : this.lockedUntil,
+      changedAt: data.changedAt.present ? data.changedAt.value : this.changedAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CredentialRow(')
+          ..write('id: $id, ')
+          ..write('kind: $kind, ')
+          ..write('adminUserId: $adminUserId, ')
+          ..write('employeeId: $employeeId, ')
+          ..write('secretHash: $secretHash, ')
+          ..write('isTemporary: $isTemporary, ')
+          ..write('failedAttempts: $failedAttempts, ')
+          ..write('lockedUntil: $lockedUntil, ')
+          ..write('changedAt: $changedAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    kind,
+    adminUserId,
+    employeeId,
+    secretHash,
+    isTemporary,
+    failedAttempts,
+    lockedUntil,
+    changedAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CredentialRow &&
+          other.id == this.id &&
+          other.kind == this.kind &&
+          other.adminUserId == this.adminUserId &&
+          other.employeeId == this.employeeId &&
+          other.secretHash == this.secretHash &&
+          other.isTemporary == this.isTemporary &&
+          other.failedAttempts == this.failedAttempts &&
+          other.lockedUntil == this.lockedUntil &&
+          other.changedAt == this.changedAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class CredentialsCompanion extends UpdateCompanion<CredentialRow> {
+  final Value<String> id;
+  final Value<String> kind;
+  final Value<String?> adminUserId;
+  final Value<String?> employeeId;
+  final Value<String> secretHash;
+  final Value<bool> isTemporary;
+  final Value<int> failedAttempts;
+  final Value<DateTime?> lockedUntil;
+  final Value<DateTime> changedAt;
+  final Value<DateTime> updatedAt;
+  final Value<int> rowid;
+  const CredentialsCompanion({
+    this.id = const Value.absent(),
+    this.kind = const Value.absent(),
+    this.adminUserId = const Value.absent(),
+    this.employeeId = const Value.absent(),
+    this.secretHash = const Value.absent(),
+    this.isTemporary = const Value.absent(),
+    this.failedAttempts = const Value.absent(),
+    this.lockedUntil = const Value.absent(),
+    this.changedAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  CredentialsCompanion.insert({
+    required String id,
+    required String kind,
+    this.adminUserId = const Value.absent(),
+    this.employeeId = const Value.absent(),
+    required String secretHash,
+    this.isTemporary = const Value.absent(),
+    this.failedAttempts = const Value.absent(),
+    this.lockedUntil = const Value.absent(),
+    required DateTime changedAt,
+    required DateTime updatedAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       kind = Value(kind),
+       secretHash = Value(secretHash),
+       changedAt = Value(changedAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<CredentialRow> custom({
+    Expression<String>? id,
+    Expression<String>? kind,
+    Expression<String>? adminUserId,
+    Expression<String>? employeeId,
+    Expression<String>? secretHash,
+    Expression<bool>? isTemporary,
+    Expression<int>? failedAttempts,
+    Expression<DateTime>? lockedUntil,
+    Expression<DateTime>? changedAt,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (kind != null) 'kind': kind,
+      if (adminUserId != null) 'admin_user_id': adminUserId,
+      if (employeeId != null) 'employee_id': employeeId,
+      if (secretHash != null) 'secret_hash': secretHash,
+      if (isTemporary != null) 'is_temporary': isTemporary,
+      if (failedAttempts != null) 'failed_attempts': failedAttempts,
+      if (lockedUntil != null) 'locked_until': lockedUntil,
+      if (changedAt != null) 'changed_at': changedAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  CredentialsCompanion copyWith({
+    Value<String>? id,
+    Value<String>? kind,
+    Value<String?>? adminUserId,
+    Value<String?>? employeeId,
+    Value<String>? secretHash,
+    Value<bool>? isTemporary,
+    Value<int>? failedAttempts,
+    Value<DateTime?>? lockedUntil,
+    Value<DateTime>? changedAt,
+    Value<DateTime>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return CredentialsCompanion(
+      id: id ?? this.id,
+      kind: kind ?? this.kind,
+      adminUserId: adminUserId ?? this.adminUserId,
+      employeeId: employeeId ?? this.employeeId,
+      secretHash: secretHash ?? this.secretHash,
+      isTemporary: isTemporary ?? this.isTemporary,
+      failedAttempts: failedAttempts ?? this.failedAttempts,
+      lockedUntil: lockedUntil ?? this.lockedUntil,
+      changedAt: changedAt ?? this.changedAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (kind.present) {
+      map['kind'] = Variable<String>(kind.value);
+    }
+    if (adminUserId.present) {
+      map['admin_user_id'] = Variable<String>(adminUserId.value);
+    }
+    if (employeeId.present) {
+      map['employee_id'] = Variable<String>(employeeId.value);
+    }
+    if (secretHash.present) {
+      map['secret_hash'] = Variable<String>(secretHash.value);
+    }
+    if (isTemporary.present) {
+      map['is_temporary'] = Variable<bool>(isTemporary.value);
+    }
+    if (failedAttempts.present) {
+      map['failed_attempts'] = Variable<int>(failedAttempts.value);
+    }
+    if (lockedUntil.present) {
+      map['locked_until'] = Variable<DateTime>(lockedUntil.value);
+    }
+    if (changedAt.present) {
+      map['changed_at'] = Variable<DateTime>(changedAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CredentialsCompanion(')
+          ..write('id: $id, ')
+          ..write('kind: $kind, ')
+          ..write('adminUserId: $adminUserId, ')
+          ..write('employeeId: $employeeId, ')
+          ..write('secretHash: $secretHash, ')
+          ..write('isTemporary: $isTemporary, ')
+          ..write('failedAttempts: $failedAttempts, ')
+          ..write('lockedUntil: $lockedUntil, ')
+          ..write('changedAt: $changedAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $AuditLogTable extends AuditLog
+    with TableInfo<$AuditLogTable, AuditLogRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AuditLogTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _companyIdMeta = const VerificationMeta(
+    'companyId',
+  );
+  @override
+  late final GeneratedColumn<String> companyId = GeneratedColumn<String>(
+    'company_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES companies (id)',
+    ),
+  );
+  static const VerificationMeta _actorTypeMeta = const VerificationMeta(
+    'actorType',
+  );
+  @override
+  late final GeneratedColumn<String> actorType = GeneratedColumn<String>(
+    'actor_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _actorIdMeta = const VerificationMeta(
+    'actorId',
+  );
+  @override
+  late final GeneratedColumn<String> actorId = GeneratedColumn<String>(
+    'actor_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _actionMeta = const VerificationMeta('action');
+  @override
+  late final GeneratedColumn<String> action = GeneratedColumn<String>(
+    'action',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _entityTypeMeta = const VerificationMeta(
+    'entityType',
+  );
+  @override
+  late final GeneratedColumn<String> entityType = GeneratedColumn<String>(
+    'entity_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _entityIdMeta = const VerificationMeta(
+    'entityId',
+  );
+  @override
+  late final GeneratedColumn<String> entityId = GeneratedColumn<String>(
+    'entity_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _occurredAtMeta = const VerificationMeta(
+    'occurredAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> occurredAt = GeneratedColumn<DateTime>(
+    'occurred_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deviceIdMeta = const VerificationMeta(
+    'deviceId',
+  );
+  @override
+  late final GeneratedColumn<String> deviceId = GeneratedColumn<String>(
+    'device_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _metadataMeta = const VerificationMeta(
+    'metadata',
+  );
+  @override
+  late final GeneratedColumn<String> metadata = GeneratedColumn<String>(
+    'metadata',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<SyncState, String> syncState =
+      GeneratedColumn<String>(
+        'sync_state',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: Constant(SyncState.localOnly.name),
+      ).withConverter<SyncState>($AuditLogTable.$convertersyncState);
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    companyId,
+    actorType,
+    actorId,
+    action,
+    entityType,
+    entityId,
+    occurredAt,
+    deviceId,
+    metadata,
+    syncState,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'audit_log';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<AuditLogRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('company_id')) {
+      context.handle(
+        _companyIdMeta,
+        companyId.isAcceptableOrUnknown(data['company_id']!, _companyIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_companyIdMeta);
+    }
+    if (data.containsKey('actor_type')) {
+      context.handle(
+        _actorTypeMeta,
+        actorType.isAcceptableOrUnknown(data['actor_type']!, _actorTypeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_actorTypeMeta);
+    }
+    if (data.containsKey('actor_id')) {
+      context.handle(
+        _actorIdMeta,
+        actorId.isAcceptableOrUnknown(data['actor_id']!, _actorIdMeta),
+      );
+    }
+    if (data.containsKey('action')) {
+      context.handle(
+        _actionMeta,
+        action.isAcceptableOrUnknown(data['action']!, _actionMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_actionMeta);
+    }
+    if (data.containsKey('entity_type')) {
+      context.handle(
+        _entityTypeMeta,
+        entityType.isAcceptableOrUnknown(data['entity_type']!, _entityTypeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_entityTypeMeta);
+    }
+    if (data.containsKey('entity_id')) {
+      context.handle(
+        _entityIdMeta,
+        entityId.isAcceptableOrUnknown(data['entity_id']!, _entityIdMeta),
+      );
+    }
+    if (data.containsKey('occurred_at')) {
+      context.handle(
+        _occurredAtMeta,
+        occurredAt.isAcceptableOrUnknown(data['occurred_at']!, _occurredAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_occurredAtMeta);
+    }
+    if (data.containsKey('device_id')) {
+      context.handle(
+        _deviceIdMeta,
+        deviceId.isAcceptableOrUnknown(data['device_id']!, _deviceIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_deviceIdMeta);
+    }
+    if (data.containsKey('metadata')) {
+      context.handle(
+        _metadataMeta,
+        metadata.isAcceptableOrUnknown(data['metadata']!, _metadataMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  AuditLogRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return AuditLogRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      companyId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}company_id'],
+      )!,
+      actorType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}actor_type'],
+      )!,
+      actorId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}actor_id'],
+      ),
+      action: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}action'],
+      )!,
+      entityType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}entity_type'],
+      )!,
+      entityId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}entity_id'],
+      ),
+      occurredAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}occurred_at'],
+      )!,
+      deviceId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}device_id'],
+      )!,
+      metadata: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}metadata'],
+      ),
+      syncState: $AuditLogTable.$convertersyncState.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}sync_state'],
+        )!,
+      ),
+    );
+  }
+
+  @override
+  $AuditLogTable createAlias(String alias) {
+    return $AuditLogTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<SyncState, String, String> $convertersyncState =
+      const EnumNameConverter<SyncState>(SyncState.values);
+}
+
+class AuditLogRow extends DataClass implements Insertable<AuditLogRow> {
+  final String id;
+  final String companyId;
+
+  /// `admin`, `employee` or `system`.
+  final String actorType;
+  final String? actorId;
+
+  /// Stable dotted code, for example `employee.pin_reset`.
+  final String action;
+  final String entityType;
+  final String? entityId;
+  final DateTime occurredAt;
+  final String deviceId;
+
+  /// JSON object with non-sensitive details, or null.
+  final String? metadata;
+  final SyncState syncState;
+  const AuditLogRow({
+    required this.id,
+    required this.companyId,
+    required this.actorType,
+    this.actorId,
+    required this.action,
+    required this.entityType,
+    this.entityId,
+    required this.occurredAt,
+    required this.deviceId,
+    this.metadata,
+    required this.syncState,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['company_id'] = Variable<String>(companyId);
+    map['actor_type'] = Variable<String>(actorType);
+    if (!nullToAbsent || actorId != null) {
+      map['actor_id'] = Variable<String>(actorId);
+    }
+    map['action'] = Variable<String>(action);
+    map['entity_type'] = Variable<String>(entityType);
+    if (!nullToAbsent || entityId != null) {
+      map['entity_id'] = Variable<String>(entityId);
+    }
+    map['occurred_at'] = Variable<DateTime>(occurredAt);
+    map['device_id'] = Variable<String>(deviceId);
+    if (!nullToAbsent || metadata != null) {
+      map['metadata'] = Variable<String>(metadata);
+    }
+    {
+      map['sync_state'] = Variable<String>(
+        $AuditLogTable.$convertersyncState.toSql(syncState),
+      );
+    }
+    return map;
+  }
+
+  AuditLogCompanion toCompanion(bool nullToAbsent) {
+    return AuditLogCompanion(
+      id: Value(id),
+      companyId: Value(companyId),
+      actorType: Value(actorType),
+      actorId: actorId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(actorId),
+      action: Value(action),
+      entityType: Value(entityType),
+      entityId: entityId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(entityId),
+      occurredAt: Value(occurredAt),
+      deviceId: Value(deviceId),
+      metadata: metadata == null && nullToAbsent
+          ? const Value.absent()
+          : Value(metadata),
+      syncState: Value(syncState),
+    );
+  }
+
+  factory AuditLogRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return AuditLogRow(
+      id: serializer.fromJson<String>(json['id']),
+      companyId: serializer.fromJson<String>(json['companyId']),
+      actorType: serializer.fromJson<String>(json['actorType']),
+      actorId: serializer.fromJson<String?>(json['actorId']),
+      action: serializer.fromJson<String>(json['action']),
+      entityType: serializer.fromJson<String>(json['entityType']),
+      entityId: serializer.fromJson<String?>(json['entityId']),
+      occurredAt: serializer.fromJson<DateTime>(json['occurredAt']),
+      deviceId: serializer.fromJson<String>(json['deviceId']),
+      metadata: serializer.fromJson<String?>(json['metadata']),
+      syncState: $AuditLogTable.$convertersyncState.fromJson(
+        serializer.fromJson<String>(json['syncState']),
+      ),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'companyId': serializer.toJson<String>(companyId),
+      'actorType': serializer.toJson<String>(actorType),
+      'actorId': serializer.toJson<String?>(actorId),
+      'action': serializer.toJson<String>(action),
+      'entityType': serializer.toJson<String>(entityType),
+      'entityId': serializer.toJson<String?>(entityId),
+      'occurredAt': serializer.toJson<DateTime>(occurredAt),
+      'deviceId': serializer.toJson<String>(deviceId),
+      'metadata': serializer.toJson<String?>(metadata),
+      'syncState': serializer.toJson<String>(
+        $AuditLogTable.$convertersyncState.toJson(syncState),
+      ),
+    };
+  }
+
+  AuditLogRow copyWith({
+    String? id,
+    String? companyId,
+    String? actorType,
+    Value<String?> actorId = const Value.absent(),
+    String? action,
+    String? entityType,
+    Value<String?> entityId = const Value.absent(),
+    DateTime? occurredAt,
+    String? deviceId,
+    Value<String?> metadata = const Value.absent(),
+    SyncState? syncState,
+  }) => AuditLogRow(
+    id: id ?? this.id,
+    companyId: companyId ?? this.companyId,
+    actorType: actorType ?? this.actorType,
+    actorId: actorId.present ? actorId.value : this.actorId,
+    action: action ?? this.action,
+    entityType: entityType ?? this.entityType,
+    entityId: entityId.present ? entityId.value : this.entityId,
+    occurredAt: occurredAt ?? this.occurredAt,
+    deviceId: deviceId ?? this.deviceId,
+    metadata: metadata.present ? metadata.value : this.metadata,
+    syncState: syncState ?? this.syncState,
+  );
+  AuditLogRow copyWithCompanion(AuditLogCompanion data) {
+    return AuditLogRow(
+      id: data.id.present ? data.id.value : this.id,
+      companyId: data.companyId.present ? data.companyId.value : this.companyId,
+      actorType: data.actorType.present ? data.actorType.value : this.actorType,
+      actorId: data.actorId.present ? data.actorId.value : this.actorId,
+      action: data.action.present ? data.action.value : this.action,
+      entityType: data.entityType.present
+          ? data.entityType.value
+          : this.entityType,
+      entityId: data.entityId.present ? data.entityId.value : this.entityId,
+      occurredAt: data.occurredAt.present
+          ? data.occurredAt.value
+          : this.occurredAt,
+      deviceId: data.deviceId.present ? data.deviceId.value : this.deviceId,
+      metadata: data.metadata.present ? data.metadata.value : this.metadata,
+      syncState: data.syncState.present ? data.syncState.value : this.syncState,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AuditLogRow(')
+          ..write('id: $id, ')
+          ..write('companyId: $companyId, ')
+          ..write('actorType: $actorType, ')
+          ..write('actorId: $actorId, ')
+          ..write('action: $action, ')
+          ..write('entityType: $entityType, ')
+          ..write('entityId: $entityId, ')
+          ..write('occurredAt: $occurredAt, ')
+          ..write('deviceId: $deviceId, ')
+          ..write('metadata: $metadata, ')
+          ..write('syncState: $syncState')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    companyId,
+    actorType,
+    actorId,
+    action,
+    entityType,
+    entityId,
+    occurredAt,
+    deviceId,
+    metadata,
+    syncState,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is AuditLogRow &&
+          other.id == this.id &&
+          other.companyId == this.companyId &&
+          other.actorType == this.actorType &&
+          other.actorId == this.actorId &&
+          other.action == this.action &&
+          other.entityType == this.entityType &&
+          other.entityId == this.entityId &&
+          other.occurredAt == this.occurredAt &&
+          other.deviceId == this.deviceId &&
+          other.metadata == this.metadata &&
+          other.syncState == this.syncState);
+}
+
+class AuditLogCompanion extends UpdateCompanion<AuditLogRow> {
+  final Value<String> id;
+  final Value<String> companyId;
+  final Value<String> actorType;
+  final Value<String?> actorId;
+  final Value<String> action;
+  final Value<String> entityType;
+  final Value<String?> entityId;
+  final Value<DateTime> occurredAt;
+  final Value<String> deviceId;
+  final Value<String?> metadata;
+  final Value<SyncState> syncState;
+  final Value<int> rowid;
+  const AuditLogCompanion({
+    this.id = const Value.absent(),
+    this.companyId = const Value.absent(),
+    this.actorType = const Value.absent(),
+    this.actorId = const Value.absent(),
+    this.action = const Value.absent(),
+    this.entityType = const Value.absent(),
+    this.entityId = const Value.absent(),
+    this.occurredAt = const Value.absent(),
+    this.deviceId = const Value.absent(),
+    this.metadata = const Value.absent(),
+    this.syncState = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  AuditLogCompanion.insert({
+    required String id,
+    required String companyId,
+    required String actorType,
+    this.actorId = const Value.absent(),
+    required String action,
+    required String entityType,
+    this.entityId = const Value.absent(),
+    required DateTime occurredAt,
+    required String deviceId,
+    this.metadata = const Value.absent(),
+    this.syncState = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       companyId = Value(companyId),
+       actorType = Value(actorType),
+       action = Value(action),
+       entityType = Value(entityType),
+       occurredAt = Value(occurredAt),
+       deviceId = Value(deviceId);
+  static Insertable<AuditLogRow> custom({
+    Expression<String>? id,
+    Expression<String>? companyId,
+    Expression<String>? actorType,
+    Expression<String>? actorId,
+    Expression<String>? action,
+    Expression<String>? entityType,
+    Expression<String>? entityId,
+    Expression<DateTime>? occurredAt,
+    Expression<String>? deviceId,
+    Expression<String>? metadata,
+    Expression<String>? syncState,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (companyId != null) 'company_id': companyId,
+      if (actorType != null) 'actor_type': actorType,
+      if (actorId != null) 'actor_id': actorId,
+      if (action != null) 'action': action,
+      if (entityType != null) 'entity_type': entityType,
+      if (entityId != null) 'entity_id': entityId,
+      if (occurredAt != null) 'occurred_at': occurredAt,
+      if (deviceId != null) 'device_id': deviceId,
+      if (metadata != null) 'metadata': metadata,
+      if (syncState != null) 'sync_state': syncState,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  AuditLogCompanion copyWith({
+    Value<String>? id,
+    Value<String>? companyId,
+    Value<String>? actorType,
+    Value<String?>? actorId,
+    Value<String>? action,
+    Value<String>? entityType,
+    Value<String?>? entityId,
+    Value<DateTime>? occurredAt,
+    Value<String>? deviceId,
+    Value<String?>? metadata,
+    Value<SyncState>? syncState,
+    Value<int>? rowid,
+  }) {
+    return AuditLogCompanion(
+      id: id ?? this.id,
+      companyId: companyId ?? this.companyId,
+      actorType: actorType ?? this.actorType,
+      actorId: actorId ?? this.actorId,
+      action: action ?? this.action,
+      entityType: entityType ?? this.entityType,
+      entityId: entityId ?? this.entityId,
+      occurredAt: occurredAt ?? this.occurredAt,
+      deviceId: deviceId ?? this.deviceId,
+      metadata: metadata ?? this.metadata,
+      syncState: syncState ?? this.syncState,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (companyId.present) {
+      map['company_id'] = Variable<String>(companyId.value);
+    }
+    if (actorType.present) {
+      map['actor_type'] = Variable<String>(actorType.value);
+    }
+    if (actorId.present) {
+      map['actor_id'] = Variable<String>(actorId.value);
+    }
+    if (action.present) {
+      map['action'] = Variable<String>(action.value);
+    }
+    if (entityType.present) {
+      map['entity_type'] = Variable<String>(entityType.value);
+    }
+    if (entityId.present) {
+      map['entity_id'] = Variable<String>(entityId.value);
+    }
+    if (occurredAt.present) {
+      map['occurred_at'] = Variable<DateTime>(occurredAt.value);
+    }
+    if (deviceId.present) {
+      map['device_id'] = Variable<String>(deviceId.value);
+    }
+    if (metadata.present) {
+      map['metadata'] = Variable<String>(metadata.value);
+    }
+    if (syncState.present) {
+      map['sync_state'] = Variable<String>(
+        $AuditLogTable.$convertersyncState.toSql(syncState.value),
+      );
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AuditLogCompanion(')
+          ..write('id: $id, ')
+          ..write('companyId: $companyId, ')
+          ..write('actorType: $actorType, ')
+          ..write('actorId: $actorId, ')
+          ..write('action: $action, ')
+          ..write('entityType: $entityType, ')
+          ..write('entityId: $entityId, ')
+          ..write('occurredAt: $occurredAt, ')
+          ..write('deviceId: $deviceId, ')
+          ..write('metadata: $metadata, ')
+          ..write('syncState: $syncState, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $DeviceIdentityTable extends DeviceIdentity
+    with TableInfo<$DeviceIdentityTable, DeviceIdentityRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $DeviceIdentityTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, createdAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'device_identity';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<DeviceIdentityRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  DeviceIdentityRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return DeviceIdentityRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $DeviceIdentityTable createAlias(String alias) {
+    return $DeviceIdentityTable(attachedDatabase, alias);
+  }
+}
+
+class DeviceIdentityRow extends DataClass
+    implements Insertable<DeviceIdentityRow> {
+  final String id;
+  final DateTime createdAt;
+  const DeviceIdentityRow({required this.id, required this.createdAt});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  DeviceIdentityCompanion toCompanion(bool nullToAbsent) {
+    return DeviceIdentityCompanion(id: Value(id), createdAt: Value(createdAt));
+  }
+
+  factory DeviceIdentityRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return DeviceIdentityRow(
+      id: serializer.fromJson<String>(json['id']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  DeviceIdentityRow copyWith({String? id, DateTime? createdAt}) =>
+      DeviceIdentityRow(
+        id: id ?? this.id,
+        createdAt: createdAt ?? this.createdAt,
+      );
+  DeviceIdentityRow copyWithCompanion(DeviceIdentityCompanion data) {
+    return DeviceIdentityRow(
+      id: data.id.present ? data.id.value : this.id,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DeviceIdentityRow(')
+          ..write('id: $id, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is DeviceIdentityRow &&
+          other.id == this.id &&
+          other.createdAt == this.createdAt);
+}
+
+class DeviceIdentityCompanion extends UpdateCompanion<DeviceIdentityRow> {
+  final Value<String> id;
+  final Value<DateTime> createdAt;
+  final Value<int> rowid;
+  const DeviceIdentityCompanion({
+    this.id = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  DeviceIdentityCompanion.insert({
+    required String id,
+    required DateTime createdAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       createdAt = Value(createdAt);
+  static Insertable<DeviceIdentityRow> custom({
+    Expression<String>? id,
+    Expression<DateTime>? createdAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (createdAt != null) 'created_at': createdAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  DeviceIdentityCompanion copyWith({
+    Value<String>? id,
+    Value<DateTime>? createdAt,
+    Value<int>? rowid,
+  }) {
+    return DeviceIdentityCompanion(
+      id: id ?? this.id,
+      createdAt: createdAt ?? this.createdAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DeviceIdentityCompanion(')
+          ..write('id: $id, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -3385,6 +4915,17 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $AdminUsersTable adminUsers = $AdminUsersTable(this);
   late final $EmployeesTable employees = $EmployeesTable(this);
   late final $EmployeeRatesTable employeeRates = $EmployeeRatesTable(this);
+  late final $CredentialsTable credentials = $CredentialsTable(this);
+  late final $AuditLogTable auditLog = $AuditLogTable(this);
+  late final $DeviceIdentityTable deviceIdentity = $DeviceIdentityTable(this);
+  late final Index auditLogCompanyTime = Index(
+    'audit_log_company_time',
+    'CREATE INDEX audit_log_company_time ON audit_log (company_id, occurred_at)',
+  );
+  late final Index auditLogEntity = Index(
+    'audit_log_entity',
+    'CREATE INDEX audit_log_entity ON audit_log (entity_type, entity_id)',
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -3394,6 +4935,11 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     adminUsers,
     employees,
     employeeRates,
+    credentials,
+    auditLog,
+    deviceIdentity,
+    auditLogCompanyTime,
+    auditLogEntity,
   ];
   @override
   DriftDatabaseOptions get options =>
@@ -3474,6 +5020,24 @@ final class $$CompaniesTableReferences
     ).filter((f) => f.companyId.id.sqlEquals($_itemColumn<String>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_employeesRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$AuditLogTable, List<AuditLogRow>>
+  _auditLogRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.auditLog,
+    aliasName: 'companies__id__audit_log__company_id',
+  );
+
+  $$AuditLogTableProcessedTableManager get auditLogRefs {
+    final manager = $$AuditLogTableTableManager(
+      $_db,
+      $_db.auditLog,
+    ).filter((f) => f.companyId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_auditLogRefsTable($_db));
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -3606,6 +5170,31 @@ class $$CompaniesTableFilterComposer
           }) => $$EmployeesTableFilterComposer(
             $db: $db,
             $table: $db.employees,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> auditLogRefs(
+    Expression<bool> Function($$AuditLogTableFilterComposer f) f,
+  ) {
+    final $$AuditLogTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.auditLog,
+      getReferencedColumn: (t) => t.companyId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AuditLogTableFilterComposer(
+            $db: $db,
+            $table: $db.auditLog,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -3808,6 +5397,31 @@ class $$CompaniesTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> auditLogRefs<T extends Object>(
+    Expression<T> Function($$AuditLogTableAnnotationComposer a) f,
+  ) {
+    final $$AuditLogTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.auditLog,
+      getReferencedColumn: (t) => t.companyId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AuditLogTableAnnotationComposer(
+            $db: $db,
+            $table: $db.auditLog,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$CompaniesTableTableManager
@@ -3823,7 +5437,11 @@ class $$CompaniesTableTableManager
           $$CompaniesTableUpdateCompanionBuilder,
           (CompanyRow, $$CompaniesTableReferences),
           CompanyRow,
-          PrefetchHooks Function({bool adminUsersRefs, bool employeesRefs})
+          PrefetchHooks Function({
+            bool adminUsersRefs,
+            bool employeesRefs,
+            bool auditLogRefs,
+          })
         > {
   $$CompaniesTableTableManager(_$AppDatabase db, $CompaniesTable table)
     : super(
@@ -3917,12 +5535,17 @@ class $$CompaniesTableTableManager
               )
               .toList(),
           prefetchHooksCallback:
-              ({adminUsersRefs = false, employeesRefs = false}) {
+              ({
+                adminUsersRefs = false,
+                employeesRefs = false,
+                auditLogRefs = false,
+              }) {
                 return PrefetchHooks(
                   db: db,
                   explicitlyWatchedTables: [
                     if (adminUsersRefs) db.adminUsers,
                     if (employeesRefs) db.employees,
+                    if (auditLogRefs) db.auditLog,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
@@ -3969,6 +5592,27 @@ class $$CompaniesTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (auditLogRefs)
+                        await $_getPrefetchedData<
+                          CompanyRow,
+                          $CompaniesTable,
+                          AuditLogRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$CompaniesTableReferences
+                              ._auditLogRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$CompaniesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).auditLogRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.companyId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -3989,7 +5633,11 @@ typedef $$CompaniesTableProcessedTableManager =
       $$CompaniesTableUpdateCompanionBuilder,
       (CompanyRow, $$CompaniesTableReferences),
       CompanyRow,
-      PrefetchHooks Function({bool adminUsersRefs, bool employeesRefs})
+      PrefetchHooks Function({
+        bool adminUsersRefs,
+        bool employeesRefs,
+        bool auditLogRefs,
+      })
     >;
 typedef $$AdminUsersTableCreateCompanionBuilder =
     AdminUsersCompanion Function({
@@ -4042,6 +5690,24 @@ final class $$AdminUsersTableReferences
     if (item == null) return manager;
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static MultiTypedResultKey<$CredentialsTable, List<CredentialRow>>
+  _credentialsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.credentials,
+    aliasName: 'admin_users__id__credentials__admin_user_id',
+  );
+
+  $$CredentialsTableProcessedTableManager get credentialsRefs {
+    final manager = $$CredentialsTableTableManager(
+      $_db,
+      $_db.credentials,
+    ).filter((f) => f.adminUserId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_credentialsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
     );
   }
 }
@@ -4132,6 +5798,31 @@ class $$AdminUsersTableFilterComposer
           ),
     );
     return composer;
+  }
+
+  Expression<bool> credentialsRefs(
+    Expression<bool> Function($$CredentialsTableFilterComposer f) f,
+  ) {
+    final $$CredentialsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.credentials,
+      getReferencedColumn: (t) => t.adminUserId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CredentialsTableFilterComposer(
+            $db: $db,
+            $table: $db.credentials,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
   }
 }
 
@@ -4291,6 +5982,31 @@ class $$AdminUsersTableAnnotationComposer
     );
     return composer;
   }
+
+  Expression<T> credentialsRefs<T extends Object>(
+    Expression<T> Function($$CredentialsTableAnnotationComposer a) f,
+  ) {
+    final $$CredentialsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.credentials,
+      getReferencedColumn: (t) => t.adminUserId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CredentialsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.credentials,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$AdminUsersTableTableManager
@@ -4306,7 +6022,7 @@ class $$AdminUsersTableTableManager
           $$AdminUsersTableUpdateCompanionBuilder,
           (AdminUserRow, $$AdminUsersTableReferences),
           AdminUserRow,
-          PrefetchHooks Function({bool companyId})
+          PrefetchHooks Function({bool companyId, bool credentialsRefs})
         > {
   $$AdminUsersTableTableManager(_$AppDatabase db, $AdminUsersTable table)
     : super(
@@ -4387,47 +6103,73 @@ class $$AdminUsersTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({companyId = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [],
-              addJoins:
-                  <
-                    T extends TableManagerState<
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic
-                    >
-                  >(state) {
-                    if (companyId) {
-                      state =
-                          state.withJoin(
-                                currentTable: table,
-                                currentColumn: table.companyId,
-                                referencedTable: $$AdminUsersTableReferences
-                                    ._companyIdTable(db),
-                                referencedColumn: $$AdminUsersTableReferences
-                                    ._companyIdTable(db)
-                                    .id,
-                              )
-                              as T;
-                    }
+          prefetchHooksCallback:
+              ({companyId = false, credentialsRefs = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (credentialsRefs) db.credentials,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (companyId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.companyId,
+                                    referencedTable: $$AdminUsersTableReferences
+                                        ._companyIdTable(db),
+                                    referencedColumn:
+                                        $$AdminUsersTableReferences
+                                            ._companyIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
 
-                    return state;
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (credentialsRefs)
+                        await $_getPrefetchedData<
+                          AdminUserRow,
+                          $AdminUsersTable,
+                          CredentialRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$AdminUsersTableReferences
+                              ._credentialsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$AdminUsersTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).credentialsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.adminUserId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
                   },
-              getPrefetchedDataCallback: (items) async {
-                return [];
+                );
               },
-            );
-          },
         ),
       );
 }
@@ -4444,7 +6186,7 @@ typedef $$AdminUsersTableProcessedTableManager =
       $$AdminUsersTableUpdateCompanionBuilder,
       (AdminUserRow, $$AdminUsersTableReferences),
       AdminUserRow,
-      PrefetchHooks Function({bool companyId})
+      PrefetchHooks Function({bool companyId, bool credentialsRefs})
     >;
 typedef $$EmployeesTableCreateCompanionBuilder =
     EmployeesCompanion Function({
@@ -4525,6 +6267,24 @@ final class $$EmployeesTableReferences
     ).filter((f) => f.employeeId.id.sqlEquals($_itemColumn<String>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_employeeRatesRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$CredentialsTable, List<CredentialRow>>
+  _credentialsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.credentials,
+    aliasName: 'employees__id__credentials__employee_id',
+  );
+
+  $$CredentialsTableProcessedTableManager get credentialsRefs {
+    final manager = $$CredentialsTableTableManager(
+      $_db,
+      $_db.credentials,
+    ).filter((f) => f.employeeId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_credentialsRefsTable($_db));
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -4667,6 +6427,31 @@ class $$EmployeesTableFilterComposer
           }) => $$EmployeeRatesTableFilterComposer(
             $db: $db,
             $table: $db.employeeRates,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> credentialsRefs(
+    Expression<bool> Function($$CredentialsTableFilterComposer f) f,
+  ) {
+    final $$CredentialsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.credentials,
+      getReferencedColumn: (t) => t.employeeId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CredentialsTableFilterComposer(
+            $db: $db,
+            $table: $db.credentials,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -4916,6 +6701,31 @@ class $$EmployeesTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> credentialsRefs<T extends Object>(
+    Expression<T> Function($$CredentialsTableAnnotationComposer a) f,
+  ) {
+    final $$CredentialsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.credentials,
+      getReferencedColumn: (t) => t.employeeId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CredentialsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.credentials,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$EmployeesTableTableManager
@@ -4931,7 +6741,11 @@ class $$EmployeesTableTableManager
           $$EmployeesTableUpdateCompanionBuilder,
           (EmployeeRow, $$EmployeesTableReferences),
           EmployeeRow,
-          PrefetchHooks Function({bool companyId, bool employeeRatesRefs})
+          PrefetchHooks Function({
+            bool companyId,
+            bool employeeRatesRefs,
+            bool credentialsRefs,
+          })
         > {
   $$EmployeesTableTableManager(_$AppDatabase db, $EmployeesTable table)
     : super(
@@ -5037,11 +6851,16 @@ class $$EmployeesTableTableManager
               )
               .toList(),
           prefetchHooksCallback:
-              ({companyId = false, employeeRatesRefs = false}) {
+              ({
+                companyId = false,
+                employeeRatesRefs = false,
+                credentialsRefs = false,
+              }) {
                 return PrefetchHooks(
                   db: db,
                   explicitlyWatchedTables: [
                     if (employeeRatesRefs) db.employeeRates,
+                    if (credentialsRefs) db.credentials,
                   ],
                   addJoins:
                       <
@@ -5098,6 +6917,27 @@ class $$EmployeesTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (credentialsRefs)
+                        await $_getPrefetchedData<
+                          EmployeeRow,
+                          $EmployeesTable,
+                          CredentialRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$EmployeesTableReferences
+                              ._credentialsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$EmployeesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).credentialsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.employeeId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -5118,7 +6958,11 @@ typedef $$EmployeesTableProcessedTableManager =
       $$EmployeesTableUpdateCompanionBuilder,
       (EmployeeRow, $$EmployeesTableReferences),
       EmployeeRow,
-      PrefetchHooks Function({bool companyId, bool employeeRatesRefs})
+      PrefetchHooks Function({
+        bool companyId,
+        bool employeeRatesRefs,
+        bool credentialsRefs,
+      })
     >;
 typedef $$EmployeeRatesTableCreateCompanionBuilder =
     EmployeeRatesCompanion Function({
@@ -5588,6 +7432,1106 @@ typedef $$EmployeeRatesTableProcessedTableManager =
       EmployeeRateRow,
       PrefetchHooks Function({bool employeeId})
     >;
+typedef $$CredentialsTableCreateCompanionBuilder =
+    CredentialsCompanion Function({
+      required String id,
+      required String kind,
+      Value<String?> adminUserId,
+      Value<String?> employeeId,
+      required String secretHash,
+      Value<bool> isTemporary,
+      Value<int> failedAttempts,
+      Value<DateTime?> lockedUntil,
+      required DateTime changedAt,
+      required DateTime updatedAt,
+      Value<int> rowid,
+    });
+typedef $$CredentialsTableUpdateCompanionBuilder =
+    CredentialsCompanion Function({
+      Value<String> id,
+      Value<String> kind,
+      Value<String?> adminUserId,
+      Value<String?> employeeId,
+      Value<String> secretHash,
+      Value<bool> isTemporary,
+      Value<int> failedAttempts,
+      Value<DateTime?> lockedUntil,
+      Value<DateTime> changedAt,
+      Value<DateTime> updatedAt,
+      Value<int> rowid,
+    });
+
+final class $$CredentialsTableReferences
+    extends BaseReferences<_$AppDatabase, $CredentialsTable, CredentialRow> {
+  $$CredentialsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $AdminUsersTable _adminUserIdTable(_$AppDatabase db) =>
+      db.adminUsers.createAlias('credentials__admin_user_id__admin_users__id');
+
+  $$AdminUsersTableProcessedTableManager? get adminUserId {
+    final $_column = $_itemColumn<String>('admin_user_id');
+    if ($_column == null) return null;
+    final manager = $$AdminUsersTableTableManager(
+      $_db,
+      $_db.adminUsers,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_adminUserIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $EmployeesTable _employeeIdTable(_$AppDatabase db) =>
+      db.employees.createAlias('credentials__employee_id__employees__id');
+
+  $$EmployeesTableProcessedTableManager? get employeeId {
+    final $_column = $_itemColumn<String>('employee_id');
+    if ($_column == null) return null;
+    final manager = $$EmployeesTableTableManager(
+      $_db,
+      $_db.employees,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_employeeIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$CredentialsTableFilterComposer
+    extends Composer<_$AppDatabase, $CredentialsTable> {
+  $$CredentialsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get secretHash => $composableBuilder(
+    column: $table.secretHash,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isTemporary => $composableBuilder(
+    column: $table.isTemporary,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get failedAttempts => $composableBuilder(
+    column: $table.failedAttempts,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get lockedUntil => $composableBuilder(
+    column: $table.lockedUntil,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get changedAt => $composableBuilder(
+    column: $table.changedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$AdminUsersTableFilterComposer get adminUserId {
+    final $$AdminUsersTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.adminUserId,
+      referencedTable: $db.adminUsers,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AdminUsersTableFilterComposer(
+            $db: $db,
+            $table: $db.adminUsers,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$EmployeesTableFilterComposer get employeeId {
+    final $$EmployeesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.employeeId,
+      referencedTable: $db.employees,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$EmployeesTableFilterComposer(
+            $db: $db,
+            $table: $db.employees,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$CredentialsTableOrderingComposer
+    extends Composer<_$AppDatabase, $CredentialsTable> {
+  $$CredentialsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get secretHash => $composableBuilder(
+    column: $table.secretHash,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isTemporary => $composableBuilder(
+    column: $table.isTemporary,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get failedAttempts => $composableBuilder(
+    column: $table.failedAttempts,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get lockedUntil => $composableBuilder(
+    column: $table.lockedUntil,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get changedAt => $composableBuilder(
+    column: $table.changedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$AdminUsersTableOrderingComposer get adminUserId {
+    final $$AdminUsersTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.adminUserId,
+      referencedTable: $db.adminUsers,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AdminUsersTableOrderingComposer(
+            $db: $db,
+            $table: $db.adminUsers,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$EmployeesTableOrderingComposer get employeeId {
+    final $$EmployeesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.employeeId,
+      referencedTable: $db.employees,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$EmployeesTableOrderingComposer(
+            $db: $db,
+            $table: $db.employees,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$CredentialsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $CredentialsTable> {
+  $$CredentialsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get kind =>
+      $composableBuilder(column: $table.kind, builder: (column) => column);
+
+  GeneratedColumn<String> get secretHash => $composableBuilder(
+    column: $table.secretHash,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get isTemporary => $composableBuilder(
+    column: $table.isTemporary,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get failedAttempts => $composableBuilder(
+    column: $table.failedAttempts,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get lockedUntil => $composableBuilder(
+    column: $table.lockedUntil,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get changedAt =>
+      $composableBuilder(column: $table.changedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  $$AdminUsersTableAnnotationComposer get adminUserId {
+    final $$AdminUsersTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.adminUserId,
+      referencedTable: $db.adminUsers,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AdminUsersTableAnnotationComposer(
+            $db: $db,
+            $table: $db.adminUsers,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$EmployeesTableAnnotationComposer get employeeId {
+    final $$EmployeesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.employeeId,
+      referencedTable: $db.employees,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$EmployeesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.employees,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$CredentialsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $CredentialsTable,
+          CredentialRow,
+          $$CredentialsTableFilterComposer,
+          $$CredentialsTableOrderingComposer,
+          $$CredentialsTableAnnotationComposer,
+          $$CredentialsTableCreateCompanionBuilder,
+          $$CredentialsTableUpdateCompanionBuilder,
+          (CredentialRow, $$CredentialsTableReferences),
+          CredentialRow,
+          PrefetchHooks Function({bool adminUserId, bool employeeId})
+        > {
+  $$CredentialsTableTableManager(_$AppDatabase db, $CredentialsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CredentialsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CredentialsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CredentialsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> kind = const Value.absent(),
+                Value<String?> adminUserId = const Value.absent(),
+                Value<String?> employeeId = const Value.absent(),
+                Value<String> secretHash = const Value.absent(),
+                Value<bool> isTemporary = const Value.absent(),
+                Value<int> failedAttempts = const Value.absent(),
+                Value<DateTime?> lockedUntil = const Value.absent(),
+                Value<DateTime> changedAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => CredentialsCompanion(
+                id: id,
+                kind: kind,
+                adminUserId: adminUserId,
+                employeeId: employeeId,
+                secretHash: secretHash,
+                isTemporary: isTemporary,
+                failedAttempts: failedAttempts,
+                lockedUntil: lockedUntil,
+                changedAt: changedAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String kind,
+                Value<String?> adminUserId = const Value.absent(),
+                Value<String?> employeeId = const Value.absent(),
+                required String secretHash,
+                Value<bool> isTemporary = const Value.absent(),
+                Value<int> failedAttempts = const Value.absent(),
+                Value<DateTime?> lockedUntil = const Value.absent(),
+                required DateTime changedAt,
+                required DateTime updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => CredentialsCompanion.insert(
+                id: id,
+                kind: kind,
+                adminUserId: adminUserId,
+                employeeId: employeeId,
+                secretHash: secretHash,
+                isTemporary: isTemporary,
+                failedAttempts: failedAttempts,
+                lockedUntil: lockedUntil,
+                changedAt: changedAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$CredentialsTable, CredentialRow>(table),
+                  $$CredentialsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({adminUserId = false, employeeId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (adminUserId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.adminUserId,
+                                referencedTable: $$CredentialsTableReferences
+                                    ._adminUserIdTable(db),
+                                referencedColumn: $$CredentialsTableReferences
+                                    ._adminUserIdTable(db)
+                                    .id,
+                              )
+                              as T;
+                    }
+                    if (employeeId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.employeeId,
+                                referencedTable: $$CredentialsTableReferences
+                                    ._employeeIdTable(db),
+                                referencedColumn: $$CredentialsTableReferences
+                                    ._employeeIdTable(db)
+                                    .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$CredentialsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $CredentialsTable,
+      CredentialRow,
+      $$CredentialsTableFilterComposer,
+      $$CredentialsTableOrderingComposer,
+      $$CredentialsTableAnnotationComposer,
+      $$CredentialsTableCreateCompanionBuilder,
+      $$CredentialsTableUpdateCompanionBuilder,
+      (CredentialRow, $$CredentialsTableReferences),
+      CredentialRow,
+      PrefetchHooks Function({bool adminUserId, bool employeeId})
+    >;
+typedef $$AuditLogTableCreateCompanionBuilder =
+    AuditLogCompanion Function({
+      required String id,
+      required String companyId,
+      required String actorType,
+      Value<String?> actorId,
+      required String action,
+      required String entityType,
+      Value<String?> entityId,
+      required DateTime occurredAt,
+      required String deviceId,
+      Value<String?> metadata,
+      Value<SyncState> syncState,
+      Value<int> rowid,
+    });
+typedef $$AuditLogTableUpdateCompanionBuilder =
+    AuditLogCompanion Function({
+      Value<String> id,
+      Value<String> companyId,
+      Value<String> actorType,
+      Value<String?> actorId,
+      Value<String> action,
+      Value<String> entityType,
+      Value<String?> entityId,
+      Value<DateTime> occurredAt,
+      Value<String> deviceId,
+      Value<String?> metadata,
+      Value<SyncState> syncState,
+      Value<int> rowid,
+    });
+
+final class $$AuditLogTableReferences
+    extends BaseReferences<_$AppDatabase, $AuditLogTable, AuditLogRow> {
+  $$AuditLogTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $CompaniesTable _companyIdTable(_$AppDatabase db) =>
+      db.companies.createAlias('audit_log__company_id__companies__id');
+
+  $$CompaniesTableProcessedTableManager get companyId {
+    final $_column = $_itemColumn<String>('company_id')!;
+
+    final manager = $$CompaniesTableTableManager(
+      $_db,
+      $_db.companies,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_companyIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$AuditLogTableFilterComposer
+    extends Composer<_$AppDatabase, $AuditLogTable> {
+  $$AuditLogTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get actorType => $composableBuilder(
+    column: $table.actorType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get actorId => $composableBuilder(
+    column: $table.actorId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get action => $composableBuilder(
+    column: $table.action,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get entityType => $composableBuilder(
+    column: $table.entityType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get entityId => $composableBuilder(
+    column: $table.entityId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get occurredAt => $composableBuilder(
+    column: $table.occurredAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get deviceId => $composableBuilder(
+    column: $table.deviceId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get metadata => $composableBuilder(
+    column: $table.metadata,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<SyncState, SyncState, String> get syncState =>
+      $composableBuilder(
+        column: $table.syncState,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  $$CompaniesTableFilterComposer get companyId {
+    final $$CompaniesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.companyId,
+      referencedTable: $db.companies,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CompaniesTableFilterComposer(
+            $db: $db,
+            $table: $db.companies,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$AuditLogTableOrderingComposer
+    extends Composer<_$AppDatabase, $AuditLogTable> {
+  $$AuditLogTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get actorType => $composableBuilder(
+    column: $table.actorType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get actorId => $composableBuilder(
+    column: $table.actorId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get action => $composableBuilder(
+    column: $table.action,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get entityType => $composableBuilder(
+    column: $table.entityType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get entityId => $composableBuilder(
+    column: $table.entityId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get occurredAt => $composableBuilder(
+    column: $table.occurredAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get deviceId => $composableBuilder(
+    column: $table.deviceId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get metadata => $composableBuilder(
+    column: $table.metadata,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get syncState => $composableBuilder(
+    column: $table.syncState,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$CompaniesTableOrderingComposer get companyId {
+    final $$CompaniesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.companyId,
+      referencedTable: $db.companies,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CompaniesTableOrderingComposer(
+            $db: $db,
+            $table: $db.companies,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$AuditLogTableAnnotationComposer
+    extends Composer<_$AppDatabase, $AuditLogTable> {
+  $$AuditLogTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get actorType =>
+      $composableBuilder(column: $table.actorType, builder: (column) => column);
+
+  GeneratedColumn<String> get actorId =>
+      $composableBuilder(column: $table.actorId, builder: (column) => column);
+
+  GeneratedColumn<String> get action =>
+      $composableBuilder(column: $table.action, builder: (column) => column);
+
+  GeneratedColumn<String> get entityType => $composableBuilder(
+    column: $table.entityType,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get entityId =>
+      $composableBuilder(column: $table.entityId, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get occurredAt => $composableBuilder(
+    column: $table.occurredAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get deviceId =>
+      $composableBuilder(column: $table.deviceId, builder: (column) => column);
+
+  GeneratedColumn<String> get metadata =>
+      $composableBuilder(column: $table.metadata, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<SyncState, String> get syncState =>
+      $composableBuilder(column: $table.syncState, builder: (column) => column);
+
+  $$CompaniesTableAnnotationComposer get companyId {
+    final $$CompaniesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.companyId,
+      referencedTable: $db.companies,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CompaniesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.companies,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$AuditLogTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $AuditLogTable,
+          AuditLogRow,
+          $$AuditLogTableFilterComposer,
+          $$AuditLogTableOrderingComposer,
+          $$AuditLogTableAnnotationComposer,
+          $$AuditLogTableCreateCompanionBuilder,
+          $$AuditLogTableUpdateCompanionBuilder,
+          (AuditLogRow, $$AuditLogTableReferences),
+          AuditLogRow,
+          PrefetchHooks Function({bool companyId})
+        > {
+  $$AuditLogTableTableManager(_$AppDatabase db, $AuditLogTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$AuditLogTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$AuditLogTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$AuditLogTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> companyId = const Value.absent(),
+                Value<String> actorType = const Value.absent(),
+                Value<String?> actorId = const Value.absent(),
+                Value<String> action = const Value.absent(),
+                Value<String> entityType = const Value.absent(),
+                Value<String?> entityId = const Value.absent(),
+                Value<DateTime> occurredAt = const Value.absent(),
+                Value<String> deviceId = const Value.absent(),
+                Value<String?> metadata = const Value.absent(),
+                Value<SyncState> syncState = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => AuditLogCompanion(
+                id: id,
+                companyId: companyId,
+                actorType: actorType,
+                actorId: actorId,
+                action: action,
+                entityType: entityType,
+                entityId: entityId,
+                occurredAt: occurredAt,
+                deviceId: deviceId,
+                metadata: metadata,
+                syncState: syncState,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String companyId,
+                required String actorType,
+                Value<String?> actorId = const Value.absent(),
+                required String action,
+                required String entityType,
+                Value<String?> entityId = const Value.absent(),
+                required DateTime occurredAt,
+                required String deviceId,
+                Value<String?> metadata = const Value.absent(),
+                Value<SyncState> syncState = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => AuditLogCompanion.insert(
+                id: id,
+                companyId: companyId,
+                actorType: actorType,
+                actorId: actorId,
+                action: action,
+                entityType: entityType,
+                entityId: entityId,
+                occurredAt: occurredAt,
+                deviceId: deviceId,
+                metadata: metadata,
+                syncState: syncState,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$AuditLogTable, AuditLogRow>(table),
+                  $$AuditLogTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({companyId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (companyId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.companyId,
+                                referencedTable: $$AuditLogTableReferences
+                                    ._companyIdTable(db),
+                                referencedColumn: $$AuditLogTableReferences
+                                    ._companyIdTable(db)
+                                    .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$AuditLogTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $AuditLogTable,
+      AuditLogRow,
+      $$AuditLogTableFilterComposer,
+      $$AuditLogTableOrderingComposer,
+      $$AuditLogTableAnnotationComposer,
+      $$AuditLogTableCreateCompanionBuilder,
+      $$AuditLogTableUpdateCompanionBuilder,
+      (AuditLogRow, $$AuditLogTableReferences),
+      AuditLogRow,
+      PrefetchHooks Function({bool companyId})
+    >;
+typedef $$DeviceIdentityTableCreateCompanionBuilder =
+    DeviceIdentityCompanion Function({
+      required String id,
+      required DateTime createdAt,
+      Value<int> rowid,
+    });
+typedef $$DeviceIdentityTableUpdateCompanionBuilder =
+    DeviceIdentityCompanion Function({
+      Value<String> id,
+      Value<DateTime> createdAt,
+      Value<int> rowid,
+    });
+
+class $$DeviceIdentityTableFilterComposer
+    extends Composer<_$AppDatabase, $DeviceIdentityTable> {
+  $$DeviceIdentityTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$DeviceIdentityTableOrderingComposer
+    extends Composer<_$AppDatabase, $DeviceIdentityTable> {
+  $$DeviceIdentityTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$DeviceIdentityTableAnnotationComposer
+    extends Composer<_$AppDatabase, $DeviceIdentityTable> {
+  $$DeviceIdentityTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+}
+
+class $$DeviceIdentityTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $DeviceIdentityTable,
+          DeviceIdentityRow,
+          $$DeviceIdentityTableFilterComposer,
+          $$DeviceIdentityTableOrderingComposer,
+          $$DeviceIdentityTableAnnotationComposer,
+          $$DeviceIdentityTableCreateCompanionBuilder,
+          $$DeviceIdentityTableUpdateCompanionBuilder,
+          (
+            DeviceIdentityRow,
+            BaseReferences<
+              _$AppDatabase,
+              $DeviceIdentityTable,
+              DeviceIdentityRow
+            >,
+          ),
+          DeviceIdentityRow,
+          PrefetchHooks Function()
+        > {
+  $$DeviceIdentityTableTableManager(
+    _$AppDatabase db,
+    $DeviceIdentityTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$DeviceIdentityTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$DeviceIdentityTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$DeviceIdentityTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => DeviceIdentityCompanion(
+                id: id,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required DateTime createdAt,
+                Value<int> rowid = const Value.absent(),
+              }) => DeviceIdentityCompanion.insert(
+                id: id,
+                createdAt: createdAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$DeviceIdentityTable, DeviceIdentityRow>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $DeviceIdentityTable,
+                    DeviceIdentityRow
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$DeviceIdentityTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $DeviceIdentityTable,
+      DeviceIdentityRow,
+      $$DeviceIdentityTableFilterComposer,
+      $$DeviceIdentityTableOrderingComposer,
+      $$DeviceIdentityTableAnnotationComposer,
+      $$DeviceIdentityTableCreateCompanionBuilder,
+      $$DeviceIdentityTableUpdateCompanionBuilder,
+      (
+        DeviceIdentityRow,
+        BaseReferences<_$AppDatabase, $DeviceIdentityTable, DeviceIdentityRow>,
+      ),
+      DeviceIdentityRow,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -5600,4 +8544,10 @@ class $AppDatabaseManager {
       $$EmployeesTableTableManager(_db, _db.employees);
   $$EmployeeRatesTableTableManager get employeeRates =>
       $$EmployeeRatesTableTableManager(_db, _db.employeeRates);
+  $$CredentialsTableTableManager get credentials =>
+      $$CredentialsTableTableManager(_db, _db.credentials);
+  $$AuditLogTableTableManager get auditLog =>
+      $$AuditLogTableTableManager(_db, _db.auditLog);
+  $$DeviceIdentityTableTableManager get deviceIdentity =>
+      $$DeviceIdentityTableTableManager(_db, _db.deviceIdentity);
 }

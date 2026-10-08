@@ -13,4 +13,8 @@ abstract interface class AdminUserRepository {
 
   /// Administrators of the company, ordered by username.
   Future<Result<List<AdminUser>>> listByCompany(String companyId);
+
+  /// Sets `lastLoginAt`. Sign-in bookkeeping is not an edit of the account,
+  /// so the version is unchanged.
+  Future<Result<AdminUser>> recordSignIn(String id, DateTime at);
 }
