@@ -25,6 +25,8 @@ tables are in `lib/core/database/tables.dart`. Only repositories in feature
 |---|---|---|
 | 1 | Phase 1 | `companies`, `admin_users`, `employees`, `employee_rates` |
 | 2 | Phase 2 | `credentials`, `audit_log`, `device_identity` |
+| 3 | Phase 3 | `attendance_events` |
+| 4 | Phase 3 follow-up | `attendance_settings`, `attendance_corrections` |
 
 ### Version 1
 
@@ -57,6 +59,33 @@ tables are in `lib/core/database/tables.dart`. Only repositories in feature
 
 Migration 1 → 2 only creates these tables and indexes; existing rows are
 untouched (verified by a data-integrity migration test).
+
+### Version 3
+
+- **attendance_events** — append-only raw clock actions: `employee_id`,
+  `event_type` (`clockIn`/`clockOut`), `occurred_at` (when it happened),
+  `recorded_at` (when this device stored it), `source`, `device_id`,
+  `created_by`, plus entity metadata. Indexed by `(employee_id, occurred_at)`
+  for per-employee history and `(occurred_at)` for company-wide days.
+  Sessions are **not** stored: they are derived from these rows on demand.
+
+Migration 2 → 3 only creates this table and its indexes.
+
+### Version 4
+
+- **attendance_settings** — one row per company (unique `company_id`):
+  `duplicate_window_minutes`, `stale_open_session_minutes`,
+  `excessive_duration_minutes`, and `break_after_minutes` / `break_minutes`
+  (both set or both null). No row means the defaults.
+- **attendance_corrections** — administrator corrections, kept forever:
+  `kind` (`added`, `timeChanged`, `removed`), `event_type`,
+  `original_event_id` (superseded event; unique, so an event is corrected at
+  most once), `replacement_event_id` (the admin-entered event that now
+  counts), previous and new times, `reason`, `corrected_by`, `corrected_at`.
+  Events are never edited: an event counts unless a correction names it as
+  its original.
+
+Migration 3 → 4 only creates these tables and indexes.
 
 Indexes come from the unique keys: `(company_id, employee_number)` serves
 lookups by company and by number; `(company_id, username)` and

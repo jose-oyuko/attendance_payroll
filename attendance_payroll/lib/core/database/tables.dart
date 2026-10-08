@@ -214,3 +214,106 @@ class DeviceIdentity extends Table {
   @override
   Set<Column<Object>> get primaryKey => {id};
 }
+
+/// Raw clock-in and clock-out actions: the source of truth for attendance.
+/// Append-only; corrections (Phase 5) are recorded as new data, never edits.
+/// Sessions are derived from these rows and not stored.
+@DataClassName('AttendanceEventRow')
+@TableIndex(
+  name: 'attendance_events_employee_time',
+  columns: {#employeeId, #occurredAt},
+)
+@TableIndex(name: 'attendance_events_time', columns: {#occurredAt})
+class AttendanceEvents extends Table with EntityColumns {
+  TextColumn get employeeId => text().references(Employees, #id)();
+
+  /// `clockIn` or `clockOut`.
+  TextColumn get eventType => text()();
+
+  /// When the action happened (UTC).
+  DateTimeColumn get occurredAt => dateTime()();
+
+  /// When this device stored it (UTC).
+  DateTimeColumn get recordedAt => dateTime()();
+
+  /// For example `kiosk`.
+  TextColumn get source => text()();
+  TextColumn get deviceId => text()();
+
+  /// Who recorded it (employee or administrator id).
+  TextColumn get createdBy => text()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+/// Each company's attendance thresholds. A company without a row uses the
+/// defaults. Durations are whole minutes.
+@DataClassName('AttendanceSettingsRow')
+class AttendanceSettings extends Table with EntityColumns {
+  TextColumn get companyId => text().unique().references(Companies, #id)();
+  IntColumn get duplicateWindowMinutes => integer()();
+  IntColumn get staleOpenSessionMinutes => integer()();
+  IntColumn get excessiveDurationMinutes => integer()();
+
+  /// Both set, or both null when there is no automatic break.
+  IntColumn get breakAfterMinutes => integer().nullable()();
+  IntColumn get breakMinutes => integer().nullable()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+
+  @override
+  List<String> get customConstraints => [
+    'CHECK (duplicate_window_minutes >= 0)',
+    'CHECK (stale_open_session_minutes > 0)',
+    'CHECK (excessive_duration_minutes > 0)',
+    'CHECK ((break_after_minutes IS NULL) = (break_minutes IS NULL))',
+  ];
+}
+
+/// Administrator corrections to attendance. Events are never edited: a
+/// correction adds a replacement event and/or supersedes an original one,
+/// and records why, by whom and when, so the history stays intact.
+///
+/// - `added`: a missed clock action; `replacement_event_id` only.
+/// - `timeChanged`: `original_event_id` is superseded by
+///   `replacement_event_id`.
+/// - `removed`: `original_event_id` is superseded with no replacement.
+@DataClassName('AttendanceCorrectionRow')
+@TableIndex(
+  name: 'attendance_corrections_original',
+  columns: {#originalEventId},
+)
+@TableIndex(
+  name: 'attendance_corrections_employee',
+  columns: {#employeeId, #correctedAt},
+)
+class AttendanceCorrections extends Table with EntityColumns {
+  TextColumn get employeeId => text().references(Employees, #id)();
+
+  /// `added`, `timeChanged` or `removed`.
+  TextColumn get kind => text()();
+
+  /// `clockIn` or `clockOut`.
+  TextColumn get eventType => text()();
+  TextColumn get originalEventId =>
+      text().nullable().unique().references(AttendanceEvents, #id)();
+  TextColumn get replacementEventId =>
+      text().nullable().references(AttendanceEvents, #id)();
+  DateTimeColumn get previousOccurredAt => dateTime().nullable()();
+  DateTimeColumn get newOccurredAt => dateTime().nullable()();
+  TextColumn get reason => text()();
+
+  /// Administrator who made the correction.
+  TextColumn get correctedBy => text().references(AdminUsers, #id)();
+  DateTimeColumn get correctedAt => dateTime()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+
+  @override
+  List<String> get customConstraints => [
+    'CHECK (original_event_id IS NOT NULL OR replacement_event_id IS NOT NULL)',
+  ];
+}

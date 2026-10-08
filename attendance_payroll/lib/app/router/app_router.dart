@@ -2,6 +2,7 @@ import 'package:attendance_payroll/app/router/admin_destination.dart';
 import 'package:attendance_payroll/app/shell/admin_shell.dart';
 import 'package:attendance_payroll/app/shell/planned_feature_screen.dart';
 import 'package:attendance_payroll/core/errors/app_failure.dart';
+import 'package:attendance_payroll/features/attendance/presentation/employee_attendance_screen.dart';
 import 'package:attendance_payroll/features/authentication/presentation/auth_controller.dart';
 import 'package:attendance_payroll/features/authentication/presentation/setup_screen.dart';
 import 'package:attendance_payroll/features/authentication/presentation/sign_in_screen.dart';
@@ -135,6 +136,16 @@ List<RouteBase> _childRoutesFor(AdminDestination destination) {
             builder: (context, state) => EmployeeFormScreen(
               employeeId: state.pathParameters[EmployeeRoutes.idParameter],
             ),
+          ),
+          GoRoute(
+            path: EmployeeRoutes.attendanceSegment,
+            builder: (context, state) {
+              final id = state.pathParameters[EmployeeRoutes.idParameter]!;
+              return EmployeeAttendanceScreen(
+                employeeId: id,
+                backLocation: EmployeeRoutes.detail(id),
+              );
+            },
           ),
         ],
       ),

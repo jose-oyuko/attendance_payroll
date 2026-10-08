@@ -92,6 +92,28 @@ name the phase delivering them.
 - Audit log of employee, PIN and sign-in events; stable device identity
 - Database schema version 2, with a tested migration from version 1
 
+## What Phase 3 adds
+
+- Append-only attendance events (clock-in/clock-out) with device and source
+- A state machine for clock actions; forgotten clock-outs never block the
+  next day; device clocks set back are detected
+- Sessions derived from events, with issues flagged for review (missing
+  clock-out, overnight, excessive hours, duplicates, clock-out without
+  clock-in); flagged sessions are never paid automatically
+- Company timezone handling with the IANA database, including DST
+- Database schema version 3, with tested migrations
+
+Follow-up to Phase 3:
+
+- Attendance rules are per company and editable under Settings
+- Administrators can correct attendance from an employee's page (Employees →
+  employee → View attendance): add a missed clock-in/out, change a time, or
+  remove an entry, each with a reason; originals are kept and every change is
+  audited
+- Database schema version 4
+
+The kiosk (tap name → PIN → confirm) comes in Phase 4.
+
 ## Project layout
 
 ```

@@ -1,5 +1,6 @@
 import 'package:attendance_payroll/core/constants/app_spacing.dart';
 import 'package:attendance_payroll/core/extensions/build_context_extensions.dart';
+import 'package:attendance_payroll/core/time/company_time_zone.dart';
 import 'package:attendance_payroll/core/utils/validators.dart';
 import 'package:attendance_payroll/features/authentication/domain/admin_user.dart';
 import 'package:attendance_payroll/features/authentication/domain/password_policy.dart';
@@ -132,7 +133,7 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
                 ),
                 autocorrect: false,
                 textInputAction: TextInputAction.next,
-                validator: (v) => Validators.isTimezoneName((v ?? '').trim())
+                validator: (v) => CompanyTimeZone.isKnown((v ?? '').trim())
                     ? null
                     : 'Enter a timezone such as Africa/Nairobi.',
               ),

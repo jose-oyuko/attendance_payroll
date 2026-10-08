@@ -1,6 +1,7 @@
 import 'package:attendance_payroll/core/constants/app_spacing.dart';
 import 'package:attendance_payroll/core/extensions/build_context_extensions.dart';
 import 'package:attendance_payroll/features/authentication/presentation/auth_controller.dart';
+import 'package:attendance_payroll/features/settings/presentation/attendance_rules_card.dart';
 import 'package:attendance_payroll/features/settings/presentation/theme_mode_provider.dart';
 import 'package:attendance_payroll/shared/widgets/page_container.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +17,11 @@ class SettingsScreen extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         spacing: AppSpacing.md,
-        children: [const _AccountCard(), _appearance(context, ref, mode)],
+        children: [
+          const _AccountCard(),
+          const AttendanceRulesCard(),
+          _appearance(context, ref, mode),
+        ],
       ),
     );
   }

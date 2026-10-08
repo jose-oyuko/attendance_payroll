@@ -113,6 +113,46 @@ destination so each area keeps its navigation state.
   one transaction (`TransactionRunner`), so neither exists without the other.
   Metadata records which fields changed, never secrets or values.
 
+## Attendance engine (Phase 3)
+
+- **Events are the source of truth.** `attendance_events` is append-only:
+  clock actions are never edited or deleted. `occurredAt` is when the action
+  happened, `recordedAt` when this device stored it.
+- **Sessions are derived, not stored.** `SessionBuilder` turns one employee's
+  events into sessions and issues: a pure, deterministic function that never
+  drops an event. A session's key is its clock-in event id, stable across
+  rebuilds, so later phases can attach exceptions and approvals to it.
+- **Issues** flagged during derivation: missing clock-out, overnight session,
+  excessive duration (these block payroll: such a session has no payable time
+  until reviewed), duplicate clock-in/out within the duplicate window, and
+  clock-out without clock-in. Phase 5 turns them into reviewable exceptions;
+  late arrival and early departure need schedules (Phase 6).
+- **State machine** (`AttendanceStateMachine`): not clocked in → clock in →
+  clocked in → clock out. A clock-in older than the stale threshold allows a
+  new clock-in, so a forgotten clock-out never blocks the next day. Recording
+  before the latest event (device clock moved back) is refused.
+- **Time zones**: instants are UTC; `CompanyTimeZone` (IANA database from
+  `package:timezone`) gives company-local dates and times, including DST, so
+  the device's own timezone setting never matters. A session belongs to the
+  company date of its clock-in.
+- **Thresholds are per company** (`AttendancePolicy`, stored in
+  `attendance_settings`, edited under Settings → Attendance rules, audited):
+  duplicate window (default 10 min), forgotten clock-out after (16 h), flag
+  sessions longer than (12 h), optional automatic break. Values are
+  range-checked. The PIN check validity (2 min) is a fixed security setting.
+- **Kiosk actions** require a fresh `PinVerification` (and a changed
+  temporary PIN); the check and the new event run in one transaction.
+- **Kiosk identification (Phase 4 design):** the employee taps their name,
+  enters their PIN, then confirms the action ("Good morning John — Clock in").
+- **Corrections** (`AttendanceCorrectionService`): an administrator with
+  `correctAttendance` can add a missed clock-in/out, change an entry's time,
+  or remove an entry, always with a reason. Nothing is overwritten: a
+  correction record plus, where needed, a new admin-sourced event; the
+  original event stays, superseded. The correction, its event and its audit
+  entry are one transaction. Sessions rebuild from the counting events, so a
+  correction takes effect everywhere, including the kiosk state. Approving or
+  dismissing flagged sessions remains Phase 5.
+
 ## Database
 
 Drift over SQLite with versioned, tested migrations. Conventions (UUIDv7 keys,
@@ -158,8 +198,8 @@ Nothing in V1 talks to a server, but the design leaves room:
 |---|---|
 | 0 | Foundation |
 | 1 | Database foundation |
-| 2 | Authentication and employee management (current) |
-| 3 | Attendance engine |
+| 2 | Authentication and employee management |
+| 3 | Attendance engine (current) |
 | 4 | Attendance UI and kiosk mode |
 | 5 | Exceptions and corrections |
 | 6 | Work schedules |
@@ -173,8 +213,10 @@ Nothing in V1 talks to a server, but the design leaves room:
 
 ## Current boundaries
 
-After Phase 2: administrators sign in and manage employees, PINs and pay
-rates. Still deferred: the kiosk and employee-facing PIN entry and PIN change
-screens (Phase 4; the domain service exists and is tested), administrator
-password change and recovery, session timeout, settings persistence (the theme
-choice is in memory only), and any attendance or payroll logic.
+After Phase 3 and its follow-up: the attendance engine (events, state
+machine, sessions, issues, time zones), per-company attendance rules, and
+administrator corrections with an employee attendance screen. Still deferred: the
+kiosk and attendance screens (Phase 4), persisted exceptions and corrections
+(Phase 5), schedules with late/early detection (Phase 6), administrator
+password change and recovery, session timeout, settings persistence, and
+payroll.

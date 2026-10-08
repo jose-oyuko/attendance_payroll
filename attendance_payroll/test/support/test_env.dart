@@ -4,6 +4,12 @@ import 'package:attendance_payroll/core/database/app_database.dart';
 import 'package:attendance_payroll/core/database/drift_device_identity_repository.dart';
 import 'package:attendance_payroll/core/database/drift_transaction_runner.dart';
 import 'package:attendance_payroll/core/security/secret_hasher.dart';
+import 'package:attendance_payroll/features/attendance/data/drift_attendance_correction_repository.dart';
+import 'package:attendance_payroll/features/attendance/data/drift_attendance_event_repository.dart';
+import 'package:attendance_payroll/features/attendance/data/drift_attendance_settings_repository.dart';
+import 'package:attendance_payroll/features/attendance/domain/attendance_correction_service.dart';
+import 'package:attendance_payroll/features/attendance/domain/attendance_service.dart';
+import 'package:attendance_payroll/features/attendance/domain/attendance_settings_service.dart';
 import 'package:attendance_payroll/features/audit/data/drift_audit_log_repository.dart';
 import 'package:attendance_payroll/features/audit/domain/audit_log_repository.dart';
 import 'package:attendance_payroll/features/authentication/data/drift_admin_user_repository.dart';
@@ -12,6 +18,7 @@ import 'package:attendance_payroll/features/authentication/domain/admin_auth_ser
 import 'package:attendance_payroll/features/authentication/domain/admin_session.dart';
 import 'package:attendance_payroll/features/authentication/domain/admin_user.dart';
 import 'package:attendance_payroll/features/authentication/domain/employee_pin_service.dart';
+import 'package:attendance_payroll/features/authentication/domain/pin_policy.dart';
 import 'package:attendance_payroll/features/company/data/drift_company_repository.dart';
 import 'package:attendance_payroll/features/employees/data/drift_employee_rate_repository.dart';
 import 'package:attendance_payroll/features/employees/data/drift_employee_repository.dart';
@@ -78,6 +85,65 @@ class TestEnv {
     audit: audit,
     transactions: transactions,
   );
+
+  late final events = DriftAttendanceEventRepository(db, clock: clock.call);
+  late final attendanceSettings = DriftAttendanceSettingsRepository(
+    db,
+    clock: clock.call,
+  );
+  late final corrections = DriftAttendanceCorrectionRepository(
+    db,
+    clock: clock.call,
+  );
+
+  late final attendance = AttendanceService(
+    employees: employees,
+    companies: companies,
+    events: events,
+    devices: DriftDeviceIdentityRepository(db),
+    transactions: transactions,
+    settings: attendanceSettings,
+    clock: clock.call,
+  );
+
+  late final attendanceSettingsService = AttendanceSettingsService(
+    settings: attendanceSettings,
+    audit: audit,
+    transactions: transactions,
+  );
+
+  late final attendanceCorrections = AttendanceCorrectionService(
+    employees: employees,
+    events: events,
+    corrections: corrections,
+    devices: DriftDeviceIdentityRepository(db),
+    audit: audit,
+    transactions: transactions,
+    clock: clock.call,
+  );
+
+  /// Gives [employee] a personal PIN through the real issue-and-change flow,
+  /// then verifies it as the kiosk would.
+  Future<PinVerification> signInAtKiosk(
+    AdminSession session,
+    Employee employee, {
+    String pin = '2580',
+  }) async {
+    assert(PinPolicy.validate(pin) == null, 'Use a valid PIN in tests.');
+    if ((await pins.status(session, employee.id)).unwrap().state ==
+        PinState.notSet) {
+      final temporary = (await pins.issueTemporaryPin(
+        session,
+        employee.id,
+      )).unwrap();
+      (await pins.changePin(
+        employee.id,
+        currentPin: temporary,
+        newPin: pin,
+      )).unwrap();
+    }
+    return (await pins.verifyPin(employee.id, pin)).unwrap();
+  }
 
   /// Completes first-run setup and returns the owner's session.
   Future<AdminSession> setUpOwner() async {

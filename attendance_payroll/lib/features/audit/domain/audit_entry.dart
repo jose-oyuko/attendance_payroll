@@ -11,7 +11,9 @@ enum AuditAction {
   employeeRateAdded('employee.rate_added'),
   employeePinReset('employee.pin_reset'),
   employeePinChanged('employee.pin_changed'),
-  employeePinLockedOut('employee.pin_locked_out');
+  employeePinLockedOut('employee.pin_locked_out'),
+  attendanceCorrected('attendance.corrected'),
+  attendanceSettingsChanged('attendance.settings_changed');
 
   const AuditAction(this.code);
 

@@ -2,7 +2,14 @@ import 'package:attendance_payroll/core/errors/app_failure.dart';
 import 'package:attendance_payroll/core/utils/validators.dart';
 
 /// Operations that require authorisation. Services check these, not roles.
-enum Permission { viewEmployees, manageEmployees, manageEmployeePins }
+enum Permission {
+  viewEmployees,
+  manageEmployees,
+  manageEmployeePins,
+  viewAttendance,
+  correctAttendance,
+  manageAttendanceSettings,
+}
 
 /// What an administrator may do. V1 has a single all-powerful role; finer
 /// roles (payroll administrator, HR administrator, attendance manager,

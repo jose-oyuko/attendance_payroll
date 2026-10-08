@@ -22,6 +22,9 @@ part 'app_database.g.dart';
     Credentials,
     AuditLog,
     DeviceIdentity,
+    AttendanceEvents,
+    AttendanceSettings,
+    AttendanceCorrections,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -40,8 +43,10 @@ class AppDatabase extends _$AppDatabase {
   ///
   /// 1 — companies, admin users, employees, employee rates.
   /// 2 — credentials, audit log, device identity.
+  /// 3 — attendance events.
+  /// 4 — attendance settings and corrections.
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration {
@@ -54,6 +59,17 @@ class AppDatabase extends _$AppDatabase {
           await m.createIndex(schema.auditLogCompanyTime);
           await m.createIndex(schema.auditLogEntity);
           await m.createTable(schema.deviceIdentity);
+        },
+        from2To3: (m, schema) async {
+          await m.createTable(schema.attendanceEvents);
+          await m.createIndex(schema.attendanceEventsEmployeeTime);
+          await m.createIndex(schema.attendanceEventsTime);
+        },
+        from3To4: (m, schema) async {
+          await m.createTable(schema.attendanceSettings);
+          await m.createTable(schema.attendanceCorrections);
+          await m.createIndex(schema.attendanceCorrectionsOriginal);
+          await m.createIndex(schema.attendanceCorrectionsEmployee);
         },
       ),
       beforeOpen: (details) async {

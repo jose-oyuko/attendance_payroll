@@ -46,6 +46,16 @@ class _EmployeeDetail extends StatelessWidget {
   Widget build(BuildContext context) {
     final details = _DetailsCard(employee: employee);
     final side = [
+      SectionCard(
+        title: 'Attendance',
+        action: FilledButton.tonal(
+          onPressed: () => context.go(EmployeeRoutes.attendance(employee.id)),
+          child: const Text('View attendance'),
+        ),
+        child: const SectionNote(
+          'Clock-ins and clock-outs, issues to review, and corrections.',
+        ),
+      ),
       EmployeePinCard(employee: employee),
       EmployeeRateCard(employee: employee),
       EmployeeStatusCard(employee: employee),

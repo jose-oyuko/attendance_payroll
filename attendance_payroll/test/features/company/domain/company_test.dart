@@ -50,5 +50,13 @@ void main() {
         expect(details.validate()?.field, field, reason: field);
       });
     });
+
+    test('timezones must exist, not just look plausible', () {
+      expect(
+        _details(timezone: 'Africa/Atlantis').validate()?.field,
+        'timezone',
+      );
+      expect(_details(timezone: 'Etc/UTC').validate(), isNull);
+    });
   });
 }

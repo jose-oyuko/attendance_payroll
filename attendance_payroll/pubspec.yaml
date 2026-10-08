@@ -23,6 +23,7 @@ dependencies:
   # SqliteException and its error codes, to map constraint violations.
   sqlite3: ^3.5.2
   # UUIDv7 identifiers that devices can generate independently.
+  timezone: ^0.11.1
   uuid: ^4.6.0
 
 dev_dependencies:

@@ -28,9 +28,17 @@ final class PinStatus {
 
 /// A successful PIN check.
 final class PinVerification {
-  const PinVerification({required this.employee, required this.mustChangePin});
+  const PinVerification({
+    required this.employee,
+    required this.mustChangePin,
+    required this.verifiedAt,
+  });
 
   final Employee employee;
+
+  /// When the PIN was checked. Actions it authorises expire soon after, so a
+  /// verification cannot be reused later.
+  final DateTime verifiedAt;
 
   /// The PIN was issued by an administrator and must be replaced now.
   final bool mustChangePin;
@@ -183,6 +191,7 @@ final class EmployeePinService {
       (credential) => PinVerification(
         employee: employee,
         mustChangePin: credential.isTemporary,
+        verifiedAt: _clock(),
       ),
     );
   }

@@ -27,6 +27,13 @@ class TestClock {
 
   /// Jumps forward, for example past a lockout.
   void advance(Duration duration) => _next = _next.add(duration);
+
+  /// The next reading will be exactly [instant], which must not be earlier
+  /// than the clock already is.
+  void jumpTo(DateTime instant) {
+    assert(!instant.isBefore(_next), 'TestClock never runs backwards.');
+    _next = instant;
+  }
 }
 
 /// Deterministic ids: `<prefix>-1`, `<prefix>-2`, ...

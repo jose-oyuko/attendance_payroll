@@ -1,4 +1,5 @@
 import 'package:attendance_payroll/core/errors/app_failure.dart';
+import 'package:attendance_payroll/core/time/company_time_zone.dart';
 import 'package:attendance_payroll/core/utils/validators.dart';
 
 /// Editable details of a company.
@@ -66,7 +67,7 @@ final class CompanyDetails {
         userMessage: 'Enter a three-letter currency code, for example KES.',
       );
     }
-    if (!Validators.isTimezoneName(timezone)) {
+    if (!CompanyTimeZone.isKnown(timezone)) {
       return const ValidationFailure(
         field: 'timezone',
         userMessage: 'Choose a valid timezone, for example Africa/Nairobi.',

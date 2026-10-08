@@ -4908,6 +4908,2524 @@ class DeviceIdentityCompanion extends UpdateCompanion<DeviceIdentityRow> {
   }
 }
 
+class $AttendanceEventsTable extends AttendanceEvents
+    with TableInfo<$AttendanceEventsTable, AttendanceEventRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AttendanceEventsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _versionMeta = const VerificationMeta(
+    'version',
+  );
+  @override
+  late final GeneratedColumn<int> version = GeneratedColumn<int>(
+    'version',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<SyncState, String> syncState =
+      GeneratedColumn<String>(
+        'sync_state',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: Constant(SyncState.localOnly.name),
+      ).withConverter<SyncState>($AttendanceEventsTable.$convertersyncState);
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _employeeIdMeta = const VerificationMeta(
+    'employeeId',
+  );
+  @override
+  late final GeneratedColumn<String> employeeId = GeneratedColumn<String>(
+    'employee_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES employees (id)',
+    ),
+  );
+  static const VerificationMeta _eventTypeMeta = const VerificationMeta(
+    'eventType',
+  );
+  @override
+  late final GeneratedColumn<String> eventType = GeneratedColumn<String>(
+    'event_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _occurredAtMeta = const VerificationMeta(
+    'occurredAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> occurredAt = GeneratedColumn<DateTime>(
+    'occurred_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _recordedAtMeta = const VerificationMeta(
+    'recordedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> recordedAt = GeneratedColumn<DateTime>(
+    'recorded_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sourceMeta = const VerificationMeta('source');
+  @override
+  late final GeneratedColumn<String> source = GeneratedColumn<String>(
+    'source',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _deviceIdMeta = const VerificationMeta(
+    'deviceId',
+  );
+  @override
+  late final GeneratedColumn<String> deviceId = GeneratedColumn<String>(
+    'device_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdByMeta = const VerificationMeta(
+    'createdBy',
+  );
+  @override
+  late final GeneratedColumn<String> createdBy = GeneratedColumn<String>(
+    'created_by',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    createdAt,
+    updatedAt,
+    version,
+    syncState,
+    deletedAt,
+    employeeId,
+    eventType,
+    occurredAt,
+    recordedAt,
+    source,
+    deviceId,
+    createdBy,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'attendance_events';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<AttendanceEventRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('version')) {
+      context.handle(
+        _versionMeta,
+        version.isAcceptableOrUnknown(data['version']!, _versionMeta),
+      );
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    if (data.containsKey('employee_id')) {
+      context.handle(
+        _employeeIdMeta,
+        employeeId.isAcceptableOrUnknown(data['employee_id']!, _employeeIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_employeeIdMeta);
+    }
+    if (data.containsKey('event_type')) {
+      context.handle(
+        _eventTypeMeta,
+        eventType.isAcceptableOrUnknown(data['event_type']!, _eventTypeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_eventTypeMeta);
+    }
+    if (data.containsKey('occurred_at')) {
+      context.handle(
+        _occurredAtMeta,
+        occurredAt.isAcceptableOrUnknown(data['occurred_at']!, _occurredAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_occurredAtMeta);
+    }
+    if (data.containsKey('recorded_at')) {
+      context.handle(
+        _recordedAtMeta,
+        recordedAt.isAcceptableOrUnknown(data['recorded_at']!, _recordedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_recordedAtMeta);
+    }
+    if (data.containsKey('source')) {
+      context.handle(
+        _sourceMeta,
+        source.isAcceptableOrUnknown(data['source']!, _sourceMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sourceMeta);
+    }
+    if (data.containsKey('device_id')) {
+      context.handle(
+        _deviceIdMeta,
+        deviceId.isAcceptableOrUnknown(data['device_id']!, _deviceIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_deviceIdMeta);
+    }
+    if (data.containsKey('created_by')) {
+      context.handle(
+        _createdByMeta,
+        createdBy.isAcceptableOrUnknown(data['created_by']!, _createdByMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdByMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  AttendanceEventRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return AttendanceEventRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      version: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}version'],
+      )!,
+      syncState: $AttendanceEventsTable.$convertersyncState.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}sync_state'],
+        )!,
+      ),
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deleted_at'],
+      ),
+      employeeId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}employee_id'],
+      )!,
+      eventType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}event_type'],
+      )!,
+      occurredAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}occurred_at'],
+      )!,
+      recordedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}recorded_at'],
+      )!,
+      source: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}source'],
+      )!,
+      deviceId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}device_id'],
+      )!,
+      createdBy: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}created_by'],
+      )!,
+    );
+  }
+
+  @override
+  $AttendanceEventsTable createAlias(String alias) {
+    return $AttendanceEventsTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<SyncState, String, String> $convertersyncState =
+      const EnumNameConverter<SyncState>(SyncState.values);
+}
+
+class AttendanceEventRow extends DataClass
+    implements Insertable<AttendanceEventRow> {
+  final String id;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final int version;
+  final SyncState syncState;
+  final DateTime? deletedAt;
+  final String employeeId;
+
+  /// `clockIn` or `clockOut`.
+  final String eventType;
+
+  /// When the action happened (UTC).
+  final DateTime occurredAt;
+
+  /// When this device stored it (UTC).
+  final DateTime recordedAt;
+
+  /// For example `kiosk`.
+  final String source;
+  final String deviceId;
+
+  /// Who recorded it (employee or administrator id).
+  final String createdBy;
+  const AttendanceEventRow({
+    required this.id,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.version,
+    required this.syncState,
+    this.deletedAt,
+    required this.employeeId,
+    required this.eventType,
+    required this.occurredAt,
+    required this.recordedAt,
+    required this.source,
+    required this.deviceId,
+    required this.createdBy,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    map['version'] = Variable<int>(version);
+    {
+      map['sync_state'] = Variable<String>(
+        $AttendanceEventsTable.$convertersyncState.toSql(syncState),
+      );
+    }
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
+    map['employee_id'] = Variable<String>(employeeId);
+    map['event_type'] = Variable<String>(eventType);
+    map['occurred_at'] = Variable<DateTime>(occurredAt);
+    map['recorded_at'] = Variable<DateTime>(recordedAt);
+    map['source'] = Variable<String>(source);
+    map['device_id'] = Variable<String>(deviceId);
+    map['created_by'] = Variable<String>(createdBy);
+    return map;
+  }
+
+  AttendanceEventsCompanion toCompanion(bool nullToAbsent) {
+    return AttendanceEventsCompanion(
+      id: Value(id),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      version: Value(version),
+      syncState: Value(syncState),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
+      employeeId: Value(employeeId),
+      eventType: Value(eventType),
+      occurredAt: Value(occurredAt),
+      recordedAt: Value(recordedAt),
+      source: Value(source),
+      deviceId: Value(deviceId),
+      createdBy: Value(createdBy),
+    );
+  }
+
+  factory AttendanceEventRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return AttendanceEventRow(
+      id: serializer.fromJson<String>(json['id']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      version: serializer.fromJson<int>(json['version']),
+      syncState: $AttendanceEventsTable.$convertersyncState.fromJson(
+        serializer.fromJson<String>(json['syncState']),
+      ),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+      employeeId: serializer.fromJson<String>(json['employeeId']),
+      eventType: serializer.fromJson<String>(json['eventType']),
+      occurredAt: serializer.fromJson<DateTime>(json['occurredAt']),
+      recordedAt: serializer.fromJson<DateTime>(json['recordedAt']),
+      source: serializer.fromJson<String>(json['source']),
+      deviceId: serializer.fromJson<String>(json['deviceId']),
+      createdBy: serializer.fromJson<String>(json['createdBy']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'version': serializer.toJson<int>(version),
+      'syncState': serializer.toJson<String>(
+        $AttendanceEventsTable.$convertersyncState.toJson(syncState),
+      ),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+      'employeeId': serializer.toJson<String>(employeeId),
+      'eventType': serializer.toJson<String>(eventType),
+      'occurredAt': serializer.toJson<DateTime>(occurredAt),
+      'recordedAt': serializer.toJson<DateTime>(recordedAt),
+      'source': serializer.toJson<String>(source),
+      'deviceId': serializer.toJson<String>(deviceId),
+      'createdBy': serializer.toJson<String>(createdBy),
+    };
+  }
+
+  AttendanceEventRow copyWith({
+    String? id,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    int? version,
+    SyncState? syncState,
+    Value<DateTime?> deletedAt = const Value.absent(),
+    String? employeeId,
+    String? eventType,
+    DateTime? occurredAt,
+    DateTime? recordedAt,
+    String? source,
+    String? deviceId,
+    String? createdBy,
+  }) => AttendanceEventRow(
+    id: id ?? this.id,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    version: version ?? this.version,
+    syncState: syncState ?? this.syncState,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+    employeeId: employeeId ?? this.employeeId,
+    eventType: eventType ?? this.eventType,
+    occurredAt: occurredAt ?? this.occurredAt,
+    recordedAt: recordedAt ?? this.recordedAt,
+    source: source ?? this.source,
+    deviceId: deviceId ?? this.deviceId,
+    createdBy: createdBy ?? this.createdBy,
+  );
+  AttendanceEventRow copyWithCompanion(AttendanceEventsCompanion data) {
+    return AttendanceEventRow(
+      id: data.id.present ? data.id.value : this.id,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      version: data.version.present ? data.version.value : this.version,
+      syncState: data.syncState.present ? data.syncState.value : this.syncState,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+      employeeId: data.employeeId.present
+          ? data.employeeId.value
+          : this.employeeId,
+      eventType: data.eventType.present ? data.eventType.value : this.eventType,
+      occurredAt: data.occurredAt.present
+          ? data.occurredAt.value
+          : this.occurredAt,
+      recordedAt: data.recordedAt.present
+          ? data.recordedAt.value
+          : this.recordedAt,
+      source: data.source.present ? data.source.value : this.source,
+      deviceId: data.deviceId.present ? data.deviceId.value : this.deviceId,
+      createdBy: data.createdBy.present ? data.createdBy.value : this.createdBy,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AttendanceEventRow(')
+          ..write('id: $id, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('version: $version, ')
+          ..write('syncState: $syncState, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('employeeId: $employeeId, ')
+          ..write('eventType: $eventType, ')
+          ..write('occurredAt: $occurredAt, ')
+          ..write('recordedAt: $recordedAt, ')
+          ..write('source: $source, ')
+          ..write('deviceId: $deviceId, ')
+          ..write('createdBy: $createdBy')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    createdAt,
+    updatedAt,
+    version,
+    syncState,
+    deletedAt,
+    employeeId,
+    eventType,
+    occurredAt,
+    recordedAt,
+    source,
+    deviceId,
+    createdBy,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is AttendanceEventRow &&
+          other.id == this.id &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.version == this.version &&
+          other.syncState == this.syncState &&
+          other.deletedAt == this.deletedAt &&
+          other.employeeId == this.employeeId &&
+          other.eventType == this.eventType &&
+          other.occurredAt == this.occurredAt &&
+          other.recordedAt == this.recordedAt &&
+          other.source == this.source &&
+          other.deviceId == this.deviceId &&
+          other.createdBy == this.createdBy);
+}
+
+class AttendanceEventsCompanion extends UpdateCompanion<AttendanceEventRow> {
+  final Value<String> id;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<int> version;
+  final Value<SyncState> syncState;
+  final Value<DateTime?> deletedAt;
+  final Value<String> employeeId;
+  final Value<String> eventType;
+  final Value<DateTime> occurredAt;
+  final Value<DateTime> recordedAt;
+  final Value<String> source;
+  final Value<String> deviceId;
+  final Value<String> createdBy;
+  final Value<int> rowid;
+  const AttendanceEventsCompanion({
+    this.id = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.version = const Value.absent(),
+    this.syncState = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.employeeId = const Value.absent(),
+    this.eventType = const Value.absent(),
+    this.occurredAt = const Value.absent(),
+    this.recordedAt = const Value.absent(),
+    this.source = const Value.absent(),
+    this.deviceId = const Value.absent(),
+    this.createdBy = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  AttendanceEventsCompanion.insert({
+    required String id,
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.version = const Value.absent(),
+    this.syncState = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    required String employeeId,
+    required String eventType,
+    required DateTime occurredAt,
+    required DateTime recordedAt,
+    required String source,
+    required String deviceId,
+    required String createdBy,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt),
+       employeeId = Value(employeeId),
+       eventType = Value(eventType),
+       occurredAt = Value(occurredAt),
+       recordedAt = Value(recordedAt),
+       source = Value(source),
+       deviceId = Value(deviceId),
+       createdBy = Value(createdBy);
+  static Insertable<AttendanceEventRow> custom({
+    Expression<String>? id,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? version,
+    Expression<String>? syncState,
+    Expression<DateTime>? deletedAt,
+    Expression<String>? employeeId,
+    Expression<String>? eventType,
+    Expression<DateTime>? occurredAt,
+    Expression<DateTime>? recordedAt,
+    Expression<String>? source,
+    Expression<String>? deviceId,
+    Expression<String>? createdBy,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (version != null) 'version': version,
+      if (syncState != null) 'sync_state': syncState,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (employeeId != null) 'employee_id': employeeId,
+      if (eventType != null) 'event_type': eventType,
+      if (occurredAt != null) 'occurred_at': occurredAt,
+      if (recordedAt != null) 'recorded_at': recordedAt,
+      if (source != null) 'source': source,
+      if (deviceId != null) 'device_id': deviceId,
+      if (createdBy != null) 'created_by': createdBy,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  AttendanceEventsCompanion copyWith({
+    Value<String>? id,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<int>? version,
+    Value<SyncState>? syncState,
+    Value<DateTime?>? deletedAt,
+    Value<String>? employeeId,
+    Value<String>? eventType,
+    Value<DateTime>? occurredAt,
+    Value<DateTime>? recordedAt,
+    Value<String>? source,
+    Value<String>? deviceId,
+    Value<String>? createdBy,
+    Value<int>? rowid,
+  }) {
+    return AttendanceEventsCompanion(
+      id: id ?? this.id,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      version: version ?? this.version,
+      syncState: syncState ?? this.syncState,
+      deletedAt: deletedAt ?? this.deletedAt,
+      employeeId: employeeId ?? this.employeeId,
+      eventType: eventType ?? this.eventType,
+      occurredAt: occurredAt ?? this.occurredAt,
+      recordedAt: recordedAt ?? this.recordedAt,
+      source: source ?? this.source,
+      deviceId: deviceId ?? this.deviceId,
+      createdBy: createdBy ?? this.createdBy,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (version.present) {
+      map['version'] = Variable<int>(version.value);
+    }
+    if (syncState.present) {
+      map['sync_state'] = Variable<String>(
+        $AttendanceEventsTable.$convertersyncState.toSql(syncState.value),
+      );
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    if (employeeId.present) {
+      map['employee_id'] = Variable<String>(employeeId.value);
+    }
+    if (eventType.present) {
+      map['event_type'] = Variable<String>(eventType.value);
+    }
+    if (occurredAt.present) {
+      map['occurred_at'] = Variable<DateTime>(occurredAt.value);
+    }
+    if (recordedAt.present) {
+      map['recorded_at'] = Variable<DateTime>(recordedAt.value);
+    }
+    if (source.present) {
+      map['source'] = Variable<String>(source.value);
+    }
+    if (deviceId.present) {
+      map['device_id'] = Variable<String>(deviceId.value);
+    }
+    if (createdBy.present) {
+      map['created_by'] = Variable<String>(createdBy.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AttendanceEventsCompanion(')
+          ..write('id: $id, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('version: $version, ')
+          ..write('syncState: $syncState, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('employeeId: $employeeId, ')
+          ..write('eventType: $eventType, ')
+          ..write('occurredAt: $occurredAt, ')
+          ..write('recordedAt: $recordedAt, ')
+          ..write('source: $source, ')
+          ..write('deviceId: $deviceId, ')
+          ..write('createdBy: $createdBy, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $AttendanceSettingsTable extends AttendanceSettings
+    with TableInfo<$AttendanceSettingsTable, AttendanceSettingsRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AttendanceSettingsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _versionMeta = const VerificationMeta(
+    'version',
+  );
+  @override
+  late final GeneratedColumn<int> version = GeneratedColumn<int>(
+    'version',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<SyncState, String> syncState =
+      GeneratedColumn<String>(
+        'sync_state',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: Constant(SyncState.localOnly.name),
+      ).withConverter<SyncState>($AttendanceSettingsTable.$convertersyncState);
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _companyIdMeta = const VerificationMeta(
+    'companyId',
+  );
+  @override
+  late final GeneratedColumn<String> companyId = GeneratedColumn<String>(
+    'company_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'UNIQUE REFERENCES companies (id)',
+    ),
+  );
+  static const VerificationMeta _duplicateWindowMinutesMeta =
+      const VerificationMeta('duplicateWindowMinutes');
+  @override
+  late final GeneratedColumn<int> duplicateWindowMinutes = GeneratedColumn<int>(
+    'duplicate_window_minutes',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _staleOpenSessionMinutesMeta =
+      const VerificationMeta('staleOpenSessionMinutes');
+  @override
+  late final GeneratedColumn<int> staleOpenSessionMinutes =
+      GeneratedColumn<int>(
+        'stale_open_session_minutes',
+        aliasedName,
+        false,
+        type: DriftSqlType.int,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _excessiveDurationMinutesMeta =
+      const VerificationMeta('excessiveDurationMinutes');
+  @override
+  late final GeneratedColumn<int> excessiveDurationMinutes =
+      GeneratedColumn<int>(
+        'excessive_duration_minutes',
+        aliasedName,
+        false,
+        type: DriftSqlType.int,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _breakAfterMinutesMeta = const VerificationMeta(
+    'breakAfterMinutes',
+  );
+  @override
+  late final GeneratedColumn<int> breakAfterMinutes = GeneratedColumn<int>(
+    'break_after_minutes',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _breakMinutesMeta = const VerificationMeta(
+    'breakMinutes',
+  );
+  @override
+  late final GeneratedColumn<int> breakMinutes = GeneratedColumn<int>(
+    'break_minutes',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    createdAt,
+    updatedAt,
+    version,
+    syncState,
+    deletedAt,
+    companyId,
+    duplicateWindowMinutes,
+    staleOpenSessionMinutes,
+    excessiveDurationMinutes,
+    breakAfterMinutes,
+    breakMinutes,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'attendance_settings';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<AttendanceSettingsRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('version')) {
+      context.handle(
+        _versionMeta,
+        version.isAcceptableOrUnknown(data['version']!, _versionMeta),
+      );
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    if (data.containsKey('company_id')) {
+      context.handle(
+        _companyIdMeta,
+        companyId.isAcceptableOrUnknown(data['company_id']!, _companyIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_companyIdMeta);
+    }
+    if (data.containsKey('duplicate_window_minutes')) {
+      context.handle(
+        _duplicateWindowMinutesMeta,
+        duplicateWindowMinutes.isAcceptableOrUnknown(
+          data['duplicate_window_minutes']!,
+          _duplicateWindowMinutesMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_duplicateWindowMinutesMeta);
+    }
+    if (data.containsKey('stale_open_session_minutes')) {
+      context.handle(
+        _staleOpenSessionMinutesMeta,
+        staleOpenSessionMinutes.isAcceptableOrUnknown(
+          data['stale_open_session_minutes']!,
+          _staleOpenSessionMinutesMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_staleOpenSessionMinutesMeta);
+    }
+    if (data.containsKey('excessive_duration_minutes')) {
+      context.handle(
+        _excessiveDurationMinutesMeta,
+        excessiveDurationMinutes.isAcceptableOrUnknown(
+          data['excessive_duration_minutes']!,
+          _excessiveDurationMinutesMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_excessiveDurationMinutesMeta);
+    }
+    if (data.containsKey('break_after_minutes')) {
+      context.handle(
+        _breakAfterMinutesMeta,
+        breakAfterMinutes.isAcceptableOrUnknown(
+          data['break_after_minutes']!,
+          _breakAfterMinutesMeta,
+        ),
+      );
+    }
+    if (data.containsKey('break_minutes')) {
+      context.handle(
+        _breakMinutesMeta,
+        breakMinutes.isAcceptableOrUnknown(
+          data['break_minutes']!,
+          _breakMinutesMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  AttendanceSettingsRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return AttendanceSettingsRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      version: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}version'],
+      )!,
+      syncState: $AttendanceSettingsTable.$convertersyncState.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}sync_state'],
+        )!,
+      ),
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deleted_at'],
+      ),
+      companyId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}company_id'],
+      )!,
+      duplicateWindowMinutes: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}duplicate_window_minutes'],
+      )!,
+      staleOpenSessionMinutes: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}stale_open_session_minutes'],
+      )!,
+      excessiveDurationMinutes: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}excessive_duration_minutes'],
+      )!,
+      breakAfterMinutes: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}break_after_minutes'],
+      ),
+      breakMinutes: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}break_minutes'],
+      ),
+    );
+  }
+
+  @override
+  $AttendanceSettingsTable createAlias(String alias) {
+    return $AttendanceSettingsTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<SyncState, String, String> $convertersyncState =
+      const EnumNameConverter<SyncState>(SyncState.values);
+}
+
+class AttendanceSettingsRow extends DataClass
+    implements Insertable<AttendanceSettingsRow> {
+  final String id;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final int version;
+  final SyncState syncState;
+  final DateTime? deletedAt;
+  final String companyId;
+  final int duplicateWindowMinutes;
+  final int staleOpenSessionMinutes;
+  final int excessiveDurationMinutes;
+
+  /// Both set, or both null when there is no automatic break.
+  final int? breakAfterMinutes;
+  final int? breakMinutes;
+  const AttendanceSettingsRow({
+    required this.id,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.version,
+    required this.syncState,
+    this.deletedAt,
+    required this.companyId,
+    required this.duplicateWindowMinutes,
+    required this.staleOpenSessionMinutes,
+    required this.excessiveDurationMinutes,
+    this.breakAfterMinutes,
+    this.breakMinutes,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    map['version'] = Variable<int>(version);
+    {
+      map['sync_state'] = Variable<String>(
+        $AttendanceSettingsTable.$convertersyncState.toSql(syncState),
+      );
+    }
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
+    map['company_id'] = Variable<String>(companyId);
+    map['duplicate_window_minutes'] = Variable<int>(duplicateWindowMinutes);
+    map['stale_open_session_minutes'] = Variable<int>(staleOpenSessionMinutes);
+    map['excessive_duration_minutes'] = Variable<int>(excessiveDurationMinutes);
+    if (!nullToAbsent || breakAfterMinutes != null) {
+      map['break_after_minutes'] = Variable<int>(breakAfterMinutes);
+    }
+    if (!nullToAbsent || breakMinutes != null) {
+      map['break_minutes'] = Variable<int>(breakMinutes);
+    }
+    return map;
+  }
+
+  AttendanceSettingsCompanion toCompanion(bool nullToAbsent) {
+    return AttendanceSettingsCompanion(
+      id: Value(id),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      version: Value(version),
+      syncState: Value(syncState),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
+      companyId: Value(companyId),
+      duplicateWindowMinutes: Value(duplicateWindowMinutes),
+      staleOpenSessionMinutes: Value(staleOpenSessionMinutes),
+      excessiveDurationMinutes: Value(excessiveDurationMinutes),
+      breakAfterMinutes: breakAfterMinutes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(breakAfterMinutes),
+      breakMinutes: breakMinutes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(breakMinutes),
+    );
+  }
+
+  factory AttendanceSettingsRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return AttendanceSettingsRow(
+      id: serializer.fromJson<String>(json['id']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      version: serializer.fromJson<int>(json['version']),
+      syncState: $AttendanceSettingsTable.$convertersyncState.fromJson(
+        serializer.fromJson<String>(json['syncState']),
+      ),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+      companyId: serializer.fromJson<String>(json['companyId']),
+      duplicateWindowMinutes: serializer.fromJson<int>(
+        json['duplicateWindowMinutes'],
+      ),
+      staleOpenSessionMinutes: serializer.fromJson<int>(
+        json['staleOpenSessionMinutes'],
+      ),
+      excessiveDurationMinutes: serializer.fromJson<int>(
+        json['excessiveDurationMinutes'],
+      ),
+      breakAfterMinutes: serializer.fromJson<int?>(json['breakAfterMinutes']),
+      breakMinutes: serializer.fromJson<int?>(json['breakMinutes']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'version': serializer.toJson<int>(version),
+      'syncState': serializer.toJson<String>(
+        $AttendanceSettingsTable.$convertersyncState.toJson(syncState),
+      ),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+      'companyId': serializer.toJson<String>(companyId),
+      'duplicateWindowMinutes': serializer.toJson<int>(duplicateWindowMinutes),
+      'staleOpenSessionMinutes': serializer.toJson<int>(
+        staleOpenSessionMinutes,
+      ),
+      'excessiveDurationMinutes': serializer.toJson<int>(
+        excessiveDurationMinutes,
+      ),
+      'breakAfterMinutes': serializer.toJson<int?>(breakAfterMinutes),
+      'breakMinutes': serializer.toJson<int?>(breakMinutes),
+    };
+  }
+
+  AttendanceSettingsRow copyWith({
+    String? id,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    int? version,
+    SyncState? syncState,
+    Value<DateTime?> deletedAt = const Value.absent(),
+    String? companyId,
+    int? duplicateWindowMinutes,
+    int? staleOpenSessionMinutes,
+    int? excessiveDurationMinutes,
+    Value<int?> breakAfterMinutes = const Value.absent(),
+    Value<int?> breakMinutes = const Value.absent(),
+  }) => AttendanceSettingsRow(
+    id: id ?? this.id,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    version: version ?? this.version,
+    syncState: syncState ?? this.syncState,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+    companyId: companyId ?? this.companyId,
+    duplicateWindowMinutes:
+        duplicateWindowMinutes ?? this.duplicateWindowMinutes,
+    staleOpenSessionMinutes:
+        staleOpenSessionMinutes ?? this.staleOpenSessionMinutes,
+    excessiveDurationMinutes:
+        excessiveDurationMinutes ?? this.excessiveDurationMinutes,
+    breakAfterMinutes: breakAfterMinutes.present
+        ? breakAfterMinutes.value
+        : this.breakAfterMinutes,
+    breakMinutes: breakMinutes.present ? breakMinutes.value : this.breakMinutes,
+  );
+  AttendanceSettingsRow copyWithCompanion(AttendanceSettingsCompanion data) {
+    return AttendanceSettingsRow(
+      id: data.id.present ? data.id.value : this.id,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      version: data.version.present ? data.version.value : this.version,
+      syncState: data.syncState.present ? data.syncState.value : this.syncState,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+      companyId: data.companyId.present ? data.companyId.value : this.companyId,
+      duplicateWindowMinutes: data.duplicateWindowMinutes.present
+          ? data.duplicateWindowMinutes.value
+          : this.duplicateWindowMinutes,
+      staleOpenSessionMinutes: data.staleOpenSessionMinutes.present
+          ? data.staleOpenSessionMinutes.value
+          : this.staleOpenSessionMinutes,
+      excessiveDurationMinutes: data.excessiveDurationMinutes.present
+          ? data.excessiveDurationMinutes.value
+          : this.excessiveDurationMinutes,
+      breakAfterMinutes: data.breakAfterMinutes.present
+          ? data.breakAfterMinutes.value
+          : this.breakAfterMinutes,
+      breakMinutes: data.breakMinutes.present
+          ? data.breakMinutes.value
+          : this.breakMinutes,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AttendanceSettingsRow(')
+          ..write('id: $id, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('version: $version, ')
+          ..write('syncState: $syncState, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('companyId: $companyId, ')
+          ..write('duplicateWindowMinutes: $duplicateWindowMinutes, ')
+          ..write('staleOpenSessionMinutes: $staleOpenSessionMinutes, ')
+          ..write('excessiveDurationMinutes: $excessiveDurationMinutes, ')
+          ..write('breakAfterMinutes: $breakAfterMinutes, ')
+          ..write('breakMinutes: $breakMinutes')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    createdAt,
+    updatedAt,
+    version,
+    syncState,
+    deletedAt,
+    companyId,
+    duplicateWindowMinutes,
+    staleOpenSessionMinutes,
+    excessiveDurationMinutes,
+    breakAfterMinutes,
+    breakMinutes,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is AttendanceSettingsRow &&
+          other.id == this.id &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.version == this.version &&
+          other.syncState == this.syncState &&
+          other.deletedAt == this.deletedAt &&
+          other.companyId == this.companyId &&
+          other.duplicateWindowMinutes == this.duplicateWindowMinutes &&
+          other.staleOpenSessionMinutes == this.staleOpenSessionMinutes &&
+          other.excessiveDurationMinutes == this.excessiveDurationMinutes &&
+          other.breakAfterMinutes == this.breakAfterMinutes &&
+          other.breakMinutes == this.breakMinutes);
+}
+
+class AttendanceSettingsCompanion
+    extends UpdateCompanion<AttendanceSettingsRow> {
+  final Value<String> id;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<int> version;
+  final Value<SyncState> syncState;
+  final Value<DateTime?> deletedAt;
+  final Value<String> companyId;
+  final Value<int> duplicateWindowMinutes;
+  final Value<int> staleOpenSessionMinutes;
+  final Value<int> excessiveDurationMinutes;
+  final Value<int?> breakAfterMinutes;
+  final Value<int?> breakMinutes;
+  final Value<int> rowid;
+  const AttendanceSettingsCompanion({
+    this.id = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.version = const Value.absent(),
+    this.syncState = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.companyId = const Value.absent(),
+    this.duplicateWindowMinutes = const Value.absent(),
+    this.staleOpenSessionMinutes = const Value.absent(),
+    this.excessiveDurationMinutes = const Value.absent(),
+    this.breakAfterMinutes = const Value.absent(),
+    this.breakMinutes = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  AttendanceSettingsCompanion.insert({
+    required String id,
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.version = const Value.absent(),
+    this.syncState = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    required String companyId,
+    required int duplicateWindowMinutes,
+    required int staleOpenSessionMinutes,
+    required int excessiveDurationMinutes,
+    this.breakAfterMinutes = const Value.absent(),
+    this.breakMinutes = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt),
+       companyId = Value(companyId),
+       duplicateWindowMinutes = Value(duplicateWindowMinutes),
+       staleOpenSessionMinutes = Value(staleOpenSessionMinutes),
+       excessiveDurationMinutes = Value(excessiveDurationMinutes);
+  static Insertable<AttendanceSettingsRow> custom({
+    Expression<String>? id,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? version,
+    Expression<String>? syncState,
+    Expression<DateTime>? deletedAt,
+    Expression<String>? companyId,
+    Expression<int>? duplicateWindowMinutes,
+    Expression<int>? staleOpenSessionMinutes,
+    Expression<int>? excessiveDurationMinutes,
+    Expression<int>? breakAfterMinutes,
+    Expression<int>? breakMinutes,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (version != null) 'version': version,
+      if (syncState != null) 'sync_state': syncState,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (companyId != null) 'company_id': companyId,
+      if (duplicateWindowMinutes != null)
+        'duplicate_window_minutes': duplicateWindowMinutes,
+      if (staleOpenSessionMinutes != null)
+        'stale_open_session_minutes': staleOpenSessionMinutes,
+      if (excessiveDurationMinutes != null)
+        'excessive_duration_minutes': excessiveDurationMinutes,
+      if (breakAfterMinutes != null) 'break_after_minutes': breakAfterMinutes,
+      if (breakMinutes != null) 'break_minutes': breakMinutes,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  AttendanceSettingsCompanion copyWith({
+    Value<String>? id,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<int>? version,
+    Value<SyncState>? syncState,
+    Value<DateTime?>? deletedAt,
+    Value<String>? companyId,
+    Value<int>? duplicateWindowMinutes,
+    Value<int>? staleOpenSessionMinutes,
+    Value<int>? excessiveDurationMinutes,
+    Value<int?>? breakAfterMinutes,
+    Value<int?>? breakMinutes,
+    Value<int>? rowid,
+  }) {
+    return AttendanceSettingsCompanion(
+      id: id ?? this.id,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      version: version ?? this.version,
+      syncState: syncState ?? this.syncState,
+      deletedAt: deletedAt ?? this.deletedAt,
+      companyId: companyId ?? this.companyId,
+      duplicateWindowMinutes:
+          duplicateWindowMinutes ?? this.duplicateWindowMinutes,
+      staleOpenSessionMinutes:
+          staleOpenSessionMinutes ?? this.staleOpenSessionMinutes,
+      excessiveDurationMinutes:
+          excessiveDurationMinutes ?? this.excessiveDurationMinutes,
+      breakAfterMinutes: breakAfterMinutes ?? this.breakAfterMinutes,
+      breakMinutes: breakMinutes ?? this.breakMinutes,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (version.present) {
+      map['version'] = Variable<int>(version.value);
+    }
+    if (syncState.present) {
+      map['sync_state'] = Variable<String>(
+        $AttendanceSettingsTable.$convertersyncState.toSql(syncState.value),
+      );
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    if (companyId.present) {
+      map['company_id'] = Variable<String>(companyId.value);
+    }
+    if (duplicateWindowMinutes.present) {
+      map['duplicate_window_minutes'] = Variable<int>(
+        duplicateWindowMinutes.value,
+      );
+    }
+    if (staleOpenSessionMinutes.present) {
+      map['stale_open_session_minutes'] = Variable<int>(
+        staleOpenSessionMinutes.value,
+      );
+    }
+    if (excessiveDurationMinutes.present) {
+      map['excessive_duration_minutes'] = Variable<int>(
+        excessiveDurationMinutes.value,
+      );
+    }
+    if (breakAfterMinutes.present) {
+      map['break_after_minutes'] = Variable<int>(breakAfterMinutes.value);
+    }
+    if (breakMinutes.present) {
+      map['break_minutes'] = Variable<int>(breakMinutes.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AttendanceSettingsCompanion(')
+          ..write('id: $id, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('version: $version, ')
+          ..write('syncState: $syncState, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('companyId: $companyId, ')
+          ..write('duplicateWindowMinutes: $duplicateWindowMinutes, ')
+          ..write('staleOpenSessionMinutes: $staleOpenSessionMinutes, ')
+          ..write('excessiveDurationMinutes: $excessiveDurationMinutes, ')
+          ..write('breakAfterMinutes: $breakAfterMinutes, ')
+          ..write('breakMinutes: $breakMinutes, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $AttendanceCorrectionsTable extends AttendanceCorrections
+    with TableInfo<$AttendanceCorrectionsTable, AttendanceCorrectionRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AttendanceCorrectionsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _versionMeta = const VerificationMeta(
+    'version',
+  );
+  @override
+  late final GeneratedColumn<int> version = GeneratedColumn<int>(
+    'version',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<SyncState, String> syncState =
+      GeneratedColumn<String>(
+        'sync_state',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: Constant(SyncState.localOnly.name),
+      ).withConverter<SyncState>(
+        $AttendanceCorrectionsTable.$convertersyncState,
+      );
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _employeeIdMeta = const VerificationMeta(
+    'employeeId',
+  );
+  @override
+  late final GeneratedColumn<String> employeeId = GeneratedColumn<String>(
+    'employee_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES employees (id)',
+    ),
+  );
+  static const VerificationMeta _kindMeta = const VerificationMeta('kind');
+  @override
+  late final GeneratedColumn<String> kind = GeneratedColumn<String>(
+    'kind',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _eventTypeMeta = const VerificationMeta(
+    'eventType',
+  );
+  @override
+  late final GeneratedColumn<String> eventType = GeneratedColumn<String>(
+    'event_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _originalEventIdMeta = const VerificationMeta(
+    'originalEventId',
+  );
+  @override
+  late final GeneratedColumn<String> originalEventId = GeneratedColumn<String>(
+    'original_event_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'UNIQUE REFERENCES attendance_events (id)',
+    ),
+  );
+  static const VerificationMeta _replacementEventIdMeta =
+      const VerificationMeta('replacementEventId');
+  @override
+  late final GeneratedColumn<String> replacementEventId =
+      GeneratedColumn<String>(
+        'replacement_event_id',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'REFERENCES attendance_events (id)',
+        ),
+      );
+  static const VerificationMeta _previousOccurredAtMeta =
+      const VerificationMeta('previousOccurredAt');
+  @override
+  late final GeneratedColumn<DateTime> previousOccurredAt =
+      GeneratedColumn<DateTime>(
+        'previous_occurred_at',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _newOccurredAtMeta = const VerificationMeta(
+    'newOccurredAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> newOccurredAt =
+      GeneratedColumn<DateTime>(
+        'new_occurred_at',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _reasonMeta = const VerificationMeta('reason');
+  @override
+  late final GeneratedColumn<String> reason = GeneratedColumn<String>(
+    'reason',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _correctedByMeta = const VerificationMeta(
+    'correctedBy',
+  );
+  @override
+  late final GeneratedColumn<String> correctedBy = GeneratedColumn<String>(
+    'corrected_by',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES admin_users (id)',
+    ),
+  );
+  static const VerificationMeta _correctedAtMeta = const VerificationMeta(
+    'correctedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> correctedAt = GeneratedColumn<DateTime>(
+    'corrected_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    createdAt,
+    updatedAt,
+    version,
+    syncState,
+    deletedAt,
+    employeeId,
+    kind,
+    eventType,
+    originalEventId,
+    replacementEventId,
+    previousOccurredAt,
+    newOccurredAt,
+    reason,
+    correctedBy,
+    correctedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'attendance_corrections';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<AttendanceCorrectionRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('version')) {
+      context.handle(
+        _versionMeta,
+        version.isAcceptableOrUnknown(data['version']!, _versionMeta),
+      );
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    if (data.containsKey('employee_id')) {
+      context.handle(
+        _employeeIdMeta,
+        employeeId.isAcceptableOrUnknown(data['employee_id']!, _employeeIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_employeeIdMeta);
+    }
+    if (data.containsKey('kind')) {
+      context.handle(
+        _kindMeta,
+        kind.isAcceptableOrUnknown(data['kind']!, _kindMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_kindMeta);
+    }
+    if (data.containsKey('event_type')) {
+      context.handle(
+        _eventTypeMeta,
+        eventType.isAcceptableOrUnknown(data['event_type']!, _eventTypeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_eventTypeMeta);
+    }
+    if (data.containsKey('original_event_id')) {
+      context.handle(
+        _originalEventIdMeta,
+        originalEventId.isAcceptableOrUnknown(
+          data['original_event_id']!,
+          _originalEventIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('replacement_event_id')) {
+      context.handle(
+        _replacementEventIdMeta,
+        replacementEventId.isAcceptableOrUnknown(
+          data['replacement_event_id']!,
+          _replacementEventIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('previous_occurred_at')) {
+      context.handle(
+        _previousOccurredAtMeta,
+        previousOccurredAt.isAcceptableOrUnknown(
+          data['previous_occurred_at']!,
+          _previousOccurredAtMeta,
+        ),
+      );
+    }
+    if (data.containsKey('new_occurred_at')) {
+      context.handle(
+        _newOccurredAtMeta,
+        newOccurredAt.isAcceptableOrUnknown(
+          data['new_occurred_at']!,
+          _newOccurredAtMeta,
+        ),
+      );
+    }
+    if (data.containsKey('reason')) {
+      context.handle(
+        _reasonMeta,
+        reason.isAcceptableOrUnknown(data['reason']!, _reasonMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_reasonMeta);
+    }
+    if (data.containsKey('corrected_by')) {
+      context.handle(
+        _correctedByMeta,
+        correctedBy.isAcceptableOrUnknown(
+          data['corrected_by']!,
+          _correctedByMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_correctedByMeta);
+    }
+    if (data.containsKey('corrected_at')) {
+      context.handle(
+        _correctedAtMeta,
+        correctedAt.isAcceptableOrUnknown(
+          data['corrected_at']!,
+          _correctedAtMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_correctedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  AttendanceCorrectionRow map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return AttendanceCorrectionRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      version: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}version'],
+      )!,
+      syncState: $AttendanceCorrectionsTable.$convertersyncState.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}sync_state'],
+        )!,
+      ),
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deleted_at'],
+      ),
+      employeeId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}employee_id'],
+      )!,
+      kind: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}kind'],
+      )!,
+      eventType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}event_type'],
+      )!,
+      originalEventId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}original_event_id'],
+      ),
+      replacementEventId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}replacement_event_id'],
+      ),
+      previousOccurredAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}previous_occurred_at'],
+      ),
+      newOccurredAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}new_occurred_at'],
+      ),
+      reason: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}reason'],
+      )!,
+      correctedBy: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}corrected_by'],
+      )!,
+      correctedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}corrected_at'],
+      )!,
+    );
+  }
+
+  @override
+  $AttendanceCorrectionsTable createAlias(String alias) {
+    return $AttendanceCorrectionsTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<SyncState, String, String> $convertersyncState =
+      const EnumNameConverter<SyncState>(SyncState.values);
+}
+
+class AttendanceCorrectionRow extends DataClass
+    implements Insertable<AttendanceCorrectionRow> {
+  final String id;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final int version;
+  final SyncState syncState;
+  final DateTime? deletedAt;
+  final String employeeId;
+
+  /// `added`, `timeChanged` or `removed`.
+  final String kind;
+
+  /// `clockIn` or `clockOut`.
+  final String eventType;
+  final String? originalEventId;
+  final String? replacementEventId;
+  final DateTime? previousOccurredAt;
+  final DateTime? newOccurredAt;
+  final String reason;
+
+  /// Administrator who made the correction.
+  final String correctedBy;
+  final DateTime correctedAt;
+  const AttendanceCorrectionRow({
+    required this.id,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.version,
+    required this.syncState,
+    this.deletedAt,
+    required this.employeeId,
+    required this.kind,
+    required this.eventType,
+    this.originalEventId,
+    this.replacementEventId,
+    this.previousOccurredAt,
+    this.newOccurredAt,
+    required this.reason,
+    required this.correctedBy,
+    required this.correctedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    map['version'] = Variable<int>(version);
+    {
+      map['sync_state'] = Variable<String>(
+        $AttendanceCorrectionsTable.$convertersyncState.toSql(syncState),
+      );
+    }
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
+    map['employee_id'] = Variable<String>(employeeId);
+    map['kind'] = Variable<String>(kind);
+    map['event_type'] = Variable<String>(eventType);
+    if (!nullToAbsent || originalEventId != null) {
+      map['original_event_id'] = Variable<String>(originalEventId);
+    }
+    if (!nullToAbsent || replacementEventId != null) {
+      map['replacement_event_id'] = Variable<String>(replacementEventId);
+    }
+    if (!nullToAbsent || previousOccurredAt != null) {
+      map['previous_occurred_at'] = Variable<DateTime>(previousOccurredAt);
+    }
+    if (!nullToAbsent || newOccurredAt != null) {
+      map['new_occurred_at'] = Variable<DateTime>(newOccurredAt);
+    }
+    map['reason'] = Variable<String>(reason);
+    map['corrected_by'] = Variable<String>(correctedBy);
+    map['corrected_at'] = Variable<DateTime>(correctedAt);
+    return map;
+  }
+
+  AttendanceCorrectionsCompanion toCompanion(bool nullToAbsent) {
+    return AttendanceCorrectionsCompanion(
+      id: Value(id),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      version: Value(version),
+      syncState: Value(syncState),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
+      employeeId: Value(employeeId),
+      kind: Value(kind),
+      eventType: Value(eventType),
+      originalEventId: originalEventId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(originalEventId),
+      replacementEventId: replacementEventId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(replacementEventId),
+      previousOccurredAt: previousOccurredAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(previousOccurredAt),
+      newOccurredAt: newOccurredAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(newOccurredAt),
+      reason: Value(reason),
+      correctedBy: Value(correctedBy),
+      correctedAt: Value(correctedAt),
+    );
+  }
+
+  factory AttendanceCorrectionRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return AttendanceCorrectionRow(
+      id: serializer.fromJson<String>(json['id']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      version: serializer.fromJson<int>(json['version']),
+      syncState: $AttendanceCorrectionsTable.$convertersyncState.fromJson(
+        serializer.fromJson<String>(json['syncState']),
+      ),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+      employeeId: serializer.fromJson<String>(json['employeeId']),
+      kind: serializer.fromJson<String>(json['kind']),
+      eventType: serializer.fromJson<String>(json['eventType']),
+      originalEventId: serializer.fromJson<String?>(json['originalEventId']),
+      replacementEventId: serializer.fromJson<String?>(
+        json['replacementEventId'],
+      ),
+      previousOccurredAt: serializer.fromJson<DateTime?>(
+        json['previousOccurredAt'],
+      ),
+      newOccurredAt: serializer.fromJson<DateTime?>(json['newOccurredAt']),
+      reason: serializer.fromJson<String>(json['reason']),
+      correctedBy: serializer.fromJson<String>(json['correctedBy']),
+      correctedAt: serializer.fromJson<DateTime>(json['correctedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'version': serializer.toJson<int>(version),
+      'syncState': serializer.toJson<String>(
+        $AttendanceCorrectionsTable.$convertersyncState.toJson(syncState),
+      ),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+      'employeeId': serializer.toJson<String>(employeeId),
+      'kind': serializer.toJson<String>(kind),
+      'eventType': serializer.toJson<String>(eventType),
+      'originalEventId': serializer.toJson<String?>(originalEventId),
+      'replacementEventId': serializer.toJson<String?>(replacementEventId),
+      'previousOccurredAt': serializer.toJson<DateTime?>(previousOccurredAt),
+      'newOccurredAt': serializer.toJson<DateTime?>(newOccurredAt),
+      'reason': serializer.toJson<String>(reason),
+      'correctedBy': serializer.toJson<String>(correctedBy),
+      'correctedAt': serializer.toJson<DateTime>(correctedAt),
+    };
+  }
+
+  AttendanceCorrectionRow copyWith({
+    String? id,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    int? version,
+    SyncState? syncState,
+    Value<DateTime?> deletedAt = const Value.absent(),
+    String? employeeId,
+    String? kind,
+    String? eventType,
+    Value<String?> originalEventId = const Value.absent(),
+    Value<String?> replacementEventId = const Value.absent(),
+    Value<DateTime?> previousOccurredAt = const Value.absent(),
+    Value<DateTime?> newOccurredAt = const Value.absent(),
+    String? reason,
+    String? correctedBy,
+    DateTime? correctedAt,
+  }) => AttendanceCorrectionRow(
+    id: id ?? this.id,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    version: version ?? this.version,
+    syncState: syncState ?? this.syncState,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+    employeeId: employeeId ?? this.employeeId,
+    kind: kind ?? this.kind,
+    eventType: eventType ?? this.eventType,
+    originalEventId: originalEventId.present
+        ? originalEventId.value
+        : this.originalEventId,
+    replacementEventId: replacementEventId.present
+        ? replacementEventId.value
+        : this.replacementEventId,
+    previousOccurredAt: previousOccurredAt.present
+        ? previousOccurredAt.value
+        : this.previousOccurredAt,
+    newOccurredAt: newOccurredAt.present
+        ? newOccurredAt.value
+        : this.newOccurredAt,
+    reason: reason ?? this.reason,
+    correctedBy: correctedBy ?? this.correctedBy,
+    correctedAt: correctedAt ?? this.correctedAt,
+  );
+  AttendanceCorrectionRow copyWithCompanion(
+    AttendanceCorrectionsCompanion data,
+  ) {
+    return AttendanceCorrectionRow(
+      id: data.id.present ? data.id.value : this.id,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      version: data.version.present ? data.version.value : this.version,
+      syncState: data.syncState.present ? data.syncState.value : this.syncState,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+      employeeId: data.employeeId.present
+          ? data.employeeId.value
+          : this.employeeId,
+      kind: data.kind.present ? data.kind.value : this.kind,
+      eventType: data.eventType.present ? data.eventType.value : this.eventType,
+      originalEventId: data.originalEventId.present
+          ? data.originalEventId.value
+          : this.originalEventId,
+      replacementEventId: data.replacementEventId.present
+          ? data.replacementEventId.value
+          : this.replacementEventId,
+      previousOccurredAt: data.previousOccurredAt.present
+          ? data.previousOccurredAt.value
+          : this.previousOccurredAt,
+      newOccurredAt: data.newOccurredAt.present
+          ? data.newOccurredAt.value
+          : this.newOccurredAt,
+      reason: data.reason.present ? data.reason.value : this.reason,
+      correctedBy: data.correctedBy.present
+          ? data.correctedBy.value
+          : this.correctedBy,
+      correctedAt: data.correctedAt.present
+          ? data.correctedAt.value
+          : this.correctedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AttendanceCorrectionRow(')
+          ..write('id: $id, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('version: $version, ')
+          ..write('syncState: $syncState, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('employeeId: $employeeId, ')
+          ..write('kind: $kind, ')
+          ..write('eventType: $eventType, ')
+          ..write('originalEventId: $originalEventId, ')
+          ..write('replacementEventId: $replacementEventId, ')
+          ..write('previousOccurredAt: $previousOccurredAt, ')
+          ..write('newOccurredAt: $newOccurredAt, ')
+          ..write('reason: $reason, ')
+          ..write('correctedBy: $correctedBy, ')
+          ..write('correctedAt: $correctedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    createdAt,
+    updatedAt,
+    version,
+    syncState,
+    deletedAt,
+    employeeId,
+    kind,
+    eventType,
+    originalEventId,
+    replacementEventId,
+    previousOccurredAt,
+    newOccurredAt,
+    reason,
+    correctedBy,
+    correctedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is AttendanceCorrectionRow &&
+          other.id == this.id &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.version == this.version &&
+          other.syncState == this.syncState &&
+          other.deletedAt == this.deletedAt &&
+          other.employeeId == this.employeeId &&
+          other.kind == this.kind &&
+          other.eventType == this.eventType &&
+          other.originalEventId == this.originalEventId &&
+          other.replacementEventId == this.replacementEventId &&
+          other.previousOccurredAt == this.previousOccurredAt &&
+          other.newOccurredAt == this.newOccurredAt &&
+          other.reason == this.reason &&
+          other.correctedBy == this.correctedBy &&
+          other.correctedAt == this.correctedAt);
+}
+
+class AttendanceCorrectionsCompanion
+    extends UpdateCompanion<AttendanceCorrectionRow> {
+  final Value<String> id;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<int> version;
+  final Value<SyncState> syncState;
+  final Value<DateTime?> deletedAt;
+  final Value<String> employeeId;
+  final Value<String> kind;
+  final Value<String> eventType;
+  final Value<String?> originalEventId;
+  final Value<String?> replacementEventId;
+  final Value<DateTime?> previousOccurredAt;
+  final Value<DateTime?> newOccurredAt;
+  final Value<String> reason;
+  final Value<String> correctedBy;
+  final Value<DateTime> correctedAt;
+  final Value<int> rowid;
+  const AttendanceCorrectionsCompanion({
+    this.id = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.version = const Value.absent(),
+    this.syncState = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.employeeId = const Value.absent(),
+    this.kind = const Value.absent(),
+    this.eventType = const Value.absent(),
+    this.originalEventId = const Value.absent(),
+    this.replacementEventId = const Value.absent(),
+    this.previousOccurredAt = const Value.absent(),
+    this.newOccurredAt = const Value.absent(),
+    this.reason = const Value.absent(),
+    this.correctedBy = const Value.absent(),
+    this.correctedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  AttendanceCorrectionsCompanion.insert({
+    required String id,
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.version = const Value.absent(),
+    this.syncState = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    required String employeeId,
+    required String kind,
+    required String eventType,
+    this.originalEventId = const Value.absent(),
+    this.replacementEventId = const Value.absent(),
+    this.previousOccurredAt = const Value.absent(),
+    this.newOccurredAt = const Value.absent(),
+    required String reason,
+    required String correctedBy,
+    required DateTime correctedAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt),
+       employeeId = Value(employeeId),
+       kind = Value(kind),
+       eventType = Value(eventType),
+       reason = Value(reason),
+       correctedBy = Value(correctedBy),
+       correctedAt = Value(correctedAt);
+  static Insertable<AttendanceCorrectionRow> custom({
+    Expression<String>? id,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? version,
+    Expression<String>? syncState,
+    Expression<DateTime>? deletedAt,
+    Expression<String>? employeeId,
+    Expression<String>? kind,
+    Expression<String>? eventType,
+    Expression<String>? originalEventId,
+    Expression<String>? replacementEventId,
+    Expression<DateTime>? previousOccurredAt,
+    Expression<DateTime>? newOccurredAt,
+    Expression<String>? reason,
+    Expression<String>? correctedBy,
+    Expression<DateTime>? correctedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (version != null) 'version': version,
+      if (syncState != null) 'sync_state': syncState,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (employeeId != null) 'employee_id': employeeId,
+      if (kind != null) 'kind': kind,
+      if (eventType != null) 'event_type': eventType,
+      if (originalEventId != null) 'original_event_id': originalEventId,
+      if (replacementEventId != null)
+        'replacement_event_id': replacementEventId,
+      if (previousOccurredAt != null)
+        'previous_occurred_at': previousOccurredAt,
+      if (newOccurredAt != null) 'new_occurred_at': newOccurredAt,
+      if (reason != null) 'reason': reason,
+      if (correctedBy != null) 'corrected_by': correctedBy,
+      if (correctedAt != null) 'corrected_at': correctedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  AttendanceCorrectionsCompanion copyWith({
+    Value<String>? id,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<int>? version,
+    Value<SyncState>? syncState,
+    Value<DateTime?>? deletedAt,
+    Value<String>? employeeId,
+    Value<String>? kind,
+    Value<String>? eventType,
+    Value<String?>? originalEventId,
+    Value<String?>? replacementEventId,
+    Value<DateTime?>? previousOccurredAt,
+    Value<DateTime?>? newOccurredAt,
+    Value<String>? reason,
+    Value<String>? correctedBy,
+    Value<DateTime>? correctedAt,
+    Value<int>? rowid,
+  }) {
+    return AttendanceCorrectionsCompanion(
+      id: id ?? this.id,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      version: version ?? this.version,
+      syncState: syncState ?? this.syncState,
+      deletedAt: deletedAt ?? this.deletedAt,
+      employeeId: employeeId ?? this.employeeId,
+      kind: kind ?? this.kind,
+      eventType: eventType ?? this.eventType,
+      originalEventId: originalEventId ?? this.originalEventId,
+      replacementEventId: replacementEventId ?? this.replacementEventId,
+      previousOccurredAt: previousOccurredAt ?? this.previousOccurredAt,
+      newOccurredAt: newOccurredAt ?? this.newOccurredAt,
+      reason: reason ?? this.reason,
+      correctedBy: correctedBy ?? this.correctedBy,
+      correctedAt: correctedAt ?? this.correctedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (version.present) {
+      map['version'] = Variable<int>(version.value);
+    }
+    if (syncState.present) {
+      map['sync_state'] = Variable<String>(
+        $AttendanceCorrectionsTable.$convertersyncState.toSql(syncState.value),
+      );
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    if (employeeId.present) {
+      map['employee_id'] = Variable<String>(employeeId.value);
+    }
+    if (kind.present) {
+      map['kind'] = Variable<String>(kind.value);
+    }
+    if (eventType.present) {
+      map['event_type'] = Variable<String>(eventType.value);
+    }
+    if (originalEventId.present) {
+      map['original_event_id'] = Variable<String>(originalEventId.value);
+    }
+    if (replacementEventId.present) {
+      map['replacement_event_id'] = Variable<String>(replacementEventId.value);
+    }
+    if (previousOccurredAt.present) {
+      map['previous_occurred_at'] = Variable<DateTime>(
+        previousOccurredAt.value,
+      );
+    }
+    if (newOccurredAt.present) {
+      map['new_occurred_at'] = Variable<DateTime>(newOccurredAt.value);
+    }
+    if (reason.present) {
+      map['reason'] = Variable<String>(reason.value);
+    }
+    if (correctedBy.present) {
+      map['corrected_by'] = Variable<String>(correctedBy.value);
+    }
+    if (correctedAt.present) {
+      map['corrected_at'] = Variable<DateTime>(correctedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AttendanceCorrectionsCompanion(')
+          ..write('id: $id, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('version: $version, ')
+          ..write('syncState: $syncState, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('employeeId: $employeeId, ')
+          ..write('kind: $kind, ')
+          ..write('eventType: $eventType, ')
+          ..write('originalEventId: $originalEventId, ')
+          ..write('replacementEventId: $replacementEventId, ')
+          ..write('previousOccurredAt: $previousOccurredAt, ')
+          ..write('newOccurredAt: $newOccurredAt, ')
+          ..write('reason: $reason, ')
+          ..write('correctedBy: $correctedBy, ')
+          ..write('correctedAt: $correctedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -4918,6 +7436,13 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $CredentialsTable credentials = $CredentialsTable(this);
   late final $AuditLogTable auditLog = $AuditLogTable(this);
   late final $DeviceIdentityTable deviceIdentity = $DeviceIdentityTable(this);
+  late final $AttendanceEventsTable attendanceEvents = $AttendanceEventsTable(
+    this,
+  );
+  late final $AttendanceSettingsTable attendanceSettings =
+      $AttendanceSettingsTable(this);
+  late final $AttendanceCorrectionsTable attendanceCorrections =
+      $AttendanceCorrectionsTable(this);
   late final Index auditLogCompanyTime = Index(
     'audit_log_company_time',
     'CREATE INDEX audit_log_company_time ON audit_log (company_id, occurred_at)',
@@ -4925,6 +7450,22 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final Index auditLogEntity = Index(
     'audit_log_entity',
     'CREATE INDEX audit_log_entity ON audit_log (entity_type, entity_id)',
+  );
+  late final Index attendanceEventsEmployeeTime = Index(
+    'attendance_events_employee_time',
+    'CREATE INDEX attendance_events_employee_time ON attendance_events (employee_id, occurred_at)',
+  );
+  late final Index attendanceEventsTime = Index(
+    'attendance_events_time',
+    'CREATE INDEX attendance_events_time ON attendance_events (occurred_at)',
+  );
+  late final Index attendanceCorrectionsOriginal = Index(
+    'attendance_corrections_original',
+    'CREATE INDEX attendance_corrections_original ON attendance_corrections (original_event_id)',
+  );
+  late final Index attendanceCorrectionsEmployee = Index(
+    'attendance_corrections_employee',
+    'CREATE INDEX attendance_corrections_employee ON attendance_corrections (employee_id, corrected_at)',
   );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
@@ -4938,8 +7479,15 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     credentials,
     auditLog,
     deviceIdentity,
+    attendanceEvents,
+    attendanceSettings,
+    attendanceCorrections,
     auditLogCompanyTime,
     auditLogEntity,
+    attendanceEventsEmployeeTime,
+    attendanceEventsTime,
+    attendanceCorrectionsOriginal,
+    attendanceCorrectionsEmployee,
   ];
   @override
   DriftDatabaseOptions get options =>
@@ -5038,6 +7586,30 @@ final class $$CompaniesTableReferences
     ).filter((f) => f.companyId.id.sqlEquals($_itemColumn<String>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_auditLogRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $AttendanceSettingsTable,
+    List<AttendanceSettingsRow>
+  >
+  _attendanceSettingsRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.attendanceSettings,
+        aliasName: 'companies__id__attendance_settings__company_id',
+      );
+
+  $$AttendanceSettingsTableProcessedTableManager get attendanceSettingsRefs {
+    final manager = $$AttendanceSettingsTableTableManager(
+      $_db,
+      $_db.attendanceSettings,
+    ).filter((f) => f.companyId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _attendanceSettingsRefsTable($_db),
+    );
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -5195,6 +7767,31 @@ class $$CompaniesTableFilterComposer
           }) => $$AuditLogTableFilterComposer(
             $db: $db,
             $table: $db.auditLog,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> attendanceSettingsRefs(
+    Expression<bool> Function($$AttendanceSettingsTableFilterComposer f) f,
+  ) {
+    final $$AttendanceSettingsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.attendanceSettings,
+      getReferencedColumn: (t) => t.companyId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AttendanceSettingsTableFilterComposer(
+            $db: $db,
+            $table: $db.attendanceSettings,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -5422,6 +8019,32 @@ class $$CompaniesTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> attendanceSettingsRefs<T extends Object>(
+    Expression<T> Function($$AttendanceSettingsTableAnnotationComposer a) f,
+  ) {
+    final $$AttendanceSettingsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.attendanceSettings,
+          getReferencedColumn: (t) => t.companyId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AttendanceSettingsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.attendanceSettings,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$CompaniesTableTableManager
@@ -5441,6 +8064,7 @@ class $$CompaniesTableTableManager
             bool adminUsersRefs,
             bool employeesRefs,
             bool auditLogRefs,
+            bool attendanceSettingsRefs,
           })
         > {
   $$CompaniesTableTableManager(_$AppDatabase db, $CompaniesTable table)
@@ -5539,6 +8163,7 @@ class $$CompaniesTableTableManager
                 adminUsersRefs = false,
                 employeesRefs = false,
                 auditLogRefs = false,
+                attendanceSettingsRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -5546,6 +8171,7 @@ class $$CompaniesTableTableManager
                     if (adminUsersRefs) db.adminUsers,
                     if (employeesRefs) db.employees,
                     if (auditLogRefs) db.auditLog,
+                    if (attendanceSettingsRefs) db.attendanceSettings,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
@@ -5613,6 +8239,27 @@ class $$CompaniesTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (attendanceSettingsRefs)
+                        await $_getPrefetchedData<
+                          CompanyRow,
+                          $CompaniesTable,
+                          AttendanceSettingsRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$CompaniesTableReferences
+                              ._attendanceSettingsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$CompaniesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).attendanceSettingsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.companyId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -5637,6 +8284,7 @@ typedef $$CompaniesTableProcessedTableManager =
         bool adminUsersRefs,
         bool employeesRefs,
         bool auditLogRefs,
+        bool attendanceSettingsRefs,
       })
     >;
 typedef $$AdminUsersTableCreateCompanionBuilder =
@@ -5706,6 +8354,31 @@ final class $$AdminUsersTableReferences
     ).filter((f) => f.adminUserId.id.sqlEquals($_itemColumn<String>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_credentialsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $AttendanceCorrectionsTable,
+    List<AttendanceCorrectionRow>
+  >
+  _attendanceCorrectionsRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.attendanceCorrections,
+        aliasName: 'admin_users__id__attendance_corrections__corrected_by',
+      );
+
+  $$AttendanceCorrectionsTableProcessedTableManager
+  get attendanceCorrectionsRefs {
+    final manager = $$AttendanceCorrectionsTableTableManager(
+      $_db,
+      $_db.attendanceCorrections,
+    ).filter((f) => f.correctedBy.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _attendanceCorrectionsRefsTable($_db),
+    );
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -5822,6 +8495,32 @@ class $$AdminUsersTableFilterComposer
                 $removeJoinBuilderFromRootComposer,
           ),
     );
+    return f(composer);
+  }
+
+  Expression<bool> attendanceCorrectionsRefs(
+    Expression<bool> Function($$AttendanceCorrectionsTableFilterComposer f) f,
+  ) {
+    final $$AttendanceCorrectionsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.attendanceCorrections,
+          getReferencedColumn: (t) => t.correctedBy,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AttendanceCorrectionsTableFilterComposer(
+                $db: $db,
+                $table: $db.attendanceCorrections,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
     return f(composer);
   }
 }
@@ -6007,6 +8706,32 @@ class $$AdminUsersTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> attendanceCorrectionsRefs<T extends Object>(
+    Expression<T> Function($$AttendanceCorrectionsTableAnnotationComposer a) f,
+  ) {
+    final $$AttendanceCorrectionsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.attendanceCorrections,
+          getReferencedColumn: (t) => t.correctedBy,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AttendanceCorrectionsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.attendanceCorrections,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$AdminUsersTableTableManager
@@ -6022,7 +8747,11 @@ class $$AdminUsersTableTableManager
           $$AdminUsersTableUpdateCompanionBuilder,
           (AdminUserRow, $$AdminUsersTableReferences),
           AdminUserRow,
-          PrefetchHooks Function({bool companyId, bool credentialsRefs})
+          PrefetchHooks Function({
+            bool companyId,
+            bool credentialsRefs,
+            bool attendanceCorrectionsRefs,
+          })
         > {
   $$AdminUsersTableTableManager(_$AppDatabase db, $AdminUsersTable table)
     : super(
@@ -6104,11 +8833,16 @@ class $$AdminUsersTableTableManager
               )
               .toList(),
           prefetchHooksCallback:
-              ({companyId = false, credentialsRefs = false}) {
+              ({
+                companyId = false,
+                credentialsRefs = false,
+                attendanceCorrectionsRefs = false,
+              }) {
                 return PrefetchHooks(
                   db: db,
                   explicitlyWatchedTables: [
                     if (credentialsRefs) db.credentials,
+                    if (attendanceCorrectionsRefs) db.attendanceCorrections,
                   ],
                   addJoins:
                       <
@@ -6166,6 +8900,27 @@ class $$AdminUsersTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (attendanceCorrectionsRefs)
+                        await $_getPrefetchedData<
+                          AdminUserRow,
+                          $AdminUsersTable,
+                          AttendanceCorrectionRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$AdminUsersTableReferences
+                              ._attendanceCorrectionsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$AdminUsersTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).attendanceCorrectionsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.correctedBy == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -6186,7 +8941,11 @@ typedef $$AdminUsersTableProcessedTableManager =
       $$AdminUsersTableUpdateCompanionBuilder,
       (AdminUserRow, $$AdminUsersTableReferences),
       AdminUserRow,
-      PrefetchHooks Function({bool companyId, bool credentialsRefs})
+      PrefetchHooks Function({
+        bool companyId,
+        bool credentialsRefs,
+        bool attendanceCorrectionsRefs,
+      })
     >;
 typedef $$EmployeesTableCreateCompanionBuilder =
     EmployeesCompanion Function({
@@ -6285,6 +9044,51 @@ final class $$EmployeesTableReferences
     ).filter((f) => f.employeeId.id.sqlEquals($_itemColumn<String>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_credentialsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$AttendanceEventsTable, List<AttendanceEventRow>>
+  _attendanceEventsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.attendanceEvents,
+    aliasName: 'employees__id__attendance_events__employee_id',
+  );
+
+  $$AttendanceEventsTableProcessedTableManager get attendanceEventsRefs {
+    final manager = $$AttendanceEventsTableTableManager(
+      $_db,
+      $_db.attendanceEvents,
+    ).filter((f) => f.employeeId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _attendanceEventsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<
+    $AttendanceCorrectionsTable,
+    List<AttendanceCorrectionRow>
+  >
+  _attendanceCorrectionsRefsTable(_$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(
+        db.attendanceCorrections,
+        aliasName: 'employees__id__attendance_corrections__employee_id',
+      );
+
+  $$AttendanceCorrectionsTableProcessedTableManager
+  get attendanceCorrectionsRefs {
+    final manager = $$AttendanceCorrectionsTableTableManager(
+      $_db,
+      $_db.attendanceCorrections,
+    ).filter((f) => f.employeeId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _attendanceCorrectionsRefsTable($_db),
+    );
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -6458,6 +9262,57 @@ class $$EmployeesTableFilterComposer
                 $removeJoinBuilderFromRootComposer,
           ),
     );
+    return f(composer);
+  }
+
+  Expression<bool> attendanceEventsRefs(
+    Expression<bool> Function($$AttendanceEventsTableFilterComposer f) f,
+  ) {
+    final $$AttendanceEventsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.attendanceEvents,
+      getReferencedColumn: (t) => t.employeeId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AttendanceEventsTableFilterComposer(
+            $db: $db,
+            $table: $db.attendanceEvents,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> attendanceCorrectionsRefs(
+    Expression<bool> Function($$AttendanceCorrectionsTableFilterComposer f) f,
+  ) {
+    final $$AttendanceCorrectionsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.attendanceCorrections,
+          getReferencedColumn: (t) => t.employeeId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AttendanceCorrectionsTableFilterComposer(
+                $db: $db,
+                $table: $db.attendanceCorrections,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
     return f(composer);
   }
 }
@@ -6726,6 +9581,57 @@ class $$EmployeesTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> attendanceEventsRefs<T extends Object>(
+    Expression<T> Function($$AttendanceEventsTableAnnotationComposer a) f,
+  ) {
+    final $$AttendanceEventsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.attendanceEvents,
+      getReferencedColumn: (t) => t.employeeId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AttendanceEventsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.attendanceEvents,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> attendanceCorrectionsRefs<T extends Object>(
+    Expression<T> Function($$AttendanceCorrectionsTableAnnotationComposer a) f,
+  ) {
+    final $$AttendanceCorrectionsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.id,
+          referencedTable: $db.attendanceCorrections,
+          getReferencedColumn: (t) => t.employeeId,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AttendanceCorrectionsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.attendanceCorrections,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return f(composer);
+  }
 }
 
 class $$EmployeesTableTableManager
@@ -6745,6 +9651,8 @@ class $$EmployeesTableTableManager
             bool companyId,
             bool employeeRatesRefs,
             bool credentialsRefs,
+            bool attendanceEventsRefs,
+            bool attendanceCorrectionsRefs,
           })
         > {
   $$EmployeesTableTableManager(_$AppDatabase db, $EmployeesTable table)
@@ -6855,12 +9763,16 @@ class $$EmployeesTableTableManager
                 companyId = false,
                 employeeRatesRefs = false,
                 credentialsRefs = false,
+                attendanceEventsRefs = false,
+                attendanceCorrectionsRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
                   explicitlyWatchedTables: [
                     if (employeeRatesRefs) db.employeeRates,
                     if (credentialsRefs) db.credentials,
+                    if (attendanceEventsRefs) db.attendanceEvents,
+                    if (attendanceCorrectionsRefs) db.attendanceCorrections,
                   ],
                   addJoins:
                       <
@@ -6938,6 +9850,48 @@ class $$EmployeesTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (attendanceEventsRefs)
+                        await $_getPrefetchedData<
+                          EmployeeRow,
+                          $EmployeesTable,
+                          AttendanceEventRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$EmployeesTableReferences
+                              ._attendanceEventsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$EmployeesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).attendanceEventsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.employeeId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (attendanceCorrectionsRefs)
+                        await $_getPrefetchedData<
+                          EmployeeRow,
+                          $EmployeesTable,
+                          AttendanceCorrectionRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$EmployeesTableReferences
+                              ._attendanceCorrectionsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$EmployeesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).attendanceCorrectionsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.employeeId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -6962,6 +9916,8 @@ typedef $$EmployeesTableProcessedTableManager =
         bool companyId,
         bool employeeRatesRefs,
         bool credentialsRefs,
+        bool attendanceEventsRefs,
+        bool attendanceCorrectionsRefs,
       })
     >;
 typedef $$EmployeeRatesTableCreateCompanionBuilder =
@@ -8532,6 +11488,1816 @@ typedef $$DeviceIdentityTableProcessedTableManager =
       DeviceIdentityRow,
       PrefetchHooks Function()
     >;
+typedef $$AttendanceEventsTableCreateCompanionBuilder =
+    AttendanceEventsCompanion Function({
+      required String id,
+      required DateTime createdAt,
+      required DateTime updatedAt,
+      Value<int> version,
+      Value<SyncState> syncState,
+      Value<DateTime?> deletedAt,
+      required String employeeId,
+      required String eventType,
+      required DateTime occurredAt,
+      required DateTime recordedAt,
+      required String source,
+      required String deviceId,
+      required String createdBy,
+      Value<int> rowid,
+    });
+typedef $$AttendanceEventsTableUpdateCompanionBuilder =
+    AttendanceEventsCompanion Function({
+      Value<String> id,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<int> version,
+      Value<SyncState> syncState,
+      Value<DateTime?> deletedAt,
+      Value<String> employeeId,
+      Value<String> eventType,
+      Value<DateTime> occurredAt,
+      Value<DateTime> recordedAt,
+      Value<String> source,
+      Value<String> deviceId,
+      Value<String> createdBy,
+      Value<int> rowid,
+    });
+
+final class $$AttendanceEventsTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $AttendanceEventsTable,
+          AttendanceEventRow
+        > {
+  $$AttendanceEventsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $EmployeesTable _employeeIdTable(_$AppDatabase db) =>
+      db.employees.createAlias('attendance_events__employee_id__employees__id');
+
+  $$EmployeesTableProcessedTableManager get employeeId {
+    final $_column = $_itemColumn<String>('employee_id')!;
+
+    final manager = $$EmployeesTableTableManager(
+      $_db,
+      $_db.employees,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_employeeIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$AttendanceEventsTableFilterComposer
+    extends Composer<_$AppDatabase, $AttendanceEventsTable> {
+  $$AttendanceEventsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get version => $composableBuilder(
+    column: $table.version,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<SyncState, SyncState, String> get syncState =>
+      $composableBuilder(
+        column: $table.syncState,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get eventType => $composableBuilder(
+    column: $table.eventType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get occurredAt => $composableBuilder(
+    column: $table.occurredAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get recordedAt => $composableBuilder(
+    column: $table.recordedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get source => $composableBuilder(
+    column: $table.source,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get deviceId => $composableBuilder(
+    column: $table.deviceId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get createdBy => $composableBuilder(
+    column: $table.createdBy,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$EmployeesTableFilterComposer get employeeId {
+    final $$EmployeesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.employeeId,
+      referencedTable: $db.employees,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$EmployeesTableFilterComposer(
+            $db: $db,
+            $table: $db.employees,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$AttendanceEventsTableOrderingComposer
+    extends Composer<_$AppDatabase, $AttendanceEventsTable> {
+  $$AttendanceEventsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get version => $composableBuilder(
+    column: $table.version,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get syncState => $composableBuilder(
+    column: $table.syncState,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get eventType => $composableBuilder(
+    column: $table.eventType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get occurredAt => $composableBuilder(
+    column: $table.occurredAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get recordedAt => $composableBuilder(
+    column: $table.recordedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get source => $composableBuilder(
+    column: $table.source,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get deviceId => $composableBuilder(
+    column: $table.deviceId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get createdBy => $composableBuilder(
+    column: $table.createdBy,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$EmployeesTableOrderingComposer get employeeId {
+    final $$EmployeesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.employeeId,
+      referencedTable: $db.employees,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$EmployeesTableOrderingComposer(
+            $db: $db,
+            $table: $db.employees,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$AttendanceEventsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $AttendanceEventsTable> {
+  $$AttendanceEventsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<int> get version =>
+      $composableBuilder(column: $table.version, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<SyncState, String> get syncState =>
+      $composableBuilder(column: $table.syncState, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get eventType =>
+      $composableBuilder(column: $table.eventType, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get occurredAt => $composableBuilder(
+    column: $table.occurredAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get recordedAt => $composableBuilder(
+    column: $table.recordedAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get source =>
+      $composableBuilder(column: $table.source, builder: (column) => column);
+
+  GeneratedColumn<String> get deviceId =>
+      $composableBuilder(column: $table.deviceId, builder: (column) => column);
+
+  GeneratedColumn<String> get createdBy =>
+      $composableBuilder(column: $table.createdBy, builder: (column) => column);
+
+  $$EmployeesTableAnnotationComposer get employeeId {
+    final $$EmployeesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.employeeId,
+      referencedTable: $db.employees,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$EmployeesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.employees,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$AttendanceEventsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $AttendanceEventsTable,
+          AttendanceEventRow,
+          $$AttendanceEventsTableFilterComposer,
+          $$AttendanceEventsTableOrderingComposer,
+          $$AttendanceEventsTableAnnotationComposer,
+          $$AttendanceEventsTableCreateCompanionBuilder,
+          $$AttendanceEventsTableUpdateCompanionBuilder,
+          (AttendanceEventRow, $$AttendanceEventsTableReferences),
+          AttendanceEventRow,
+          PrefetchHooks Function({bool employeeId})
+        > {
+  $$AttendanceEventsTableTableManager(
+    _$AppDatabase db,
+    $AttendanceEventsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$AttendanceEventsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$AttendanceEventsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$AttendanceEventsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> version = const Value.absent(),
+                Value<SyncState> syncState = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<String> employeeId = const Value.absent(),
+                Value<String> eventType = const Value.absent(),
+                Value<DateTime> occurredAt = const Value.absent(),
+                Value<DateTime> recordedAt = const Value.absent(),
+                Value<String> source = const Value.absent(),
+                Value<String> deviceId = const Value.absent(),
+                Value<String> createdBy = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => AttendanceEventsCompanion(
+                id: id,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                version: version,
+                syncState: syncState,
+                deletedAt: deletedAt,
+                employeeId: employeeId,
+                eventType: eventType,
+                occurredAt: occurredAt,
+                recordedAt: recordedAt,
+                source: source,
+                deviceId: deviceId,
+                createdBy: createdBy,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required DateTime createdAt,
+                required DateTime updatedAt,
+                Value<int> version = const Value.absent(),
+                Value<SyncState> syncState = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+                required String employeeId,
+                required String eventType,
+                required DateTime occurredAt,
+                required DateTime recordedAt,
+                required String source,
+                required String deviceId,
+                required String createdBy,
+                Value<int> rowid = const Value.absent(),
+              }) => AttendanceEventsCompanion.insert(
+                id: id,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                version: version,
+                syncState: syncState,
+                deletedAt: deletedAt,
+                employeeId: employeeId,
+                eventType: eventType,
+                occurredAt: occurredAt,
+                recordedAt: recordedAt,
+                source: source,
+                deviceId: deviceId,
+                createdBy: createdBy,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$AttendanceEventsTable, AttendanceEventRow>(
+                    table,
+                  ),
+                  $$AttendanceEventsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({employeeId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (employeeId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.employeeId,
+                                referencedTable:
+                                    $$AttendanceEventsTableReferences
+                                        ._employeeIdTable(db),
+                                referencedColumn:
+                                    $$AttendanceEventsTableReferences
+                                        ._employeeIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$AttendanceEventsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $AttendanceEventsTable,
+      AttendanceEventRow,
+      $$AttendanceEventsTableFilterComposer,
+      $$AttendanceEventsTableOrderingComposer,
+      $$AttendanceEventsTableAnnotationComposer,
+      $$AttendanceEventsTableCreateCompanionBuilder,
+      $$AttendanceEventsTableUpdateCompanionBuilder,
+      (AttendanceEventRow, $$AttendanceEventsTableReferences),
+      AttendanceEventRow,
+      PrefetchHooks Function({bool employeeId})
+    >;
+typedef $$AttendanceSettingsTableCreateCompanionBuilder =
+    AttendanceSettingsCompanion Function({
+      required String id,
+      required DateTime createdAt,
+      required DateTime updatedAt,
+      Value<int> version,
+      Value<SyncState> syncState,
+      Value<DateTime?> deletedAt,
+      required String companyId,
+      required int duplicateWindowMinutes,
+      required int staleOpenSessionMinutes,
+      required int excessiveDurationMinutes,
+      Value<int?> breakAfterMinutes,
+      Value<int?> breakMinutes,
+      Value<int> rowid,
+    });
+typedef $$AttendanceSettingsTableUpdateCompanionBuilder =
+    AttendanceSettingsCompanion Function({
+      Value<String> id,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<int> version,
+      Value<SyncState> syncState,
+      Value<DateTime?> deletedAt,
+      Value<String> companyId,
+      Value<int> duplicateWindowMinutes,
+      Value<int> staleOpenSessionMinutes,
+      Value<int> excessiveDurationMinutes,
+      Value<int?> breakAfterMinutes,
+      Value<int?> breakMinutes,
+      Value<int> rowid,
+    });
+
+final class $$AttendanceSettingsTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $AttendanceSettingsTable,
+          AttendanceSettingsRow
+        > {
+  $$AttendanceSettingsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $CompaniesTable _companyIdTable(_$AppDatabase db) => db.companies
+      .createAlias('attendance_settings__company_id__companies__id');
+
+  $$CompaniesTableProcessedTableManager get companyId {
+    final $_column = $_itemColumn<String>('company_id')!;
+
+    final manager = $$CompaniesTableTableManager(
+      $_db,
+      $_db.companies,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_companyIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$AttendanceSettingsTableFilterComposer
+    extends Composer<_$AppDatabase, $AttendanceSettingsTable> {
+  $$AttendanceSettingsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get version => $composableBuilder(
+    column: $table.version,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<SyncState, SyncState, String> get syncState =>
+      $composableBuilder(
+        column: $table.syncState,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get duplicateWindowMinutes => $composableBuilder(
+    column: $table.duplicateWindowMinutes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get staleOpenSessionMinutes => $composableBuilder(
+    column: $table.staleOpenSessionMinutes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get excessiveDurationMinutes => $composableBuilder(
+    column: $table.excessiveDurationMinutes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get breakAfterMinutes => $composableBuilder(
+    column: $table.breakAfterMinutes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get breakMinutes => $composableBuilder(
+    column: $table.breakMinutes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$CompaniesTableFilterComposer get companyId {
+    final $$CompaniesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.companyId,
+      referencedTable: $db.companies,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CompaniesTableFilterComposer(
+            $db: $db,
+            $table: $db.companies,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$AttendanceSettingsTableOrderingComposer
+    extends Composer<_$AppDatabase, $AttendanceSettingsTable> {
+  $$AttendanceSettingsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get version => $composableBuilder(
+    column: $table.version,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get syncState => $composableBuilder(
+    column: $table.syncState,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get duplicateWindowMinutes => $composableBuilder(
+    column: $table.duplicateWindowMinutes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get staleOpenSessionMinutes => $composableBuilder(
+    column: $table.staleOpenSessionMinutes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get excessiveDurationMinutes => $composableBuilder(
+    column: $table.excessiveDurationMinutes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get breakAfterMinutes => $composableBuilder(
+    column: $table.breakAfterMinutes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get breakMinutes => $composableBuilder(
+    column: $table.breakMinutes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$CompaniesTableOrderingComposer get companyId {
+    final $$CompaniesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.companyId,
+      referencedTable: $db.companies,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CompaniesTableOrderingComposer(
+            $db: $db,
+            $table: $db.companies,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$AttendanceSettingsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $AttendanceSettingsTable> {
+  $$AttendanceSettingsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<int> get version =>
+      $composableBuilder(column: $table.version, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<SyncState, String> get syncState =>
+      $composableBuilder(column: $table.syncState, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  GeneratedColumn<int> get duplicateWindowMinutes => $composableBuilder(
+    column: $table.duplicateWindowMinutes,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get staleOpenSessionMinutes => $composableBuilder(
+    column: $table.staleOpenSessionMinutes,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get excessiveDurationMinutes => $composableBuilder(
+    column: $table.excessiveDurationMinutes,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get breakAfterMinutes => $composableBuilder(
+    column: $table.breakAfterMinutes,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get breakMinutes => $composableBuilder(
+    column: $table.breakMinutes,
+    builder: (column) => column,
+  );
+
+  $$CompaniesTableAnnotationComposer get companyId {
+    final $$CompaniesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.companyId,
+      referencedTable: $db.companies,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CompaniesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.companies,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$AttendanceSettingsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $AttendanceSettingsTable,
+          AttendanceSettingsRow,
+          $$AttendanceSettingsTableFilterComposer,
+          $$AttendanceSettingsTableOrderingComposer,
+          $$AttendanceSettingsTableAnnotationComposer,
+          $$AttendanceSettingsTableCreateCompanionBuilder,
+          $$AttendanceSettingsTableUpdateCompanionBuilder,
+          (AttendanceSettingsRow, $$AttendanceSettingsTableReferences),
+          AttendanceSettingsRow,
+          PrefetchHooks Function({bool companyId})
+        > {
+  $$AttendanceSettingsTableTableManager(
+    _$AppDatabase db,
+    $AttendanceSettingsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$AttendanceSettingsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$AttendanceSettingsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$AttendanceSettingsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> version = const Value.absent(),
+                Value<SyncState> syncState = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<String> companyId = const Value.absent(),
+                Value<int> duplicateWindowMinutes = const Value.absent(),
+                Value<int> staleOpenSessionMinutes = const Value.absent(),
+                Value<int> excessiveDurationMinutes = const Value.absent(),
+                Value<int?> breakAfterMinutes = const Value.absent(),
+                Value<int?> breakMinutes = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => AttendanceSettingsCompanion(
+                id: id,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                version: version,
+                syncState: syncState,
+                deletedAt: deletedAt,
+                companyId: companyId,
+                duplicateWindowMinutes: duplicateWindowMinutes,
+                staleOpenSessionMinutes: staleOpenSessionMinutes,
+                excessiveDurationMinutes: excessiveDurationMinutes,
+                breakAfterMinutes: breakAfterMinutes,
+                breakMinutes: breakMinutes,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required DateTime createdAt,
+                required DateTime updatedAt,
+                Value<int> version = const Value.absent(),
+                Value<SyncState> syncState = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+                required String companyId,
+                required int duplicateWindowMinutes,
+                required int staleOpenSessionMinutes,
+                required int excessiveDurationMinutes,
+                Value<int?> breakAfterMinutes = const Value.absent(),
+                Value<int?> breakMinutes = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => AttendanceSettingsCompanion.insert(
+                id: id,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                version: version,
+                syncState: syncState,
+                deletedAt: deletedAt,
+                companyId: companyId,
+                duplicateWindowMinutes: duplicateWindowMinutes,
+                staleOpenSessionMinutes: staleOpenSessionMinutes,
+                excessiveDurationMinutes: excessiveDurationMinutes,
+                breakAfterMinutes: breakAfterMinutes,
+                breakMinutes: breakMinutes,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$AttendanceSettingsTable, AttendanceSettingsRow>(
+                    table,
+                  ),
+                  $$AttendanceSettingsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({companyId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (companyId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.companyId,
+                                referencedTable:
+                                    $$AttendanceSettingsTableReferences
+                                        ._companyIdTable(db),
+                                referencedColumn:
+                                    $$AttendanceSettingsTableReferences
+                                        ._companyIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$AttendanceSettingsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $AttendanceSettingsTable,
+      AttendanceSettingsRow,
+      $$AttendanceSettingsTableFilterComposer,
+      $$AttendanceSettingsTableOrderingComposer,
+      $$AttendanceSettingsTableAnnotationComposer,
+      $$AttendanceSettingsTableCreateCompanionBuilder,
+      $$AttendanceSettingsTableUpdateCompanionBuilder,
+      (AttendanceSettingsRow, $$AttendanceSettingsTableReferences),
+      AttendanceSettingsRow,
+      PrefetchHooks Function({bool companyId})
+    >;
+typedef $$AttendanceCorrectionsTableCreateCompanionBuilder =
+    AttendanceCorrectionsCompanion Function({
+      required String id,
+      required DateTime createdAt,
+      required DateTime updatedAt,
+      Value<int> version,
+      Value<SyncState> syncState,
+      Value<DateTime?> deletedAt,
+      required String employeeId,
+      required String kind,
+      required String eventType,
+      Value<String?> originalEventId,
+      Value<String?> replacementEventId,
+      Value<DateTime?> previousOccurredAt,
+      Value<DateTime?> newOccurredAt,
+      required String reason,
+      required String correctedBy,
+      required DateTime correctedAt,
+      Value<int> rowid,
+    });
+typedef $$AttendanceCorrectionsTableUpdateCompanionBuilder =
+    AttendanceCorrectionsCompanion Function({
+      Value<String> id,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<int> version,
+      Value<SyncState> syncState,
+      Value<DateTime?> deletedAt,
+      Value<String> employeeId,
+      Value<String> kind,
+      Value<String> eventType,
+      Value<String?> originalEventId,
+      Value<String?> replacementEventId,
+      Value<DateTime?> previousOccurredAt,
+      Value<DateTime?> newOccurredAt,
+      Value<String> reason,
+      Value<String> correctedBy,
+      Value<DateTime> correctedAt,
+      Value<int> rowid,
+    });
+
+final class $$AttendanceCorrectionsTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $AttendanceCorrectionsTable,
+          AttendanceCorrectionRow
+        > {
+  $$AttendanceCorrectionsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $EmployeesTable _employeeIdTable(_$AppDatabase db) => db.employees
+      .createAlias('attendance_corrections__employee_id__employees__id');
+
+  $$EmployeesTableProcessedTableManager get employeeId {
+    final $_column = $_itemColumn<String>('employee_id')!;
+
+    final manager = $$EmployeesTableTableManager(
+      $_db,
+      $_db.employees,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_employeeIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $AttendanceEventsTable _originalEventIdTable(_$AppDatabase db) =>
+      db.attendanceEvents.createAlias(
+        'attendance_corrections__original_event_id__attendance_events__id',
+      );
+
+  $$AttendanceEventsTableProcessedTableManager? get originalEventId {
+    final $_column = $_itemColumn<String>('original_event_id');
+    if ($_column == null) return null;
+    final manager = $$AttendanceEventsTableTableManager(
+      $_db,
+      $_db.attendanceEvents,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_originalEventIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $AttendanceEventsTable _replacementEventIdTable(_$AppDatabase db) =>
+      db.attendanceEvents.createAlias(
+        'attendance_corrections__replacement_event_id__attendance_events__id',
+      );
+
+  $$AttendanceEventsTableProcessedTableManager? get replacementEventId {
+    final $_column = $_itemColumn<String>('replacement_event_id');
+    if ($_column == null) return null;
+    final manager = $$AttendanceEventsTableTableManager(
+      $_db,
+      $_db.attendanceEvents,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_replacementEventIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $AdminUsersTable _correctedByTable(_$AppDatabase db) => db.adminUsers
+      .createAlias('attendance_corrections__corrected_by__admin_users__id');
+
+  $$AdminUsersTableProcessedTableManager get correctedBy {
+    final $_column = $_itemColumn<String>('corrected_by')!;
+
+    final manager = $$AdminUsersTableTableManager(
+      $_db,
+      $_db.adminUsers,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_correctedByTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$AttendanceCorrectionsTableFilterComposer
+    extends Composer<_$AppDatabase, $AttendanceCorrectionsTable> {
+  $$AttendanceCorrectionsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get version => $composableBuilder(
+    column: $table.version,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<SyncState, SyncState, String> get syncState =>
+      $composableBuilder(
+        column: $table.syncState,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get eventType => $composableBuilder(
+    column: $table.eventType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get previousOccurredAt => $composableBuilder(
+    column: $table.previousOccurredAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get newOccurredAt => $composableBuilder(
+    column: $table.newOccurredAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get reason => $composableBuilder(
+    column: $table.reason,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get correctedAt => $composableBuilder(
+    column: $table.correctedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$EmployeesTableFilterComposer get employeeId {
+    final $$EmployeesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.employeeId,
+      referencedTable: $db.employees,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$EmployeesTableFilterComposer(
+            $db: $db,
+            $table: $db.employees,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$AttendanceEventsTableFilterComposer get originalEventId {
+    final $$AttendanceEventsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.originalEventId,
+      referencedTable: $db.attendanceEvents,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AttendanceEventsTableFilterComposer(
+            $db: $db,
+            $table: $db.attendanceEvents,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$AttendanceEventsTableFilterComposer get replacementEventId {
+    final $$AttendanceEventsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.replacementEventId,
+      referencedTable: $db.attendanceEvents,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AttendanceEventsTableFilterComposer(
+            $db: $db,
+            $table: $db.attendanceEvents,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$AdminUsersTableFilterComposer get correctedBy {
+    final $$AdminUsersTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.correctedBy,
+      referencedTable: $db.adminUsers,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AdminUsersTableFilterComposer(
+            $db: $db,
+            $table: $db.adminUsers,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$AttendanceCorrectionsTableOrderingComposer
+    extends Composer<_$AppDatabase, $AttendanceCorrectionsTable> {
+  $$AttendanceCorrectionsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get version => $composableBuilder(
+    column: $table.version,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get syncState => $composableBuilder(
+    column: $table.syncState,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get eventType => $composableBuilder(
+    column: $table.eventType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get previousOccurredAt => $composableBuilder(
+    column: $table.previousOccurredAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get newOccurredAt => $composableBuilder(
+    column: $table.newOccurredAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get reason => $composableBuilder(
+    column: $table.reason,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get correctedAt => $composableBuilder(
+    column: $table.correctedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$EmployeesTableOrderingComposer get employeeId {
+    final $$EmployeesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.employeeId,
+      referencedTable: $db.employees,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$EmployeesTableOrderingComposer(
+            $db: $db,
+            $table: $db.employees,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$AttendanceEventsTableOrderingComposer get originalEventId {
+    final $$AttendanceEventsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.originalEventId,
+      referencedTable: $db.attendanceEvents,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AttendanceEventsTableOrderingComposer(
+            $db: $db,
+            $table: $db.attendanceEvents,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$AttendanceEventsTableOrderingComposer get replacementEventId {
+    final $$AttendanceEventsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.replacementEventId,
+      referencedTable: $db.attendanceEvents,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AttendanceEventsTableOrderingComposer(
+            $db: $db,
+            $table: $db.attendanceEvents,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$AdminUsersTableOrderingComposer get correctedBy {
+    final $$AdminUsersTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.correctedBy,
+      referencedTable: $db.adminUsers,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AdminUsersTableOrderingComposer(
+            $db: $db,
+            $table: $db.adminUsers,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$AttendanceCorrectionsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $AttendanceCorrectionsTable> {
+  $$AttendanceCorrectionsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<int> get version =>
+      $composableBuilder(column: $table.version, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<SyncState, String> get syncState =>
+      $composableBuilder(column: $table.syncState, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get kind =>
+      $composableBuilder(column: $table.kind, builder: (column) => column);
+
+  GeneratedColumn<String> get eventType =>
+      $composableBuilder(column: $table.eventType, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get previousOccurredAt => $composableBuilder(
+    column: $table.previousOccurredAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get newOccurredAt => $composableBuilder(
+    column: $table.newOccurredAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get reason =>
+      $composableBuilder(column: $table.reason, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get correctedAt => $composableBuilder(
+    column: $table.correctedAt,
+    builder: (column) => column,
+  );
+
+  $$EmployeesTableAnnotationComposer get employeeId {
+    final $$EmployeesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.employeeId,
+      referencedTable: $db.employees,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$EmployeesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.employees,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$AttendanceEventsTableAnnotationComposer get originalEventId {
+    final $$AttendanceEventsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.originalEventId,
+      referencedTable: $db.attendanceEvents,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AttendanceEventsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.attendanceEvents,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$AttendanceEventsTableAnnotationComposer get replacementEventId {
+    final $$AttendanceEventsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.replacementEventId,
+      referencedTable: $db.attendanceEvents,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AttendanceEventsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.attendanceEvents,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$AdminUsersTableAnnotationComposer get correctedBy {
+    final $$AdminUsersTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.correctedBy,
+      referencedTable: $db.adminUsers,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AdminUsersTableAnnotationComposer(
+            $db: $db,
+            $table: $db.adminUsers,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$AttendanceCorrectionsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $AttendanceCorrectionsTable,
+          AttendanceCorrectionRow,
+          $$AttendanceCorrectionsTableFilterComposer,
+          $$AttendanceCorrectionsTableOrderingComposer,
+          $$AttendanceCorrectionsTableAnnotationComposer,
+          $$AttendanceCorrectionsTableCreateCompanionBuilder,
+          $$AttendanceCorrectionsTableUpdateCompanionBuilder,
+          (AttendanceCorrectionRow, $$AttendanceCorrectionsTableReferences),
+          AttendanceCorrectionRow,
+          PrefetchHooks Function({
+            bool employeeId,
+            bool originalEventId,
+            bool replacementEventId,
+            bool correctedBy,
+          })
+        > {
+  $$AttendanceCorrectionsTableTableManager(
+    _$AppDatabase db,
+    $AttendanceCorrectionsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$AttendanceCorrectionsTableFilterComposer(
+                $db: db,
+                $table: table,
+              ),
+          createOrderingComposer: () =>
+              $$AttendanceCorrectionsTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$AttendanceCorrectionsTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> version = const Value.absent(),
+                Value<SyncState> syncState = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<String> employeeId = const Value.absent(),
+                Value<String> kind = const Value.absent(),
+                Value<String> eventType = const Value.absent(),
+                Value<String?> originalEventId = const Value.absent(),
+                Value<String?> replacementEventId = const Value.absent(),
+                Value<DateTime?> previousOccurredAt = const Value.absent(),
+                Value<DateTime?> newOccurredAt = const Value.absent(),
+                Value<String> reason = const Value.absent(),
+                Value<String> correctedBy = const Value.absent(),
+                Value<DateTime> correctedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => AttendanceCorrectionsCompanion(
+                id: id,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                version: version,
+                syncState: syncState,
+                deletedAt: deletedAt,
+                employeeId: employeeId,
+                kind: kind,
+                eventType: eventType,
+                originalEventId: originalEventId,
+                replacementEventId: replacementEventId,
+                previousOccurredAt: previousOccurredAt,
+                newOccurredAt: newOccurredAt,
+                reason: reason,
+                correctedBy: correctedBy,
+                correctedAt: correctedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required DateTime createdAt,
+                required DateTime updatedAt,
+                Value<int> version = const Value.absent(),
+                Value<SyncState> syncState = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+                required String employeeId,
+                required String kind,
+                required String eventType,
+                Value<String?> originalEventId = const Value.absent(),
+                Value<String?> replacementEventId = const Value.absent(),
+                Value<DateTime?> previousOccurredAt = const Value.absent(),
+                Value<DateTime?> newOccurredAt = const Value.absent(),
+                required String reason,
+                required String correctedBy,
+                required DateTime correctedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => AttendanceCorrectionsCompanion.insert(
+                id: id,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                version: version,
+                syncState: syncState,
+                deletedAt: deletedAt,
+                employeeId: employeeId,
+                kind: kind,
+                eventType: eventType,
+                originalEventId: originalEventId,
+                replacementEventId: replacementEventId,
+                previousOccurredAt: previousOccurredAt,
+                newOccurredAt: newOccurredAt,
+                reason: reason,
+                correctedBy: correctedBy,
+                correctedAt: correctedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<
+                    $AttendanceCorrectionsTable,
+                    AttendanceCorrectionRow
+                  >(table),
+                  $$AttendanceCorrectionsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({
+                employeeId = false,
+                originalEventId = false,
+                replacementEventId = false,
+                correctedBy = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (employeeId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.employeeId,
+                                    referencedTable:
+                                        $$AttendanceCorrectionsTableReferences
+                                            ._employeeIdTable(db),
+                                    referencedColumn:
+                                        $$AttendanceCorrectionsTableReferences
+                                            ._employeeIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+                        if (originalEventId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.originalEventId,
+                                    referencedTable:
+                                        $$AttendanceCorrectionsTableReferences
+                                            ._originalEventIdTable(db),
+                                    referencedColumn:
+                                        $$AttendanceCorrectionsTableReferences
+                                            ._originalEventIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+                        if (replacementEventId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.replacementEventId,
+                                    referencedTable:
+                                        $$AttendanceCorrectionsTableReferences
+                                            ._replacementEventIdTable(db),
+                                    referencedColumn:
+                                        $$AttendanceCorrectionsTableReferences
+                                            ._replacementEventIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+                        if (correctedBy) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.correctedBy,
+                                    referencedTable:
+                                        $$AttendanceCorrectionsTableReferences
+                                            ._correctedByTable(db),
+                                    referencedColumn:
+                                        $$AttendanceCorrectionsTableReferences
+                                            ._correctedByTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$AttendanceCorrectionsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $AttendanceCorrectionsTable,
+      AttendanceCorrectionRow,
+      $$AttendanceCorrectionsTableFilterComposer,
+      $$AttendanceCorrectionsTableOrderingComposer,
+      $$AttendanceCorrectionsTableAnnotationComposer,
+      $$AttendanceCorrectionsTableCreateCompanionBuilder,
+      $$AttendanceCorrectionsTableUpdateCompanionBuilder,
+      (AttendanceCorrectionRow, $$AttendanceCorrectionsTableReferences),
+      AttendanceCorrectionRow,
+      PrefetchHooks Function({
+        bool employeeId,
+        bool originalEventId,
+        bool replacementEventId,
+        bool correctedBy,
+      })
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -8550,4 +13316,10 @@ class $AppDatabaseManager {
       $$AuditLogTableTableManager(_db, _db.auditLog);
   $$DeviceIdentityTableTableManager get deviceIdentity =>
       $$DeviceIdentityTableTableManager(_db, _db.deviceIdentity);
+  $$AttendanceEventsTableTableManager get attendanceEvents =>
+      $$AttendanceEventsTableTableManager(_db, _db.attendanceEvents);
+  $$AttendanceSettingsTableTableManager get attendanceSettings =>
+      $$AttendanceSettingsTableTableManager(_db, _db.attendanceSettings);
+  $$AttendanceCorrectionsTableTableManager get attendanceCorrections =>
+      $$AttendanceCorrectionsTableTableManager(_db, _db.attendanceCorrections);
 }
