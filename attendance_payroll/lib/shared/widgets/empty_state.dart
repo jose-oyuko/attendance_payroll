@@ -26,7 +26,9 @@ class EmptyState extends StatelessWidget {
     final action = this.action;
     return Center(
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: AppConstants.messageMaxWidth),
+        constraints: const BoxConstraints(
+          maxWidth: AppConstants.messageMaxWidth,
+        ),
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.lg),
           child: Column(

@@ -85,10 +85,7 @@ class _CompactLayout extends StatelessWidget {
                 AppSpacing.md,
                 AppSpacing.sm,
               ),
-              child: Text(
-                appName,
-                style: context.textStyles.titleSmall,
-              ),
+              child: Text(appName, style: context.textStyles.titleSmall),
             ),
             for (final destination in AdminDestination.values)
               NavigationDrawerDestination(

@@ -16,7 +16,11 @@ class SemanticColorSet {
   final Color container;
   final Color onContainer;
 
-  static SemanticColorSet lerp(SemanticColorSet a, SemanticColorSet b, double t) {
+  static SemanticColorSet lerp(
+    SemanticColorSet a,
+    SemanticColorSet b,
+    double t,
+  ) {
     return SemanticColorSet(
       color: Color.lerp(a.color, b.color, t)!,
       onColor: Color.lerp(a.onColor, b.onColor, t)!,

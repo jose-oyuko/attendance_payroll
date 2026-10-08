@@ -38,9 +38,7 @@ abstract final class Redactor {
   static Map<String, Object?> redactMap(Map<String, Object?> fields) {
     return <String, Object?>{
       for (final entry in fields.entries)
-        entry.key: isSensitiveKey(entry.key)
-            ? mask
-            : _redactValue(entry.value),
+        entry.key: isSensitiveKey(entry.key) ? mask : _redactValue(entry.value),
     };
   }
 

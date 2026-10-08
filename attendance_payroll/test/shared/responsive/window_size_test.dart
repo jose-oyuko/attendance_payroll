@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   group('WindowSize.fromWidth', () {
     test('maps widths to Material 3 size classes at the boundaries', () {
-      const expectations = <double, WindowSize>{
+      final expectations = <double, WindowSize>{
         0: WindowSize.compact,
         399: WindowSize.compact,
         599.9: WindowSize.compact,

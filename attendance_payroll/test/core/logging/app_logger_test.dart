@@ -86,10 +86,7 @@ void main() {
 
       logger.info('boot', 'Started', fields: <String, Object?>{'env': 'dev'});
 
-      expect(
-        sink.records.single.format(),
-        '[INFO] boot: Started {env: dev}',
-      );
+      expect(sink.records.single.format(), '[INFO] boot: Started {env: dev}');
     });
   });
 }

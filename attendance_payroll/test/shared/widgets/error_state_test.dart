@@ -13,7 +13,9 @@ void main() {
     );
 
     await tester.pumpWidget(
-      MaterialApp(home: Scaffold(body: ErrorState(failure: failure))),
+      MaterialApp(
+        home: Scaffold(body: ErrorState(failure: failure)),
+      ),
     );
 
     expect(find.text(failure.userMessage), findsOneWidget);
@@ -57,7 +59,10 @@ void main() {
     );
 
     expect(find.text('No employees yet.'), findsOneWidget);
-    expect(find.text('Add your first employee to get started.'), findsOneWidget);
+    expect(
+      find.text('Add your first employee to get started.'),
+      findsOneWidget,
+    );
     expect(find.text('Add employee'), findsOneWidget);
   });
 }

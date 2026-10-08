@@ -9,6 +9,8 @@ analyzer:
     - build/**
     - "**/*.g.dart"
     - "**/*.freezed.dart"
+    - android/**
+    - web/**
   errors:
     missing_required_param: error
     missing_return: error

@@ -1,5 +1,3 @@
-import 'dart:ui' show PlatformDispatcher;
-
 import 'package:attendance_payroll/core/logging/app_logger.dart';
 import 'package:flutter/foundation.dart';
 
