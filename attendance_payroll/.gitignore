@@ -46,3 +46,8 @@ pubspec.lock.bak
 .env
 *.db
 *.sqlite
+*.sqlite3
+# SQLite side files (WAL mode); `*.db` alone does not match them.
+*.db-wal
+*.db-shm
+*.db-journal

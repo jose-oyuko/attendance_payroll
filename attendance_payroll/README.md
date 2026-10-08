@@ -32,6 +32,7 @@ Then:
 
 ```bash
 flutter pub get
+dart run build_runner build   # only after changing tables; generated code is committed
 dart format .
 flutter analyze
 flutter test
@@ -73,6 +74,16 @@ Areas that are not built yet (Employees, Attendance, Schedules, Payroll,
 Reports, Backup) are shown as clearly labelled "not available yet" screens that
 name the phase delivering them.
 
+## What Phase 1 adds
+
+- Drift/SQLite database with schema version 1 and migration tests
+  ([docs/DATABASE.md](docs/DATABASE.md))
+- Companies, administrator users, employees and pay rate history
+- Repositories with validation, optimistic concurrency and friendly errors
+- Tests against real SQLite, including persistence across a restart
+
+There is no employee UI yet (Phase 2); the repositories are exercised by tests.
+
 ## Project layout
 
 ```
@@ -82,7 +93,8 @@ lib/
   features/   one folder per feature, each with data/ domain/ presentation/
   shared/     widgets and responsive helpers used by several features
 test/         mirrors lib/
-docs/         architecture notes
+docs/         architecture and database notes
+drift_schemas/  exported schema snapshots, one per schema version
 ```
 
 Empty `.gitkeep` files hold the folders reserved for later phases.

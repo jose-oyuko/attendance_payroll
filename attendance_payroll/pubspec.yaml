@@ -8,14 +8,26 @@ environment:
   flutter: ">=3.44.0"
 
 dependencies:
+  # Typed SQLite access and schema migrations.
+  drift: ^2.35.2
+  # Opens the on-device database on a background isolate (bundles SQLite).
+  drift_flutter: ^0.3.1
   flutter:
     sdk: flutter
   # State management and dependency injection (Notifier API, no code generation).
   flutter_riverpod: ^3.4.3
   # Declarative routing, including the stateful admin shell.
   go_router: ^18.0.2
+  # SqliteException and its error codes, to map constraint violations.
+  sqlite3: ^3.5.2
+  # UUIDv7 identifiers that devices can generate independently.
+  uuid: ^4.6.0
 
 dev_dependencies:
+  # Runs drift_dev code generation.
+  build_runner: ^2.16.2
+  # Drift code generator, schema snapshots and migration test helpers.
+  drift_dev: ^2.35.1
   flutter_lints: ^6.0.0
   flutter_test:
     sdk: flutter

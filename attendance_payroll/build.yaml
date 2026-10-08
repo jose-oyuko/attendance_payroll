@@ -1,0 +1,14 @@
+targets:
+  $default:
+    builders:
+      drift_dev:
+        options:
+          # Instants as ISO-8601 text keep millisecond precision and stay
+          # readable; all values written are UTC.
+          store_date_time_values_as_text: true
+          # Used by `dart run drift_dev make-migrations` to export schema
+          # snapshots and generate migration tests.
+          databases:
+            app_database: lib/core/database/app_database.dart
+          schema_dir: drift_schemas/
+          test_dir: test/core/database/migrations/

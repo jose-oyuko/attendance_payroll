@@ -39,8 +39,8 @@ technical `cause` that is only for logs. `toString()` omits the cause. Domain
 and data code return `Result<T>` (`core/result/result.dart`) instead of
 throwing. `Result.guard` converts anything thrown into an `Err`.
 
-Phase 1 adds a mapper from Drift/SQLite exceptions to `DatabaseFailure` and
-`ConflictFailure` (for example a unique-constraint violation).
+`guardDatabase` (`core/database/database_guard.dart`) maps Drift/SQLite
+exceptions to `ConflictFailure` (unique violations) and `DatabaseFailure`.
 
 ### Logging
 
@@ -85,18 +85,17 @@ administrative navigation.
 and the phase that builds them. The router creates one `StatefulShellBranch` per
 destination so each area keeps its navigation state.
 
-## Database design (Phase 1)
+## Database
 
-- Drift over SQLite, `schemaVersion` plus step-by-step migrations. Schema dumps
-  are checked in so migrations can be tested.
-- UUID text primary keys generated in the app, so devices can create records
-  independently.
-- Shared metadata columns where meaningful: `createdAt`, `updatedAt`, `version`,
-  `syncState`, `deletedAt`.
-- Timestamps stored as UTC; the company timezone is applied in the domain layer.
-- Money stored as integer minor units (never doubles).
-- Attendance events are append-only; corrections reference the original event.
-- Foreign keys enabled; unique employee number per company.
+Drift over SQLite with versioned, tested migrations. Conventions (UUIDv7 keys,
+UTC instants, `LocalDate` calendar dates, integer money, optimistic
+concurrency, sync metadata), the schema history and the procedure for changing
+the schema are in [DATABASE.md](DATABASE.md).
+
+Repository interfaces live in each feature's `domain/`, Drift implementations
+in `data/`, exposed through Riverpod providers. Domain entities validate
+themselves (`validate()`); repositories validate again before writing, and the
+database enforces keys, foreign keys and CHECK constraints underneath.
 
 ## Future synchronization
 
@@ -129,8 +128,8 @@ Nothing in V1 talks to a server, but the design leaves room:
 
 | Phase | Scope |
 |---|---|
-| 0 | Foundation (this phase) |
-| 1 | Database foundation |
+| 0 | Foundation |
+| 1 | Database foundation (current) |
 | 2 | Authentication and employee management |
 | 3 | Attendance engine |
 | 4 | Attendance UI and kiosk mode |
@@ -144,8 +143,10 @@ Nothing in V1 talks to a server, but the design leaves room:
 | 12 | Hardening |
 | 13 | Cloud architecture (documentation only) |
 
-## Phase 0 boundaries
+## Current boundaries
 
-Deliberately not in Phase 0: database, authentication, persistence of settings
-(the theme choice is in memory only), device identity, and any attendance or
-payroll logic. Screens for those areas state which phase delivers them.
+Phase 1 adds persistence and repositories but no screens that use them:
+employee management UI and authentication are Phase 2. Still deferred: settings
+persistence (the theme choice is in memory only), device identity (introduced
+with attendance events in Phase 3, where records first need it), and any
+attendance or payroll logic.
