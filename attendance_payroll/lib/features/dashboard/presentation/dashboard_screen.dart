@@ -1,79 +1,88 @@
-import 'package:attendance_payroll/app/configuration/app_config.dart';
+import 'package:attendance_payroll/app/router/admin_destination.dart';
 import 'package:attendance_payroll/app/theme/semantic_colors.dart';
 import 'package:attendance_payroll/core/constants/app_spacing.dart';
+import 'package:attendance_payroll/core/errors/app_failure.dart';
 import 'package:attendance_payroll/core/extensions/build_context_extensions.dart';
+import 'package:attendance_payroll/features/attendance/presentation/attendance_view_providers.dart';
 import 'package:attendance_payroll/features/company/presentation/current_company_provider.dart';
-import 'package:attendance_payroll/features/settings/presentation/theme_mode_provider.dart';
 import 'package:attendance_payroll/shared/responsive/adaptive_grid.dart';
-import 'package:attendance_payroll/shared/responsive/window_size.dart';
 import 'package:attendance_payroll/shared/widgets/page_container.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
-/// Dashboard: company and environment summary for now. Attendance and payroll
-/// cards are added in the phases that build those features.
+/// Today at a glance. Payroll cards are added with payroll (Phase 8).
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final config = ref.watch(appConfigProvider);
-    final themeMode = ref.watch(themeModeProvider);
-    final semantic = context.semanticColors;
     final company = ref.watch(currentCompanyProvider).value;
+    final today = ref.watch(todaysAttendanceProvider);
+    final semantic = context.semanticColors;
 
     return PageContainer(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: AppSpacing.md,
         children: [
-          Text(
-            'Attendance and payroll summaries will appear here as those '
-            'features are built.',
-            style: context.textStyles.bodyLarge,
-          ),
-          const SizedBox(height: AppSpacing.lg),
-          AdaptiveGrid(
+          Row(
             children: [
-              _StatusCard(
-                icon: Icons.layers_outlined,
-                title: 'Environment',
-                value: config.environment.label,
-                accent: semantic.info,
+              Expanded(
+                child: Text(
+                  company == null
+                      ? "Today's attendance"
+                      : "Today's attendance · ${company.details.name}",
+                  style: context.textStyles.titleMedium,
+                ),
               ),
-              _StatusCard(
-                icon: Icons.devices,
-                title: 'Window size',
-                value: context.windowSize.label,
-                accent: semantic.neutral,
-              ),
-              _StatusCard(
-                icon: Icons.brightness_6_outlined,
-                title: 'Theme',
-                value: _themeLabel(themeMode),
-                accent: semantic.neutral,
-              ),
-              _StatusCard(
-                icon: Icons.business_outlined,
-                title: 'Company',
-                value: company?.details.name ?? '…',
-                caption: company == null
-                    ? null
-                    : '${company.details.currencyCode} · '
-                          '${company.details.timezone}',
-                accent: semantic.info,
+              TextButton(
+                onPressed: () => context.go(AdminDestination.attendance.path),
+                child: const Text('Open attendance'),
               ),
             ],
           ),
+          switch (today) {
+            AsyncData(:final value) => AdaptiveGrid(
+              children: [
+                _StatusCard(
+                  icon: Icons.how_to_reg_outlined,
+                  title: 'Present',
+                  value: '${value.present} of ${value.employees.length}',
+                  accent: semantic.success,
+                ),
+                _StatusCard(
+                  icon: Icons.work_history_outlined,
+                  title: 'Working now',
+                  value: '${value.working}',
+                  accent: semantic.info,
+                ),
+                _StatusCard(
+                  icon: Icons.report_outlined,
+                  title: 'Needs review',
+                  value: '${value.needsReview}',
+                  caption: value.needsReview == 0
+                      ? 'Everything looks good.'
+                      : 'Open attendance to review.',
+                  accent: semantic.warning,
+                ),
+                _StatusCard(
+                  icon: Icons.person_off_outlined,
+                  title: 'Not clocked in',
+                  value: '${value.notClockedIn}',
+                  accent: semantic.neutral,
+                ),
+              ],
+            ),
+            AsyncError(:final error) => Text(
+              AppFailure.from(error).userMessage,
+            ),
+            _ => const LinearProgressIndicator(),
+          },
         ],
       ),
     );
   }
-
-  static String _themeLabel(ThemeMode mode) => switch (mode) {
-    ThemeMode.system => 'System',
-    ThemeMode.light => 'Light',
-    ThemeMode.dark => 'Dark',
-  };
 }
 
 class _StatusCard extends StatelessWidget {
@@ -94,43 +103,45 @@ class _StatusCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final caption = this.caption;
-    return Card.outlined(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.md),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            DecoratedBox(
-              decoration: BoxDecoration(
-                color: accent.container,
-                borderRadius: BorderRadius.circular(AppSpacing.sm),
+    return MergeSemantics(
+      child: Card.outlined(
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.md),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  color: accent.container,
+                  borderRadius: BorderRadius.circular(AppSpacing.sm),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(AppSpacing.sm),
+                  child: Icon(icon, color: accent.onContainer),
+                ),
               ),
-              child: Padding(
-                padding: const EdgeInsets.all(AppSpacing.sm),
-                child: Icon(icon, color: accent.onContainer),
-              ),
-            ),
-            const SizedBox(width: AppSpacing.md),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(title, style: context.textStyles.labelLarge),
-                  const SizedBox(height: AppSpacing.xs),
-                  Text(value, style: context.textStyles.titleMedium),
-                  if (caption != null) ...[
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(title, style: context.textStyles.labelLarge),
                     const SizedBox(height: AppSpacing.xs),
-                    Text(
-                      caption,
-                      style: context.textStyles.bodySmall?.copyWith(
-                        color: context.colors.onSurfaceVariant,
+                    Text(value, style: context.textStyles.titleMedium),
+                    if (caption != null) ...[
+                      const SizedBox(height: AppSpacing.xs),
+                      Text(
+                        caption,
+                        style: context.textStyles.bodySmall?.copyWith(
+                          color: context.colors.onSurfaceVariant,
+                        ),
                       ),
-                    ),
+                    ],
                   ],
-                ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

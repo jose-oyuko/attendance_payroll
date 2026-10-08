@@ -24,6 +24,8 @@ import 'package:attendance_payroll/features/employees/data/drift_employee_rate_r
 import 'package:attendance_payroll/features/employees/data/drift_employee_repository.dart';
 import 'package:attendance_payroll/features/employees/domain/employee.dart';
 import 'package:attendance_payroll/features/employees/domain/employee_management_service.dart';
+import 'package:attendance_payroll/features/kiosk/data/drift_kiosk_mode_repository.dart';
+import 'package:attendance_payroll/features/kiosk/domain/kiosk_service.dart';
 import 'package:drift/drift.dart';
 
 import 'test_database.dart';
@@ -120,6 +122,17 @@ class TestEnv {
     audit: audit,
     transactions: transactions,
     clock: clock.call,
+  );
+
+  late final kioskMode = DriftKioskModeRepository(db, clock: clock.call);
+
+  late final kiosk = KioskService(
+    kioskMode: kioskMode,
+    companies: companies,
+    employees: employees,
+    pins: pins,
+    audit: audit,
+    transactions: transactions,
   );
 
   /// Gives [employee] a personal PIN through the real issue-and-change flow,

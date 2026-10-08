@@ -5,6 +5,8 @@ import 'package:attendance_payroll/features/authentication/data/authentication_p
 import 'package:attendance_payroll/features/authentication/domain/admin_session.dart';
 import 'package:attendance_payroll/features/authentication/domain/admin_user.dart';
 import 'package:attendance_payroll/features/company/domain/company.dart';
+import 'package:attendance_payroll/features/kiosk/data/kiosk_providers.dart';
+import 'package:attendance_payroll/features/kiosk/domain/kiosk_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Where the administrator experience stands. The router redirects on it.
@@ -27,12 +29,24 @@ final class SignedIn extends AuthState {
   final AdminSession session;
 }
 
+/// This device is an attendance kiosk: only the kiosk is reachable, and
+/// leaving it needs an administrator's password.
+final class KioskMode extends AuthState {
+  const KioskMode(this.kiosk);
+
+  final KioskContext kiosk;
+}
+
 class AuthController extends AsyncNotifier<AuthState> {
   @override
   Future<AuthState> build() async {
     final setUp = (await ref.watch(adminAuthServiceProvider).isSetUp())
         .unwrap();
-    return setUp ? const SignedOut() : const NeedsSetup();
+    if (!setUp) {
+      return const NeedsSetup();
+    }
+    final kiosk = (await ref.watch(kioskServiceProvider).current()).unwrap();
+    return kiosk == null ? const SignedOut() : KioskMode(kiosk);
   }
 
   /// Completes first-run setup and signs the owner in. Returns the failure to
@@ -57,6 +71,50 @@ class AuthController extends AsyncNotifier<AuthState> {
   }
 
   void signOut() => state = const AsyncData(SignedOut());
+
+  /// Turns this device into the attendance kiosk and signs the administrator
+  /// out. Returns the failure to show, or `null` on success.
+  Future<AppFailure?> startKiosk() async {
+    final session = switch (state) {
+      AsyncData(value: SignedIn(:final session)) => session,
+      _ => null,
+    };
+    if (session == null) {
+      return const AuthenticationFailure(
+        userMessage: 'Sign in as an administrator first.',
+      );
+    }
+    final kiosk = ref.read(kioskServiceProvider);
+    final started = await kiosk.start(session);
+    if (started case Err(:final failure)) {
+      return failure;
+    }
+    final context = (await kiosk.current()).valueOrNull;
+    if (context == null) {
+      return const UnexpectedFailure();
+    }
+    state = AsyncData(KioskMode(context));
+    return null;
+  }
+
+  /// Leaves kiosk mode after an administrator signs in. Returns the failure
+  /// to show, or `null` on success; on failure the kiosk stays locked.
+  Future<AppFailure?> unlockKiosk(String username, String password) async {
+    final signedIn = await ref
+        .read(adminAuthServiceProvider)
+        .signIn(username, password);
+    switch (signedIn) {
+      case Err(:final failure):
+        return failure;
+      case Ok(value: final session):
+        final stopped = await ref.read(kioskServiceProvider).stop(session);
+        if (stopped case Err(:final failure)) {
+          return failure;
+        }
+        state = AsyncData(SignedIn(session));
+        return null;
+    }
+  }
 
   AppFailure? _apply(Result<AdminSession> result) {
     switch (result) {

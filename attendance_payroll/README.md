@@ -112,7 +112,17 @@ Follow-up to Phase 3:
   audited
 - Database schema version 4
 
-The kiosk (tap name → PIN → confirm) comes in Phase 4.
+## What Phase 4 adds
+
+- Kiosk mode for a shared tablet: tap your name, enter your PIN (choose your
+  own PIN the first time), confirm Clock in / Clock out, see a confirmation.
+  Started from Attendance → Start kiosk; it signs the administrator out,
+  survives restarts, and only an administrator's password leaves it
+- Employees can change their PIN at the kiosk
+- Attendance area: everyone's attendance for any day, with status and hours;
+  tap a person for their history and corrections
+- Dashboard: today's present / working now / needs review / not clocked in
+- Database schema version 5
 
 ## Project layout
 

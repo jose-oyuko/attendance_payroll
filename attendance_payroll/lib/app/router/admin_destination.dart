@@ -22,7 +22,6 @@ enum AdminDestination {
     label: 'Attendance',
     icon: Icons.access_time,
     selectedIcon: Icons.access_time_filled,
-    plannedPhase: 4,
   ),
   schedules(
     path: '/schedules',

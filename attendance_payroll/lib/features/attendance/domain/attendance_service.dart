@@ -11,6 +11,7 @@ import 'package:attendance_payroll/features/attendance/domain/attendance_policy.
 import 'package:attendance_payroll/features/attendance/domain/attendance_session.dart';
 import 'package:attendance_payroll/features/attendance/domain/attendance_settings_repository.dart';
 import 'package:attendance_payroll/features/attendance/domain/attendance_state.dart';
+import 'package:attendance_payroll/features/attendance/domain/daily_attendance.dart';
 import 'package:attendance_payroll/features/attendance/domain/session_builder.dart';
 import 'package:attendance_payroll/features/authentication/domain/admin_session.dart';
 import 'package:attendance_payroll/features/authentication/domain/admin_user.dart';
@@ -140,6 +141,77 @@ final class AttendanceService {
             if (inRange(issue.occurredAt)) issue,
         ],
       );
+    });
+  }
+
+  /// Everyone's attendance on company date [date]: active employees and
+  /// anyone else who has attendance that day.
+  Future<Result<DailyAttendance>> day(
+    AdminSession session,
+    LocalDate date,
+  ) async {
+    if (session.check(Permission.viewAttendance) case final denied?) {
+      return Err(denied);
+    }
+    final timeZone = await _companyTimeZone(session.companyId);
+    if (timeZone case Err(:final failure)) {
+      return Err(failure);
+    }
+    final loadedPolicy = await _policyFor(session.companyId);
+    if (loadedPolicy case Err(:final failure)) {
+      return Err(failure);
+    }
+    final employees = await _employees.listByCompany(
+      session.companyId,
+      includeArchived: true,
+    );
+    if (employees case Err(:final failure)) {
+      return Err(failure);
+    }
+    final policy = loadedPolicy.valueOrNull!;
+    final zone = timeZone.valueOrNull!;
+    final range = zone.rangeOf(date, date);
+    final events = await _events.betweenForCompany(
+      session.companyId,
+      from: range.start.subtract(policy.sessionLookaround),
+      to: range.end.add(policy.sessionLookaround),
+    );
+    return events.map((loaded) {
+      final byEmployee = <String, List<AttendanceEvent>>{};
+      for (final event in loaded) {
+        (byEmployee[event.employeeId] ??= []).add(event);
+      }
+      final builder = SessionBuilder(policy: policy, timeZone: zone);
+      final now = _clock();
+      final days = <EmployeeDay>[];
+      for (final employee in employees.valueOrNull!) {
+        final timeline = builder.build(
+          byEmployee[employee.id] ?? const [],
+          now: now,
+        );
+        final day = EmployeeDay(
+          employee: employee,
+          sessions: [
+            for (final s in timeline.sessions)
+              if (s.workDate == date) s,
+          ],
+          issues: [
+            for (final issue in timeline.issues)
+              if (zone.dateOf(issue.occurredAt) == date) issue,
+          ],
+        );
+        final active =
+            employee.details.employmentStatus == EmploymentStatus.active;
+        if (active || day.sessions.isNotEmpty || day.issues.isNotEmpty) {
+          days.add(day);
+        }
+      }
+      days.sort(
+        (a, b) => a.employee.details.shownName.toLowerCase().compareTo(
+          b.employee.details.shownName.toLowerCase(),
+        ),
+      );
+      return DailyAttendance(date: date, employees: days);
     });
   }
 

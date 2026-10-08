@@ -7426,6 +7426,285 @@ class AttendanceCorrectionsCompanion
   }
 }
 
+class $DeviceSettingsTable extends DeviceSettings
+    with TableInfo<$DeviceSettingsTable, DeviceSettingsRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $DeviceSettingsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _kioskCompanyIdMeta = const VerificationMeta(
+    'kioskCompanyId',
+  );
+  @override
+  late final GeneratedColumn<String> kioskCompanyId = GeneratedColumn<String>(
+    'kiosk_company_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES companies (id)',
+    ),
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, kioskCompanyId, updatedAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'device_settings';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<DeviceSettingsRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('kiosk_company_id')) {
+      context.handle(
+        _kioskCompanyIdMeta,
+        kioskCompanyId.isAcceptableOrUnknown(
+          data['kiosk_company_id']!,
+          _kioskCompanyIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  DeviceSettingsRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return DeviceSettingsRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      kioskCompanyId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}kiosk_company_id'],
+      ),
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $DeviceSettingsTable createAlias(String alias) {
+    return $DeviceSettingsTable(attachedDatabase, alias);
+  }
+}
+
+class DeviceSettingsRow extends DataClass
+    implements Insertable<DeviceSettingsRow> {
+  final String id;
+
+  /// The company whose employees use this device as an attendance kiosk, or
+  /// null when kiosk mode is off.
+  final String? kioskCompanyId;
+  final DateTime updatedAt;
+  const DeviceSettingsRow({
+    required this.id,
+    this.kioskCompanyId,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    if (!nullToAbsent || kioskCompanyId != null) {
+      map['kiosk_company_id'] = Variable<String>(kioskCompanyId);
+    }
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  DeviceSettingsCompanion toCompanion(bool nullToAbsent) {
+    return DeviceSettingsCompanion(
+      id: Value(id),
+      kioskCompanyId: kioskCompanyId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(kioskCompanyId),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory DeviceSettingsRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return DeviceSettingsRow(
+      id: serializer.fromJson<String>(json['id']),
+      kioskCompanyId: serializer.fromJson<String?>(json['kioskCompanyId']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'kioskCompanyId': serializer.toJson<String?>(kioskCompanyId),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  DeviceSettingsRow copyWith({
+    String? id,
+    Value<String?> kioskCompanyId = const Value.absent(),
+    DateTime? updatedAt,
+  }) => DeviceSettingsRow(
+    id: id ?? this.id,
+    kioskCompanyId: kioskCompanyId.present
+        ? kioskCompanyId.value
+        : this.kioskCompanyId,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  DeviceSettingsRow copyWithCompanion(DeviceSettingsCompanion data) {
+    return DeviceSettingsRow(
+      id: data.id.present ? data.id.value : this.id,
+      kioskCompanyId: data.kioskCompanyId.present
+          ? data.kioskCompanyId.value
+          : this.kioskCompanyId,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DeviceSettingsRow(')
+          ..write('id: $id, ')
+          ..write('kioskCompanyId: $kioskCompanyId, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, kioskCompanyId, updatedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is DeviceSettingsRow &&
+          other.id == this.id &&
+          other.kioskCompanyId == this.kioskCompanyId &&
+          other.updatedAt == this.updatedAt);
+}
+
+class DeviceSettingsCompanion extends UpdateCompanion<DeviceSettingsRow> {
+  final Value<String> id;
+  final Value<String?> kioskCompanyId;
+  final Value<DateTime> updatedAt;
+  final Value<int> rowid;
+  const DeviceSettingsCompanion({
+    this.id = const Value.absent(),
+    this.kioskCompanyId = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  DeviceSettingsCompanion.insert({
+    required String id,
+    this.kioskCompanyId = const Value.absent(),
+    required DateTime updatedAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       updatedAt = Value(updatedAt);
+  static Insertable<DeviceSettingsRow> custom({
+    Expression<String>? id,
+    Expression<String>? kioskCompanyId,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (kioskCompanyId != null) 'kiosk_company_id': kioskCompanyId,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  DeviceSettingsCompanion copyWith({
+    Value<String>? id,
+    Value<String?>? kioskCompanyId,
+    Value<DateTime>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return DeviceSettingsCompanion(
+      id: id ?? this.id,
+      kioskCompanyId: kioskCompanyId ?? this.kioskCompanyId,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (kioskCompanyId.present) {
+      map['kiosk_company_id'] = Variable<String>(kioskCompanyId.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DeviceSettingsCompanion(')
+          ..write('id: $id, ')
+          ..write('kioskCompanyId: $kioskCompanyId, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -7443,6 +7722,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       $AttendanceSettingsTable(this);
   late final $AttendanceCorrectionsTable attendanceCorrections =
       $AttendanceCorrectionsTable(this);
+  late final $DeviceSettingsTable deviceSettings = $DeviceSettingsTable(this);
   late final Index auditLogCompanyTime = Index(
     'audit_log_company_time',
     'CREATE INDEX audit_log_company_time ON audit_log (company_id, occurred_at)',
@@ -7482,6 +7762,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     attendanceEvents,
     attendanceSettings,
     attendanceCorrections,
+    deviceSettings,
     auditLogCompanyTime,
     auditLogEntity,
     attendanceEventsEmployeeTime,
@@ -7610,6 +7891,24 @@ final class $$CompaniesTableReferences
     final cache = $_typedResult.readTableOrNull(
       _attendanceSettingsRefsTable($_db),
     );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$DeviceSettingsTable, List<DeviceSettingsRow>>
+  _deviceSettingsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.deviceSettings,
+    aliasName: 'companies__id__device_settings__kiosk_company_id',
+  );
+
+  $$DeviceSettingsTableProcessedTableManager get deviceSettingsRefs {
+    final manager = $$DeviceSettingsTableTableManager(
+      $_db,
+      $_db.deviceSettings,
+    ).filter((f) => f.kioskCompanyId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_deviceSettingsRefsTable($_db));
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -7792,6 +8091,31 @@ class $$CompaniesTableFilterComposer
           }) => $$AttendanceSettingsTableFilterComposer(
             $db: $db,
             $table: $db.attendanceSettings,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> deviceSettingsRefs(
+    Expression<bool> Function($$DeviceSettingsTableFilterComposer f) f,
+  ) {
+    final $$DeviceSettingsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.deviceSettings,
+      getReferencedColumn: (t) => t.kioskCompanyId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$DeviceSettingsTableFilterComposer(
+            $db: $db,
+            $table: $db.deviceSettings,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -8045,6 +8369,31 @@ class $$CompaniesTableAnnotationComposer
         );
     return f(composer);
   }
+
+  Expression<T> deviceSettingsRefs<T extends Object>(
+    Expression<T> Function($$DeviceSettingsTableAnnotationComposer a) f,
+  ) {
+    final $$DeviceSettingsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.deviceSettings,
+      getReferencedColumn: (t) => t.kioskCompanyId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$DeviceSettingsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.deviceSettings,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$CompaniesTableTableManager
@@ -8065,6 +8414,7 @@ class $$CompaniesTableTableManager
             bool employeesRefs,
             bool auditLogRefs,
             bool attendanceSettingsRefs,
+            bool deviceSettingsRefs,
           })
         > {
   $$CompaniesTableTableManager(_$AppDatabase db, $CompaniesTable table)
@@ -8164,6 +8514,7 @@ class $$CompaniesTableTableManager
                 employeesRefs = false,
                 auditLogRefs = false,
                 attendanceSettingsRefs = false,
+                deviceSettingsRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -8172,6 +8523,7 @@ class $$CompaniesTableTableManager
                     if (employeesRefs) db.employees,
                     if (auditLogRefs) db.auditLog,
                     if (attendanceSettingsRefs) db.attendanceSettings,
+                    if (deviceSettingsRefs) db.deviceSettings,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
@@ -8260,6 +8612,27 @@ class $$CompaniesTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (deviceSettingsRefs)
+                        await $_getPrefetchedData<
+                          CompanyRow,
+                          $CompaniesTable,
+                          DeviceSettingsRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$CompaniesTableReferences
+                              ._deviceSettingsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$CompaniesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).deviceSettingsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.kioskCompanyId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -8285,6 +8658,7 @@ typedef $$CompaniesTableProcessedTableManager =
         bool employeesRefs,
         bool auditLogRefs,
         bool attendanceSettingsRefs,
+        bool deviceSettingsRefs,
       })
     >;
 typedef $$AdminUsersTableCreateCompanionBuilder =
@@ -13298,6 +13672,293 @@ typedef $$AttendanceCorrectionsTableProcessedTableManager =
         bool correctedBy,
       })
     >;
+typedef $$DeviceSettingsTableCreateCompanionBuilder =
+    DeviceSettingsCompanion Function({
+      required String id,
+      Value<String?> kioskCompanyId,
+      required DateTime updatedAt,
+      Value<int> rowid,
+    });
+typedef $$DeviceSettingsTableUpdateCompanionBuilder =
+    DeviceSettingsCompanion Function({
+      Value<String> id,
+      Value<String?> kioskCompanyId,
+      Value<DateTime> updatedAt,
+      Value<int> rowid,
+    });
+
+final class $$DeviceSettingsTableReferences
+    extends
+        BaseReferences<_$AppDatabase, $DeviceSettingsTable, DeviceSettingsRow> {
+  $$DeviceSettingsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $CompaniesTable _kioskCompanyIdTable(_$AppDatabase db) => db.companies
+      .createAlias('device_settings__kiosk_company_id__companies__id');
+
+  $$CompaniesTableProcessedTableManager? get kioskCompanyId {
+    final $_column = $_itemColumn<String>('kiosk_company_id');
+    if ($_column == null) return null;
+    final manager = $$CompaniesTableTableManager(
+      $_db,
+      $_db.companies,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_kioskCompanyIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$DeviceSettingsTableFilterComposer
+    extends Composer<_$AppDatabase, $DeviceSettingsTable> {
+  $$DeviceSettingsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$CompaniesTableFilterComposer get kioskCompanyId {
+    final $$CompaniesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.kioskCompanyId,
+      referencedTable: $db.companies,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CompaniesTableFilterComposer(
+            $db: $db,
+            $table: $db.companies,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$DeviceSettingsTableOrderingComposer
+    extends Composer<_$AppDatabase, $DeviceSettingsTable> {
+  $$DeviceSettingsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$CompaniesTableOrderingComposer get kioskCompanyId {
+    final $$CompaniesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.kioskCompanyId,
+      referencedTable: $db.companies,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CompaniesTableOrderingComposer(
+            $db: $db,
+            $table: $db.companies,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$DeviceSettingsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $DeviceSettingsTable> {
+  $$DeviceSettingsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  $$CompaniesTableAnnotationComposer get kioskCompanyId {
+    final $$CompaniesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.kioskCompanyId,
+      referencedTable: $db.companies,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CompaniesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.companies,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$DeviceSettingsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $DeviceSettingsTable,
+          DeviceSettingsRow,
+          $$DeviceSettingsTableFilterComposer,
+          $$DeviceSettingsTableOrderingComposer,
+          $$DeviceSettingsTableAnnotationComposer,
+          $$DeviceSettingsTableCreateCompanionBuilder,
+          $$DeviceSettingsTableUpdateCompanionBuilder,
+          (DeviceSettingsRow, $$DeviceSettingsTableReferences),
+          DeviceSettingsRow,
+          PrefetchHooks Function({bool kioskCompanyId})
+        > {
+  $$DeviceSettingsTableTableManager(
+    _$AppDatabase db,
+    $DeviceSettingsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$DeviceSettingsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$DeviceSettingsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$DeviceSettingsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String?> kioskCompanyId = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => DeviceSettingsCompanion(
+                id: id,
+                kioskCompanyId: kioskCompanyId,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                Value<String?> kioskCompanyId = const Value.absent(),
+                required DateTime updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => DeviceSettingsCompanion.insert(
+                id: id,
+                kioskCompanyId: kioskCompanyId,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$DeviceSettingsTable, DeviceSettingsRow>(table),
+                  $$DeviceSettingsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({kioskCompanyId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (kioskCompanyId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.kioskCompanyId,
+                                referencedTable: $$DeviceSettingsTableReferences
+                                    ._kioskCompanyIdTable(db),
+                                referencedColumn:
+                                    $$DeviceSettingsTableReferences
+                                        ._kioskCompanyIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$DeviceSettingsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $DeviceSettingsTable,
+      DeviceSettingsRow,
+      $$DeviceSettingsTableFilterComposer,
+      $$DeviceSettingsTableOrderingComposer,
+      $$DeviceSettingsTableAnnotationComposer,
+      $$DeviceSettingsTableCreateCompanionBuilder,
+      $$DeviceSettingsTableUpdateCompanionBuilder,
+      (DeviceSettingsRow, $$DeviceSettingsTableReferences),
+      DeviceSettingsRow,
+      PrefetchHooks Function({bool kioskCompanyId})
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -13322,4 +13983,6 @@ class $AppDatabaseManager {
       $$AttendanceSettingsTableTableManager(_db, _db.attendanceSettings);
   $$AttendanceCorrectionsTableTableManager get attendanceCorrections =>
       $$AttendanceCorrectionsTableTableManager(_db, _db.attendanceCorrections);
+  $$DeviceSettingsTableTableManager get deviceSettings =>
+      $$DeviceSettingsTableTableManager(_db, _db.deviceSettings);
 }

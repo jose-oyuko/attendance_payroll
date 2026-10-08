@@ -9,6 +9,7 @@ import 'generated/schema_v1.dart' as v1;
 import 'generated/schema_v2.dart' as v2;
 import 'generated/schema_v3.dart' as v3;
 import 'generated/schema_v4.dart' as v4;
+import 'generated/schema_v5.dart' as v5;
 
 // Generated first by `dart run drift_dev make-migrations`, then completed by
 // hand. That command does not overwrite this file: when adding version N,
@@ -281,6 +282,52 @@ void main() {
         ]);
         expect(await newDb.select(newDb.attendanceSettings).get(), isEmpty);
         expect(await newDb.select(newDb.attendanceCorrections).get(), isEmpty);
+      },
+    );
+  });
+
+  test('v4 → v5 keeps settings and corrections unchanged', () async {
+    const at = '2026-10-07T05:02:00.000Z';
+    const company = v4.CompaniesData(
+      id: 'co-1',
+      createdAt: at,
+      updatedAt: at,
+      version: 1,
+      syncState: 'localOnly',
+      name: 'Acme Ltd',
+      currencyCode: 'KES',
+      timezone: 'Africa/Nairobi',
+    );
+    const settings = v4.AttendanceSettingsData(
+      id: 'set-1',
+      createdAt: at,
+      updatedAt: at,
+      version: 2,
+      syncState: 'localOnly',
+      companyId: 'co-1',
+      duplicateWindowMinutes: 5,
+      staleOpenSessionMinutes: 1200,
+      excessiveDurationMinutes: 600,
+      breakAfterMinutes: 360,
+      breakMinutes: 30,
+    );
+
+    await verifier.testWithDataIntegrity(
+      oldVersion: 4,
+      newVersion: 5,
+      createOld: v4.DatabaseAtV4.new,
+      createNew: v5.DatabaseAtV5.new,
+      openTestedDatabase: AppDatabase.new,
+      createItems: (batch, oldDb) {
+        batch
+          ..insert(oldDb.companies, company)
+          ..insert(oldDb.attendanceSettings, settings);
+      },
+      validateItems: (newDb) async {
+        expect(await newDb.select(newDb.attendanceSettings).get(), [
+          v5.AttendanceSettingsData.fromJson(settings.toJson()),
+        ]);
+        expect(await newDb.select(newDb.deviceSettings).get(), isEmpty);
       },
     );
   });

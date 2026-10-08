@@ -317,3 +317,26 @@ class AttendanceCorrections extends Table with EntityColumns {
     'CHECK (original_event_id IS NOT NULL OR replacement_event_id IS NOT NULL)',
   ];
 }
+
+/// Settings of this installation that are never shared with other devices.
+/// Exactly one row, with id [DeviceSettings.singletonId].
+@DataClassName('DeviceSettingsRow')
+class DeviceSettings extends Table {
+  static const String singletonId = 'this_device';
+
+  TextColumn get id => text()();
+
+  /// The company whose employees use this device as an attendance kiosk, or
+  /// null when kiosk mode is off.
+  TextColumn get kioskCompanyId =>
+      text().nullable().references(Companies, #id)();
+  DateTimeColumn get updatedAt => dateTime()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+
+  // A literal, not interpolated: drift_dev reads constraints statically when
+  // exporting schema snapshots. Must match [singletonId].
+  @override
+  List<String> get customConstraints => ["CHECK (id = 'this_device')"];
+}

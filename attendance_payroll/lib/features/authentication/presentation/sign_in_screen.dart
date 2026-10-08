@@ -1,7 +1,7 @@
 import 'package:attendance_payroll/core/constants/app_spacing.dart';
 import 'package:attendance_payroll/core/utils/validators.dart';
 import 'package:attendance_payroll/features/authentication/presentation/auth_controller.dart';
-import 'package:attendance_payroll/features/authentication/presentation/widgets/auth_panel.dart';
+import 'package:attendance_payroll/shared/widgets/auth_panel.dart';
 import 'package:attendance_payroll/shared/widgets/busy_button.dart';
 import 'package:attendance_payroll/shared/widgets/failure_banner.dart';
 import 'package:attendance_payroll/shared/widgets/password_field.dart';

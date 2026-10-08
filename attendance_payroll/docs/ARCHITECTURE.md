@@ -23,10 +23,11 @@ presentation  ->  domain  ->  repository interfaces  <-  data (Drift / platform)
 - `core/` contains framework-agnostic building blocks and must not depend on
   `app/`, `features/` or `shared/`.
 - Features may use another feature's `domain/` (entities, repository
-  interfaces, services) and its public providers (`data/*_providers.dart`).
-  They never use another feature's Drift classes or widgets. The one shared
-  piece of presentation state is the signed-in session
-  (`authentication/presentation/auth_controller.dart`). Shared UI goes in
+  interfaces, services), its public providers (`data/*_providers.dart`) and
+  its read-only presentation providers (files named `*_provider.dart` /
+  `*_providers.dart`, plus the session in
+  `authentication/presentation/auth_controller.dart`). They never use another
+  feature's Drift classes, widgets or screens. Shared UI and formatting go in
   `shared/`.
 
 Riverpod providers are the dependency-injection container. Anything
@@ -80,8 +81,8 @@ screen, so they behave inside panes.
 | medium | navigation rail, selected label only |
 | expanded and up | extended navigation rail |
 
-Kiosk mode (Phase 4) is a separate route tree with large touch targets and no
-administrative navigation.
+Kiosk mode is a separate route tree with large touch targets and no
+administrative navigation (see Phase 4 below).
 
 ### Routing
 
@@ -153,6 +154,29 @@ destination so each area keeps its navigation state.
   correction takes effect everywhere, including the kiosk state. Approving or
   dismissing flagged sessions remains Phase 5.
 
+## Kiosk mode and attendance screens (Phase 4)
+
+- **Kiosk mode** is a device setting (`device_settings`), started by an
+  administrator from Attendance → Start kiosk. Starting it signs the
+  administrator out; it survives restarts. While on, the router allows only
+  `/kiosk` and `/kiosk/unlock` (`redirectForAuth`), outside the admin shell,
+  so no administrator screen is reachable. Leaving it requires an
+  administrator to sign in at `/kiosk/unlock`.
+- **The kiosk has no session.** `KioskService` is its only door to employee
+  data: it lists active employees (names only) and checks PINs, and refuses
+  everything unless kiosk mode is on for that company. Clock actions then
+  need the resulting `PinVerification`, as before.
+- **Flow** (`KioskFlow`): tap name → PIN → (choose a new PIN if it is
+  temporary) → greeting with current status and the allowed action → clock
+  in/out → confirmation. Unfinished steps return to the start after 30 s
+  idle; the confirmation after 5 s. The back button never leaves the kiosk.
+  Keys are 76 dp; the PIN pad announces how many digits are entered.
+- **Admin attendance**: the Attendance area shows one day for everyone
+  (`AttendanceService.day`): present, working now, needs review, not clocked
+  in, with times and payable hours; each row opens the employee's history and
+  corrections. The dashboard shows today's counts. Until schedules exist
+  (Phase 6) "not clocked in" cannot distinguish absence from a day off.
+
 ## Database
 
 Drift over SQLite with versioned, tested migrations. Conventions (UUIDv7 keys,
@@ -199,8 +223,8 @@ Nothing in V1 talks to a server, but the design leaves room:
 | 0 | Foundation |
 | 1 | Database foundation |
 | 2 | Authentication and employee management |
-| 3 | Attendance engine (current) |
-| 4 | Attendance UI and kiosk mode |
+| 3 | Attendance engine |
+| 4 | Attendance UI and kiosk mode (current) |
 | 5 | Exceptions and corrections |
 | 6 | Work schedules |
 | 7 | Payroll engine |
@@ -213,10 +237,8 @@ Nothing in V1 talks to a server, but the design leaves room:
 
 ## Current boundaries
 
-After Phase 3 and its follow-up: the attendance engine (events, state
-machine, sessions, issues, time zones), per-company attendance rules, and
-administrator corrections with an employee attendance screen. Still deferred: the
-kiosk and attendance screens (Phase 4), persisted exceptions and corrections
-(Phase 5), schedules with late/early detection (Phase 6), administrator
+After Phase 4: employees clock in and out at the kiosk; administrators see
+daily attendance, each employee's history, and correct it. Still deferred: reviewing and
+approving flagged sessions (Phase 5), schedules with late/early detection (Phase 6), administrator
 password change and recovery, session timeout, settings persistence, and
 payroll.

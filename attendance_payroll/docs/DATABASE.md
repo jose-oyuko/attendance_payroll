@@ -27,6 +27,7 @@ tables are in `lib/core/database/tables.dart`. Only repositories in feature
 | 2 | Phase 2 | `credentials`, `audit_log`, `device_identity` |
 | 3 | Phase 3 | `attendance_events` |
 | 4 | Phase 3 follow-up | `attendance_settings`, `attendance_corrections` |
+| 5 | Phase 4 | `device_settings` |
 
 ### Version 1
 
@@ -87,6 +88,14 @@ Migration 2 → 3 only creates this table and its indexes.
 
 Migration 3 → 4 only creates these tables and indexes.
 
+### Version 5
+
+- **device_settings** — one row (`id = 'this_device'`, enforced by CHECK)
+  holding this installation's own settings: `kiosk_company_id` (the company
+  whose kiosk this device is, or null). Device-local, never synchronised.
+
+Migration 4 → 5 only creates this table.
+
 Indexes come from the unique keys: `(company_id, employee_number)` serves
 lookups by company and by number; `(company_id, username)` and
 `(employee_id, effective_from)` likewise. Further indexes are added with the
@@ -110,5 +119,9 @@ Never delete a user's database to get past a schema change.
 
 Write the step only after step 3: `app_database.steps.dart` must exist for
 `stepByStep` to compile.
+
+Write `customConstraints` as string literals. drift_dev reads them
+statically when exporting snapshots; an interpolated constant is silently
+left out of the snapshot and the schema test then fails.
 
 Commit the schema snapshots and generated files together with the change.

@@ -14,19 +14,23 @@ import 'test_database.dart';
 import 'test_env.dart';
 
 /// Pumps the whole app at a logical screen [size] over a fresh in-memory
-/// database. Unless [signedIn] is false, first-run setup is completed so the
-/// test starts on the dashboard as the owner.
+/// database, or over [database] to simulate restarting with existing data.
+/// Unless [signedIn] is false, first-run setup is completed so the test
+/// starts on the dashboard as the owner.
 Future<ProviderContainer> pumpApp(
   WidgetTester tester, {
   required Size size,
   bool signedIn = true,
+  AppDatabase? database,
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1.0;
   addTearDown(tester.view.reset);
 
-  final database = AppDatabase(NativeDatabase.memory());
-  addTearDown(database.close);
+  final db = database ?? AppDatabase(NativeDatabase.memory());
+  if (database == null) {
+    addTearDown(db.close);
+  }
 
   await tester.pumpWidget(
     ProviderScope(
@@ -34,7 +38,7 @@ Future<ProviderContainer> pumpApp(
         appConfigProvider.overrideWithValue(
           AppConfig.forEnvironment(AppEnvironment.development),
         ),
-        appDatabaseProvider.overrideWithValue(database),
+        appDatabaseProvider.overrideWithValue(db),
         passwordHasherProvider.overrideWithValue(fastHasher()),
         pinHasherProvider.overrideWithValue(fastHasher()),
       ],

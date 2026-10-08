@@ -32,7 +32,7 @@ void main() {
     await _tapButton(tester, 'Create company');
 
     expect(find.byType(DashboardScreen), findsOneWidget);
-    expect(find.text('Acme Ltd'), findsOneWidget);
+    expect(find.textContaining('Acme Ltd'), findsOneWidget);
   });
 
   testWidgets('setup checks the form before submitting', (tester) async {

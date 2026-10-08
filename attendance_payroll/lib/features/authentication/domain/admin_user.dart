@@ -9,6 +9,7 @@ enum Permission {
   viewAttendance,
   correctAttendance,
   manageAttendanceSettings,
+  manageKiosk,
 }
 
 /// What an administrator may do. V1 has a single all-powerful role; finer

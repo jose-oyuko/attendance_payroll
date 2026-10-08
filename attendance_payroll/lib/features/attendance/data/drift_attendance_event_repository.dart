@@ -106,6 +106,38 @@ final class DriftAttendanceEventRepository
     });
   }
 
+  @override
+  Future<Result<List<AttendanceEvent>>> betweenForCompany(
+    String companyId, {
+    required DateTime from,
+    required DateTime to,
+  }) {
+    return guardDatabase(() async {
+      final events = _db.attendanceEvents;
+      final query =
+          _db.select(events).join([
+              innerJoin(
+                _db.employees,
+                _db.employees.id.equalsExp(events.employeeId),
+              ),
+            ])
+            ..where(
+              _db.employees.companyId.equals(companyId) &
+                  events.deletedAt.isNull() &
+                  events.occurredAt.isBiggerOrEqualValue(from) &
+                  events.occurredAt.isSmallerThanValue(to) &
+                  _counts(events),
+            )
+            ..orderBy([
+              OrderingTerm.asc(events.occurredAt),
+              OrderingTerm.asc(events.recordedAt),
+              OrderingTerm.asc(events.id),
+            ]);
+      final rows = await query.get();
+      return [for (final row in rows) _toDomain(row.readTable(events))];
+    });
+  }
+
   /// Not superseded by a correction.
   Expression<bool> _counts($AttendanceEventsTable e) {
     final superseded = _db.selectOnly(_db.attendanceCorrections)

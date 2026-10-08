@@ -8,6 +8,7 @@ import 'package:attendance_payroll/features/attendance/domain/attendance_event.d
 import 'package:attendance_payroll/features/attendance/presentation/attendance_formatting.dart';
 import 'package:attendance_payroll/features/authentication/presentation/auth_controller.dart';
 import 'package:attendance_payroll/shared/formatting/date_formatting.dart';
+import 'package:attendance_payroll/shared/formatting/time_formatting.dart';
 import 'package:attendance_payroll/shared/widgets/busy_button.dart';
 import 'package:attendance_payroll/shared/widgets/date_field.dart';
 import 'package:attendance_payroll/shared/widgets/failure_banner.dart';

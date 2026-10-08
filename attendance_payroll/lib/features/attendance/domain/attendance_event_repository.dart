@@ -27,4 +27,12 @@ abstract interface class AttendanceEventRepository {
     required DateTime from,
     required DateTime to,
   });
+
+  /// Counting events of every employee of [companyId] with `occurredAt` in
+  /// `[from, to)`, in chronological order.
+  Future<Result<List<AttendanceEvent>>> betweenForCompany(
+    String companyId, {
+    required DateTime from,
+    required DateTime to,
+  });
 }

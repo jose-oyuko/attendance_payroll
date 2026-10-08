@@ -1,8 +1,10 @@
 import 'package:attendance_payroll/app/router/admin_destination.dart';
 import 'package:attendance_payroll/app/router/app_router.dart';
+import 'package:attendance_payroll/core/time/company_time_zone.dart';
 import 'package:attendance_payroll/features/authentication/domain/admin_session.dart';
 import 'package:attendance_payroll/features/authentication/domain/admin_user.dart';
 import 'package:attendance_payroll/features/authentication/presentation/auth_controller.dart';
+import 'package:attendance_payroll/features/kiosk/domain/kiosk_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -66,5 +68,49 @@ void main() {
       redirectForAuth(signedIn, AppRoutes.setup),
       AdminDestination.dashboard.path,
     );
+  });
+
+  group('kiosk mode', () {
+    final kiosk = AsyncData<AuthState>(
+      KioskMode(
+        KioskContext(
+          companyId: 'c',
+          companyName: 'Acme',
+          timeZone: CompanyTimeZone('Africa/Nairobi'),
+        ),
+      ),
+    );
+
+    test('only kiosk locations are reachable', () {
+      expect(redirectForAuth(kiosk, AppRoutes.kiosk), isNull);
+      expect(redirectForAuth(kiosk, AppRoutes.kioskUnlock), isNull);
+      for (final location in [
+        AdminDestination.dashboard.path,
+        employees,
+        AppRoutes.signIn,
+        AppRoutes.setup,
+        '/kioskx',
+      ]) {
+        expect(
+          redirectForAuth(kiosk, location),
+          AppRoutes.kiosk,
+          reason: location,
+        );
+      }
+    });
+
+    test('kiosk locations need kiosk mode', () {
+      expect(
+        redirectForAuth(signedIn, AppRoutes.kiosk),
+        AdminDestination.dashboard.path,
+      );
+      expect(
+        redirectForAuth(
+          const AsyncData<AuthState>(SignedOut()),
+          AppRoutes.kiosk,
+        ),
+        AppRoutes.signIn,
+      );
+    });
   });
 }
