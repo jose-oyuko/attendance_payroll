@@ -30,6 +30,7 @@ tables are in `lib/core/database/tables.dart`. Only repositories in feature
 | 5 | Phase 4 | `device_settings` |
 | 6 | Phase 5 | `exception_reviews` |
 | 7 | Phase 6 | `work_schedules`, `work_schedule_days`, `schedule_assignments`; `exception_reviews.event_id` optional |
+| 8 | Phase 7 | `payroll_settings`, `payroll_periods`, `payroll_adjustments`, `payroll_runs`, `payroll_lines`, `payroll_items`, `payroll_run_issues` |
 
 ### Version 1
 
@@ -126,6 +127,30 @@ Migration 5 → 6 only creates this table and its indexes.
   day (missing attendance), keyed `missingAttendance:<employee>@<date>`.
   SQLite cannot drop NOT NULL in place, so the migration rebuilds the table
   (`alterTable`); rows and indexes are kept (covered by a migration test).
+
+### Version 8
+
+- **payroll_settings** — per company: daily / weekly overtime thresholds
+  (minutes, nullable = no rule), `overtime_percent` (100–400), standard day
+  and week (minutes) for converting daily and monthly rates to hourly.
+- **payroll_periods** — `company_id`, `name`, `start_date`, `end_date`
+  (inclusive, CHECK end ≥ start), `status`. Overlapping periods are refused
+  in the creating transaction, so each day is paid once.
+- **payroll_adjustments** — allowance / bonus / deduction per employee and
+  period: positive `amount_minor` (CHECK > 0), `currency_code`,
+  `description`, `created_by`; removal is a soft delete.
+- **payroll_runs** — one per calculation: `status` (`calculated`,
+  `superseded`; `approved`/`finalized` in Phase 8), who and when, approval
+  and finalization fields for Phase 8.
+- **payroll_lines** — per employee in a run: hours (seconds) and every total
+  in minor units, stored as calculated.
+- **payroll_items** — the explainable lines of each payroll line, ordered:
+  kind, description, amount, and the rate, hours, days and percentage used.
+- **payroll_run_issues** — problems found in the run (code, employee,
+  message).
+
+A run is an immutable snapshot: recalculating writes a new run and marks the
+previous one superseded. Migration 7 → 8 only creates tables and indexes.
 
 Indexes come from the unique keys: `(company_id, employee_number)` serves
 lookups by company and by number; `(company_id, username)` and

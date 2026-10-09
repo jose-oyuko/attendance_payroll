@@ -12,6 +12,8 @@ enum Permission {
   manageKiosk,
   viewSchedules,
   manageSchedules,
+  viewPayroll,
+  managePayroll,
 }
 
 /// What an administrator may do. V1 has a single all-powerful role; finer

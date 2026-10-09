@@ -12,6 +12,7 @@ import 'generated/schema_v4.dart' as v4;
 import 'generated/schema_v5.dart' as v5;
 import 'generated/schema_v6.dart' as v6;
 import 'generated/schema_v7.dart' as v7;
+import 'generated/schema_v8.dart' as v8;
 
 // Generated first by `dart run drift_dev make-migrations`, then completed by
 // hand. That command does not overwrite this file: when adding version N,
@@ -461,6 +462,61 @@ void main() {
         ]);
         expect(await newDb.select(newDb.workSchedules).get(), isEmpty);
         expect(await newDb.select(newDb.scheduleAssignments).get(), isEmpty);
+      },
+    );
+  });
+
+  test('v7 → v8 keeps schedules unchanged', () async {
+    const at = '2026-10-09T05:00:00.000Z';
+    const company = v7.CompaniesData(
+      id: 'co-1',
+      createdAt: at,
+      updatedAt: at,
+      version: 1,
+      syncState: 'localOnly',
+      name: 'Acme Ltd',
+      currencyCode: 'KES',
+      timezone: 'Africa/Nairobi',
+    );
+    const schedule = v7.WorkSchedulesData(
+      id: 'sch-1',
+      createdAt: at,
+      updatedAt: at,
+      version: 1,
+      syncState: 'localOnly',
+      companyId: 'co-1',
+      name: 'Day shift',
+      lateToleranceMinutes: 10,
+      earlyDepartureToleranceMinutes: 10,
+    );
+    const day = v7.WorkScheduleDaysData(
+      id: 'day-1',
+      scheduleId: 'sch-1',
+      weekday: 1,
+      startMinute: 480,
+      endMinute: 1020,
+    );
+
+    await verifier.testWithDataIntegrity(
+      oldVersion: 7,
+      newVersion: 8,
+      createOld: v7.DatabaseAtV7.new,
+      createNew: v8.DatabaseAtV8.new,
+      openTestedDatabase: AppDatabase.new,
+      createItems: (batch, oldDb) {
+        batch
+          ..insert(oldDb.companies, company)
+          ..insert(oldDb.workSchedules, schedule)
+          ..insert(oldDb.workScheduleDays, day);
+      },
+      validateItems: (newDb) async {
+        expect(await newDb.select(newDb.workSchedules).get(), [
+          v8.WorkSchedulesData.fromJson(schedule.toJson()),
+        ]);
+        expect(await newDb.select(newDb.workScheduleDays).get(), [
+          v8.WorkScheduleDaysData.fromJson(day.toJson()),
+        ]);
+        expect(await newDb.select(newDb.payrollPeriods).get(), isEmpty);
       },
     );
   });

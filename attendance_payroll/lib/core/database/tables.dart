@@ -469,3 +469,163 @@ class ScheduleAssignments extends Table with EntityColumns {
     'CHECK (effective_to IS NULL OR effective_to >= effective_from)',
   ];
 }
+
+/// Each company's overtime rules and rate conversions. No row means the
+/// defaults (no overtime). Durations are whole minutes.
+@DataClassName('PayrollSettingsRow')
+class PayrollSettingsTable extends Table with EntityColumns {
+  @override
+  String get tableName => 'payroll_settings';
+
+  TextColumn get companyId => text().unique().references(Companies, #id)();
+  IntColumn get dailyOvertimeAfterMinutes => integer().nullable()();
+  IntColumn get weeklyOvertimeAfterMinutes => integer().nullable()();
+  IntColumn get overtimePercent => integer()();
+  IntColumn get standardDayMinutes => integer()();
+  IntColumn get standardWeekMinutes => integer()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+
+  @override
+  List<String> get customConstraints => [
+    'CHECK (overtime_percent BETWEEN 100 AND 400)',
+    'CHECK (standard_day_minutes > 0)',
+    'CHECK (standard_week_minutes > 0)',
+  ];
+}
+
+/// Spans of dates paid together. Periods of a company never overlap, so no
+/// day is paid twice.
+@DataClassName('PayrollPeriodRow')
+@TableIndex(
+  name: 'payroll_periods_company_start',
+  columns: {#companyId, #startDate},
+)
+class PayrollPeriods extends Table with EntityColumns {
+  TextColumn get companyId => text().references(Companies, #id)();
+  TextColumn get name => text()();
+  TextColumn get startDate => text().map(const LocalDateConverter())();
+  TextColumn get endDate => text().map(const LocalDateConverter())();
+
+  /// See `PayrollPeriodStatus`.
+  TextColumn get status => text()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+
+  @override
+  List<String> get customConstraints => ['CHECK (end_date >= start_date)'];
+}
+
+/// Allowances, bonuses and deductions for one employee in one period.
+@DataClassName('PayrollAdjustmentRow')
+@TableIndex(name: 'payroll_adjustments_period', columns: {#periodId})
+class PayrollAdjustments extends Table with EntityColumns {
+  TextColumn get periodId => text().references(PayrollPeriods, #id)();
+  TextColumn get employeeId => text().references(Employees, #id)();
+
+  /// `allowance`, `bonus` or `deduction`.
+  TextColumn get type => text()();
+
+  /// Always positive, in the minor unit; [type] decides the sign.
+  IntColumn get amountMinor => integer()();
+  TextColumn get currencyCode => text()();
+  TextColumn get description => text()();
+  TextColumn get createdBy => text().references(AdminUsers, #id)();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+
+  @override
+  List<String> get customConstraints => ['CHECK (amount_minor > 0)'];
+}
+
+/// One calculation of a period. A run's lines, items and issues are an
+/// immutable snapshot; recalculating writes a new run and marks the previous
+/// one superseded, so earlier results stay explainable.
+@DataClassName('PayrollRunRow')
+@TableIndex(name: 'payroll_runs_period', columns: {#periodId})
+class PayrollRuns extends Table with EntityColumns {
+  TextColumn get periodId => text().references(PayrollPeriods, #id)();
+
+  /// See `PayrollRunStatus`.
+  TextColumn get status => text()();
+  DateTimeColumn get calculatedAt => dateTime()();
+  TextColumn get calculatedBy => text().references(AdminUsers, #id)();
+  DateTimeColumn get approvedAt => dateTime().nullable()();
+  TextColumn get approvedBy => text().nullable().references(AdminUsers, #id)();
+  DateTimeColumn get finalizedAt => dateTime().nullable()();
+  TextColumn get finalizedBy => text().nullable().references(AdminUsers, #id)();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+/// One employee's totals in a run, stored as calculated.
+@DataClassName('PayrollLineRow')
+@TableIndex(name: 'payroll_lines_run', columns: {#runId})
+@TableIndex(name: 'payroll_lines_employee', columns: {#employeeId})
+class PayrollLines extends Table {
+  TextColumn get id => text()();
+  TextColumn get runId => text().references(PayrollRuns, #id)();
+  TextColumn get employeeId => text().references(Employees, #id)();
+  TextColumn get currencyCode => text()();
+  IntColumn get regularSeconds => integer()();
+  IntColumn get overtimeSeconds => integer()();
+  IntColumn get regularPayMinor => integer()();
+  IntColumn get overtimePayMinor => integer()();
+  IntColumn get allowancesMinor => integer()();
+  IntColumn get bonusesMinor => integer()();
+  IntColumn get deductionsMinor => integer()();
+  IntColumn get grossMinor => integer()();
+  IntColumn get netMinor => integer()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+
+  @override
+  List<Set<Column<Object>>> get uniqueKeys => [
+    {runId, employeeId},
+  ];
+}
+
+/// The explainable lines making up a payroll line.
+@DataClassName('PayrollItemRow')
+@TableIndex(name: 'payroll_items_line', columns: {#lineId})
+class PayrollItems extends Table {
+  TextColumn get id => text()();
+  TextColumn get lineId => text().references(PayrollLines, #id)();
+
+  /// Order within the line.
+  IntColumn get position => integer()();
+
+  /// See `PayrollItemKind`.
+  TextColumn get kind => text()();
+  TextColumn get description => text()();
+  IntColumn get amountMinor => integer()();
+  TextColumn get rateType => text().nullable()();
+  IntColumn get rateMinor => integer().nullable()();
+  IntColumn get seconds => integer().nullable()();
+  IntColumn get days => integer().nullable()();
+  IntColumn get percent => integer().nullable()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}
+
+/// Problems found when a run was calculated.
+@DataClassName('PayrollRunIssueRow')
+@TableIndex(name: 'payroll_run_issues_run', columns: {#runId})
+class PayrollRunIssues extends Table {
+  TextColumn get id => text()();
+  TextColumn get runId => text().references(PayrollRuns, #id)();
+  TextColumn get employeeId => text().nullable().references(Employees, #id)();
+
+  /// See `PayrollIssueCode`.
+  TextColumn get code => text()();
+  TextColumn get message => text()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}

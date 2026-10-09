@@ -30,6 +30,13 @@ part 'app_database.g.dart';
     WorkSchedules,
     WorkScheduleDays,
     ScheduleAssignments,
+    PayrollSettingsTable,
+    PayrollPeriods,
+    PayrollAdjustments,
+    PayrollRuns,
+    PayrollLines,
+    PayrollItems,
+    PayrollRunIssues,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -53,8 +60,9 @@ class AppDatabase extends _$AppDatabase {
   /// 5 — device settings (kiosk mode).
   /// 6 — exception reviews.
   /// 7 — work schedules and assignments; review event optional.
+  /// 8 — payroll: settings, periods, adjustments, runs, lines, items, issues.
   @override
-  int get schemaVersion => 7;
+  int get schemaVersion => 8;
 
   @override
   MigrationStrategy get migration {
@@ -94,6 +102,30 @@ class AppDatabase extends _$AppDatabase {
           // event_id becomes nullable: SQLite needs the table rebuilt. Rows
           // are copied unchanged; the indexes are recreated with it.
           await m.alterTable(TableMigration(schema.exceptionReviews));
+        },
+        from7To8: (m, schema) async {
+          for (final table in [
+            schema.payrollSettings,
+            schema.payrollPeriods,
+            schema.payrollAdjustments,
+            schema.payrollRuns,
+            schema.payrollLines,
+            schema.payrollItems,
+            schema.payrollRunIssues,
+          ]) {
+            await m.createTable(table);
+          }
+          for (final index in [
+            schema.payrollPeriodsCompanyStart,
+            schema.payrollAdjustmentsPeriod,
+            schema.payrollRunsPeriod,
+            schema.payrollLinesRun,
+            schema.payrollLinesEmployee,
+            schema.payrollItemsLine,
+            schema.payrollRunIssuesRun,
+          ]) {
+            await m.createIndex(index);
+          }
         },
       ),
       beforeOpen: (details) async {

@@ -146,6 +146,18 @@ Follow-up to Phase 3:
 - Daily view and dashboard: late and absent counts; expected / day off
 - Database schema version 7
 
+## What Phase 7 adds
+
+- A tested, deterministic payroll engine: hourly, daily and monthly rates;
+  per-day rate history; configurable daily and weekly overtime; allowances,
+  bonuses and deductions; gross and net pay with exact integer money
+- Payroll periods (never overlapping), adjustments and stored calculation
+  runs; recalculation keeps the earlier runs as history
+- Only settled attendance is paid; anything awaiting review is reported
+- Database schema version 8
+
+There are no payroll screens yet; Phase 8 adds them.
+
 ## Project layout
 
 ```

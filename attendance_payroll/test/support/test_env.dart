@@ -29,6 +29,9 @@ import 'package:attendance_payroll/features/employees/domain/employee.dart';
 import 'package:attendance_payroll/features/employees/domain/employee_management_service.dart';
 import 'package:attendance_payroll/features/kiosk/data/drift_kiosk_mode_repository.dart';
 import 'package:attendance_payroll/features/kiosk/domain/kiosk_service.dart';
+import 'package:attendance_payroll/features/payroll/data/drift_payroll_repositories.dart';
+import 'package:attendance_payroll/features/payroll/data/drift_payroll_run_repository.dart';
+import 'package:attendance_payroll/features/payroll/domain/payroll_service.dart';
 import 'package:attendance_payroll/features/schedules/data/drift_schedule_assignment_repository.dart';
 import 'package:attendance_payroll/features/schedules/data/drift_work_schedule_repository.dart';
 import 'package:attendance_payroll/features/schedules/domain/work_schedule_service.dart';
@@ -131,6 +134,20 @@ class TestEnv {
     employees: employees,
     audit: audit,
     transactions: transactions,
+  );
+
+  late final payroll = PayrollService(
+    companies: companies,
+    employees: employees,
+    rates: rates,
+    attendance: reader,
+    settings: DriftPayrollSettingsRepository(db, clock: clock.call),
+    periods: DriftPayrollPeriodRepository(db, clock: clock.call),
+    adjustments: DriftPayrollAdjustmentRepository(db, clock: clock.call),
+    runs: DriftPayrollRunRepository(db, clock: clock.call),
+    audit: audit,
+    transactions: transactions,
+    clock: clock.call,
   );
 
   late final attendance = AttendanceService(

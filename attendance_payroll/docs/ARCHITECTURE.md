@@ -229,6 +229,34 @@ destination so each area keeps its navigation state.
 - Editing a schedule re-evaluates all dates its employees are on it, past
   ones included; finalized payroll will keep its own figures (Phase 8).
 
+## Payroll engine (Phase 7)
+
+- **Money** (`core/money/money.dart`) is integer minor units plus a
+  currency; amounts of different currencies cannot be combined. Every
+  calculated amount comes from one exact big-integer ratio rounded once,
+  half away from zero (`Money.ofRatio`).
+- **`PayrollCalculator`** is pure and deterministic. Inputs: per-day
+  payable time (completed and approved sessions only), rate history,
+  adjustments, settings. Rules:
+  - each day is paid at the rate in force that day (one item per rate);
+  - hourly: hours × rate; daily: days worked × rate; monthly: salary × days
+    employed in the month ÷ days in the month;
+  - overtime: daily threshold first, then weekly threshold over whole ISO
+    weeks (a week spanning two periods is judged as one), paid at
+    `overtimePercent` of the hourly equivalent (daily rate ÷ standard day;
+    salary × 12 ÷ 52 ÷ standard week). No overtime until a threshold is set;
+  - gross = regular + overtime + allowances + bonuses; net = gross −
+    deductions.
+- **Issues**: blocking — attendance awaiting review, time without a rate,
+  rate in another currency, negative net pay; warnings — still clocked in,
+  archived without an end date. Nothing is hidden or clamped.
+- **`PayrollService`** creates non-overlapping periods, manages
+  adjustments, reads attendance through `AttendanceReader` for the whole
+  weeks around the period, calculates, and stores the run. A stored run never
+  changes; a later rate change only affects a recalculation. Approved or
+  finalized periods refuse changes (`payroll_locked`); the approval, finalize
+  and reopen workflow is Phase 8.
+
 ## Database
 
 Drift over SQLite with versioned, tested migrations. Conventions (UUIDv7 keys,
@@ -278,8 +306,8 @@ Nothing in V1 talks to a server, but the design leaves room:
 | 3 | Attendance engine |
 | 4 | Attendance UI and kiosk mode |
 | 5 | Exceptions and corrections |
-| 6 | Work schedules (current) |
-| 7 | Payroll engine |
+| 6 | Work schedules |
+| 7 | Payroll engine (current) |
 | 8 | Payroll UI |
 | 9 | Reports and PDF |
 | 10 | Thermal printing |
@@ -289,8 +317,8 @@ Nothing in V1 talks to a server, but the design leaves room:
 
 ## Current boundaries
 
-After Phase 6: employees clock in and out at the kiosk; administrators
-manage schedules, see daily attendance against them (late, absent, day
-off), review and settle exceptions, and correct attendance. Still deferred:
-administrator password change and recovery, session timeout, settings
-persistence, and payroll.
+After Phase 7: attendance, schedules and exceptions are complete, and a
+tested payroll engine calculates and stores runs. Still deferred: payroll
+screens and the approval / finalize / reopen workflow (Phase 8), reports and
+payslips (Phase 9), administrator password change and recovery, session
+timeout, and settings persistence.

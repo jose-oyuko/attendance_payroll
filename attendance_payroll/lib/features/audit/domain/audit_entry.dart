@@ -19,7 +19,13 @@ enum AuditAction {
   attendanceExceptionReviewed('attendance.exception_reviewed'),
   scheduleCreated('schedule.created'),
   scheduleUpdated('schedule.updated'),
-  employeeScheduleAssigned('employee.schedule_assigned');
+  employeeScheduleAssigned('employee.schedule_assigned'),
+  payrollSettingsChanged('payroll.settings_changed'),
+  payrollPeriodCreated('payroll.period_created'),
+  payrollAdjustmentAdded('payroll.adjustment_added'),
+  payrollAdjustmentRemoved('payroll.adjustment_removed'),
+  payrollCalculated('payroll.calculated'),
+  payrollRecalculated('payroll.recalculated');
 
   const AuditAction(this.code);
 
