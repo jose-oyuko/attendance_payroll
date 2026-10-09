@@ -359,7 +359,11 @@ class ExceptionReviews extends Table with EntityColumns {
   /// The issue as it was when reviewed, so the record stays meaningful after
   /// a correction makes the issue disappear.
   TextColumn get issueType => text()();
-  TextColumn get eventId => text().references(AttendanceEvents, #id)();
+
+  /// The event that revealed it; null for issues about a whole day (missing
+  /// attendance), whose key is anchored to the employee and date.
+  TextColumn get eventId =>
+      text().nullable().references(AttendanceEvents, #id)();
   TextColumn get sessionKey => text().nullable()();
   DateTimeColumn get issueOccurredAt => dateTime()();
 
@@ -375,4 +379,93 @@ class ExceptionReviews extends Table with EntityColumns {
 
   @override
   Set<Column<Object>> get primaryKey => {id};
+}
+
+/// Named weekly working patterns, e.g. "Day shift" Mon–Fri 08:00–17:00.
+/// Durations are whole minutes. Changing a schedule changes how all dates
+/// are evaluated; finalized payroll keeps its own figures (Phase 8).
+@DataClassName('WorkScheduleRow')
+class WorkSchedules extends Table with EntityColumns {
+  TextColumn get companyId => text().references(Companies, #id)();
+  TextColumn get name => text()();
+  IntColumn get lateToleranceMinutes => integer()();
+  IntColumn get earlyDepartureToleranceMinutes => integer()();
+
+  /// Both set, or both null when the schedule has no automatic break.
+  IntColumn get breakAfterMinutes => integer().nullable()();
+  IntColumn get breakMinutes => integer().nullable()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+
+  @override
+  List<Set<Column<Object>>> get uniqueKeys => [
+    {companyId, name},
+  ];
+
+  @override
+  List<String> get customConstraints => [
+    'CHECK (late_tolerance_minutes >= 0)',
+    'CHECK (early_departure_tolerance_minutes >= 0)',
+    'CHECK ((break_after_minutes IS NULL) = (break_minutes IS NULL))',
+  ];
+}
+
+/// The working days of a schedule; a weekday without a row is a day off.
+/// `end_minute` before `start_minute` means the shift ends the next day.
+@DataClassName('WorkScheduleDayRow')
+class WorkScheduleDays extends Table {
+  TextColumn get id => text()();
+  TextColumn get scheduleId => text().references(WorkSchedules, #id)();
+
+  /// ISO weekday: 1 = Monday … 7 = Sunday.
+  IntColumn get weekday => integer()();
+
+  /// Minutes after local midnight.
+  IntColumn get startMinute => integer()();
+  IntColumn get endMinute => integer()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+
+  @override
+  List<Set<Column<Object>>> get uniqueKeys => [
+    {scheduleId, weekday},
+  ];
+
+  @override
+  List<String> get customConstraints => [
+    'CHECK (weekday BETWEEN 1 AND 7)',
+    'CHECK (start_minute BETWEEN 0 AND 1439)',
+    'CHECK (end_minute BETWEEN 0 AND 1439)',
+    'CHECK (start_minute <> end_minute)',
+  ];
+}
+
+/// Which schedule an employee follows, over time. A new assignment closes
+/// the previous one the day before; history is never rewritten. A null
+/// schedule means "no schedule" from that date.
+@DataClassName('ScheduleAssignmentRow')
+class ScheduleAssignments extends Table with EntityColumns {
+  TextColumn get employeeId => text().references(Employees, #id)();
+  TextColumn get scheduleId =>
+      text().nullable().references(WorkSchedules, #id)();
+  TextColumn get effectiveFrom => text().map(const LocalDateConverter())();
+
+  /// Inclusive last day; null while current.
+  TextColumn get effectiveTo =>
+      text().map(const LocalDateConverter()).nullable()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+
+  @override
+  List<Set<Column<Object>>> get uniqueKeys => [
+    {employeeId, effectiveFrom},
+  ];
+
+  @override
+  List<String> get customConstraints => [
+    'CHECK (effective_to IS NULL OR effective_to >= effective_from)',
+  ];
 }

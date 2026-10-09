@@ -6,6 +6,7 @@ import 'package:attendance_payroll/features/employees/presentation/employee_rout
 import 'package:attendance_payroll/features/employees/presentation/employee_view_providers.dart';
 import 'package:attendance_payroll/features/employees/presentation/widgets/employee_pin_card.dart';
 import 'package:attendance_payroll/features/employees/presentation/widgets/employee_rate_card.dart';
+import 'package:attendance_payroll/features/employees/presentation/widgets/employee_schedule_card.dart';
 import 'package:attendance_payroll/features/employees/presentation/widgets/employee_status_card.dart';
 import 'package:attendance_payroll/features/employees/presentation/widgets/section_card.dart';
 import 'package:attendance_payroll/shared/formatting/date_formatting.dart';
@@ -56,6 +57,7 @@ class _EmployeeDetail extends StatelessWidget {
           'Clock-ins and clock-outs, issues to review, and corrections.',
         ),
       ),
+      EmployeeScheduleCard(employee: employee),
       EmployeePinCard(employee: employee),
       EmployeeRateCard(employee: employee),
       EmployeeStatusCard(employee: employee),

@@ -2,6 +2,7 @@ import 'package:attendance_payroll/core/utils/local_date.dart';
 import 'package:attendance_payroll/features/attendance/domain/attendance_event.dart';
 import 'package:attendance_payroll/features/attendance/domain/attendance_policy.dart';
 import 'package:attendance_payroll/features/attendance/domain/attendance_session.dart';
+import 'package:attendance_payroll/features/attendance/domain/day_schedule.dart';
 import 'package:attendance_payroll/features/attendance/domain/session_builder.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -349,6 +350,183 @@ void main() {
         build(events.reversed.toList()).issues.single.key,
       );
       expect(build(events).issues.single.key, 'duplicateClockIn:ev-002');
+    });
+  });
+
+  group('against a schedule', () {
+    // Mon–Fri 08:00–17:00 in Nairobi, 10 minutes' tolerance either way.
+    DaySchedule officeHours(LocalDate date) {
+      if (date.weekday > DateTime.friday) {
+        return const DayOff(scheduleName: 'Office');
+      }
+      return ScheduledShift(
+        scheduleName: 'Office',
+        date: date,
+        start: nairobiTime(date.day, 8, 0),
+        end: nairobiTime(date.day, 17, 0),
+        lateTolerance: const Duration(minutes: 10),
+        earlyDepartureTolerance: const Duration(minutes: 10),
+        automaticBreak: null,
+        crossesMidnight: false,
+      );
+    }
+
+    AttendanceTimeline scheduled(List<AttendanceEvent> events) =>
+        builder.build(events, now: later, schedule: officeHours);
+
+    List<AttendanceIssueType> typesOf(AttendanceTimeline t) => [
+      for (final i in t.issues) i.type,
+    ];
+
+    test('within tolerance is on time and a full day', () {
+      final timeline = scheduled([e.clockIn(5, 8, 10), e.clockOut(5, 16, 50)]);
+
+      expect(timeline.issues, isEmpty);
+      expect(timeline.sessions.single.status, SessionStatus.completed);
+    });
+
+    test('beyond tolerance is late, or left early', () {
+      final clockIn = e.clockIn(5, 8, 11);
+      final clockOut = e.clockOut(5, 16, 49);
+      final timeline = scheduled([clockIn, clockOut]);
+
+      expect(typesOf(timeline), [
+        AttendanceIssueType.lateArrival,
+        AttendanceIssueType.earlyDeparture,
+      ]);
+      expect(timeline.issues.first.eventId, clockIn.id);
+      expect(timeline.issues.last.eventId, clockOut.id);
+      // Lateness is reported, never withheld from pay.
+      expect(timeline.sessions.single.status, SessionStatus.completed);
+      expect(
+        timeline.sessions.single.payableDuration,
+        const Duration(hours: 8, minutes: 38),
+      );
+    });
+
+    test('a lunch break does not count as late or early', () {
+      final timeline = scheduled([
+        e.clockIn(5, 8, 0),
+        e.clockOut(5, 12, 0),
+        e.clockIn(5, 13, 0),
+        e.clockOut(5, 17, 0),
+      ]);
+
+      expect(timeline.sessions, hasLength(2));
+      expect(timeline.issues, isEmpty);
+    });
+
+    test('a scheduled night shift crossing midnight is expected', () {
+      DaySchedule nights(LocalDate date) => ScheduledShift(
+        scheduleName: 'Nights',
+        date: date,
+        start: nairobiTime(date.day, 22, 0),
+        end: nairobiTime(date.day + 1, 6, 0),
+        lateTolerance: Duration.zero,
+        earlyDepartureTolerance: Duration.zero,
+        automaticBreak: null,
+        crossesMidnight: true,
+      );
+
+      final timeline = builder.build(
+        [e.clockIn(5, 22, 0), e.clockOut(6, 6, 0)],
+        now: later,
+        schedule: nights,
+      );
+
+      expect(timeline.issues, isEmpty);
+      expect(
+        timeline.sessions.single.payableDuration,
+        const Duration(hours: 8),
+      );
+    });
+
+    test('work on a day off is not late, but still checked', () {
+      // 10 October is a Saturday.
+      final timeline = scheduled([e.clockIn(10, 9, 0), e.clockOut(11, 2, 0)]);
+
+      expect(typesOf(timeline), [
+        AttendanceIssueType.overnightSession,
+        AttendanceIssueType.excessiveDuration,
+      ]);
+    });
+
+    test("the schedule's break replaces the company's", () {
+      final withCompanyBreak = SessionBuilder(
+        policy: const AttendancePolicy(
+          automaticBreak: AutomaticBreak(
+            after: Duration(hours: 6),
+            deduct: Duration(hours: 1),
+          ),
+        ),
+        timeZone: nairobi,
+      );
+      DaySchedule shortBreak(LocalDate date) => ScheduledShift(
+        scheduleName: 'Shop',
+        date: date,
+        start: nairobiTime(date.day, 8, 0),
+        end: nairobiTime(date.day, 17, 0),
+        lateTolerance: Duration.zero,
+        earlyDepartureTolerance: Duration.zero,
+        automaticBreak: const AutomaticBreak(
+          after: Duration(hours: 6),
+          deduct: Duration(minutes: 30),
+        ),
+        crossesMidnight: false,
+      );
+      final events = [e.clockIn(5, 8, 0), e.clockOut(5, 17, 0)];
+
+      Duration? breakWith(ScheduleLookup schedule) => withCompanyBreak
+          .build(events, now: later, schedule: schedule)
+          .sessions
+          .single
+          .breakDuration;
+
+      expect(breakWith(shortBreak), const Duration(minutes: 30));
+      expect(breakWith(officeHours), Duration.zero, reason: 'no break set');
+      expect(
+        breakWith((_) => const Unscheduled()),
+        const Duration(hours: 1),
+        reason: 'company default without a schedule',
+      );
+    });
+
+    group('missing attendance', () {
+      List<AttendanceIssue> missing(
+        List<AttendanceEvent> events, {
+        required DateTime now,
+      }) {
+        final sessions = builder
+            .build(events, now: now, schedule: officeHours)
+            .sessions;
+        return builder.missingAttendance(
+          'emp-1',
+          sessions,
+          from: LocalDate(2026, 10, 5),
+          to: LocalDate(2026, 10, 11),
+          now: now,
+          schedule: officeHours,
+        );
+      }
+
+      test('a scheduled day without attendance is reported once it ends', () {
+        final issues = missing([
+          e.clockIn(5, 8, 0),
+          e.clockOut(5, 17, 0),
+        ], now: nairobiTime(7, 12, 0));
+
+        // Mon worked; Tue missing; Wed still in progress; weekend off.
+        expect(issues.single.type, AttendanceIssueType.missingAttendance);
+        expect(issues.single.occurredAt, nairobiTime(6, 8, 0));
+        expect(issues.single.eventId, isNull);
+        expect(issues.single.key, 'missingAttendance:emp-1@2026-10-06');
+      });
+
+      test('nothing is reported for days off', () {
+        final issues = missing([], now: nairobiTime(20, 12, 0));
+
+        expect(issues, hasLength(5), reason: 'Mon–Fri only');
+      });
     });
   });
 }

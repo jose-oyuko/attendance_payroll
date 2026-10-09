@@ -27,6 +27,9 @@ part 'app_database.g.dart';
     AttendanceCorrections,
     DeviceSettings,
     ExceptionReviews,
+    WorkSchedules,
+    WorkScheduleDays,
+    ScheduleAssignments,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -49,8 +52,9 @@ class AppDatabase extends _$AppDatabase {
   /// 4 — attendance settings and corrections.
   /// 5 — device settings (kiosk mode).
   /// 6 — exception reviews.
+  /// 7 — work schedules and assignments; review event optional.
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
 
   @override
   MigrationStrategy get migration {
@@ -82,6 +86,14 @@ class AppDatabase extends _$AppDatabase {
           await m.createTable(schema.exceptionReviews);
           await m.createIndex(schema.exceptionReviewsIssue);
           await m.createIndex(schema.exceptionReviewsCompanyTime);
+        },
+        from6To7: (m, schema) async {
+          await m.createTable(schema.workSchedules);
+          await m.createTable(schema.workScheduleDays);
+          await m.createTable(schema.scheduleAssignments);
+          // event_id becomes nullable: SQLite needs the table rebuilt. Rows
+          // are copied unchanged; the indexes are recreated with it.
+          await m.alterTable(TableMigration(schema.exceptionReviews));
         },
       ),
       beforeOpen: (details) async {

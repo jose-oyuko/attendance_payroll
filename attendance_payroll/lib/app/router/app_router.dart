@@ -17,6 +17,9 @@ import 'package:attendance_payroll/features/employees/presentation/employee_rout
 import 'package:attendance_payroll/features/employees/presentation/employees_screen.dart';
 import 'package:attendance_payroll/features/kiosk/presentation/kiosk_screen.dart';
 import 'package:attendance_payroll/features/kiosk/presentation/kiosk_unlock_screen.dart';
+import 'package:attendance_payroll/features/schedules/presentation/schedule_form_screen.dart';
+import 'package:attendance_payroll/features/schedules/presentation/schedule_routes.dart';
+import 'package:attendance_payroll/features/schedules/presentation/schedules_screen.dart';
 import 'package:attendance_payroll/features/settings/presentation/settings_screen.dart';
 import 'package:attendance_payroll/shared/widgets/error_state.dart';
 import 'package:flutter/material.dart';
@@ -140,6 +143,7 @@ Widget _screenFor(AdminDestination destination) {
     AdminDestination.dashboard => const DashboardScreen(),
     AdminDestination.employees => const EmployeesScreen(),
     AdminDestination.attendance => const AttendanceDayScreen(),
+    AdminDestination.schedules => const SchedulesScreen(),
     AdminDestination.settings => const SettingsScreen(),
     _ => PlannedFeatureScreen(destination: destination),
   };
@@ -187,6 +191,18 @@ List<RouteBase> _childRoutesFor(AdminDestination destination) {
         builder: (context, state) => EmployeeAttendanceScreen(
           employeeId: state.pathParameters[AttendanceRoutes.idParameter]!,
           backLocation: AttendanceRoutes.day,
+        ),
+      ),
+    ],
+    AdminDestination.schedules => [
+      GoRoute(
+        path: ScheduleRoutes.newSegment,
+        builder: (context, state) => const ScheduleFormScreen(),
+      ),
+      GoRoute(
+        path: ScheduleRoutes.editSegment,
+        builder: (context, state) => ScheduleFormScreen(
+          scheduleId: state.pathParameters[ScheduleRoutes.idParameter],
         ),
       ),
     ],

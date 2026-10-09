@@ -55,7 +55,9 @@ final class ExceptionReview {
   final String employeeId;
   final String issueKey;
   final AttendanceIssueType issueType;
-  final String eventId;
+
+  /// The event that revealed the issue; null for whole-day issues.
+  final String? eventId;
   final String? sessionKey;
   final DateTime issueOccurredAt;
   final ReviewDecision decision;

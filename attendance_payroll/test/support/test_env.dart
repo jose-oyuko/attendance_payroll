@@ -29,6 +29,9 @@ import 'package:attendance_payroll/features/employees/domain/employee.dart';
 import 'package:attendance_payroll/features/employees/domain/employee_management_service.dart';
 import 'package:attendance_payroll/features/kiosk/data/drift_kiosk_mode_repository.dart';
 import 'package:attendance_payroll/features/kiosk/domain/kiosk_service.dart';
+import 'package:attendance_payroll/features/schedules/data/drift_schedule_assignment_repository.dart';
+import 'package:attendance_payroll/features/schedules/data/drift_work_schedule_repository.dart';
+import 'package:attendance_payroll/features/schedules/domain/work_schedule_service.dart';
 import 'package:drift/drift.dart';
 
 import 'test_database.dart';
@@ -109,7 +112,25 @@ class TestEnv {
     events: events,
     settings: attendanceSettings,
     reviews: reviews,
+    schedules: scheduleSource,
     clock: clock.call,
+  );
+
+  late final schedulesRepo = DriftWorkScheduleRepository(db, clock: clock.call);
+  late final assignments = DriftScheduleAssignmentRepository(
+    db,
+    clock: clock.call,
+  );
+  late final scheduleSource = CompanyScheduleSource(
+    schedules: schedulesRepo,
+    assignments: assignments,
+  );
+  late final scheduleService = WorkScheduleService(
+    schedules: schedulesRepo,
+    assignments: assignments,
+    employees: employees,
+    audit: audit,
+    transactions: transactions,
   );
 
   late final attendance = AttendanceService(

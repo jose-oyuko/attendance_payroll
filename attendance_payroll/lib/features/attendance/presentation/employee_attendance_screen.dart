@@ -377,10 +377,14 @@ class _IssueTile extends StatelessWidget {
     final type = issue.type;
     // Session-level issues are fixed through the session's own entries; the
     // extra entries behind other issues can be corrected here.
+    final eventId = issue.eventId;
+    final eventType = type.eventType;
     final entryCanBeFixed =
-        issue.sessionKey == null ||
-        type == AttendanceIssueType.duplicateClockIn ||
-        type == AttendanceIssueType.duplicateClockOut;
+        eventId != null &&
+        eventType != null &&
+        (issue.sessionKey == null ||
+            type == AttendanceIssueType.duplicateClockIn ||
+            type == AttendanceIssueType.duplicateClockOut);
     return ListTile(
       contentPadding: EdgeInsets.zero,
       dense: true,
@@ -391,9 +395,9 @@ class _IssueTile extends StatelessWidget {
             : context.colors.onSurfaceVariant,
       ),
       title: Text(type.label),
-      subtitle: issue.sessionKey == null
+      subtitle: issue.sessionKey == null && eventType != null
           ? Text(
-              '${type.eventType.label} at '
+              '${eventType.label} at '
               '${formatCompanyTime(context, zone, issue.occurredAt)} on '
               '${formatLocalDate(context, zone.dateOf(issue.occurredAt))}',
             )
@@ -403,8 +407,8 @@ class _IssueTile extends StatelessWidget {
           : TextButton(
               onPressed: () => onCorrect(
                 RemoveEntryRequest(
-                  eventId: issue.eventId,
-                  type: type.eventType,
+                  eventId: eventId,
+                  type: eventType,
                   occurredAt: issue.occurredAt,
                 ),
               ),

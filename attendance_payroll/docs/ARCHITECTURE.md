@@ -204,6 +204,31 @@ destination so each area keeps its navigation state.
 - Late arrival, early departure and missing attendance need schedules and are
   added in Phase 6 as further issue types.
 
+## Work schedules (Phase 6)
+
+- **Schedules** name working weekdays with start/end times (a shift may
+  cross midnight), late and early-departure tolerances, and an optional
+  automatic break that replaces the company default on scheduled days.
+- **Assignments** are effective-dated like pay rates: a new one closes the
+  previous one; history is never rewritten; "no schedule" is allowed.
+- **Dependency direction**: attendance defines `ScheduleSource` and
+  `DaySchedule` (`Unscheduled`, `DayOff`, `ScheduledShift`); the schedules
+  feature implements it (`CompanyScheduleSource`). Attendance does not depend
+  on schedules.
+- **Comparison** (in `SessionBuilder`): the day's first clock-in later than
+  start + tolerance is `lateArrival`; the day's last clock-out earlier than
+  end − tolerance is `earlyDeparture`; a scheduled shift that ended with no
+  attendance is `missingAttendance`; a scheduled night shift does not raise
+  `overnightSession`. These three are informational: pay follows time
+  worked. They can be excused or noted, or corrected.
+- **Daily statuses** now distinguish expected (before start + tolerance),
+  absent, day off and no schedule; the dashboard and day view count late and
+  absent.
+- **Issue keys** are `<type>:<anchor>`: the event id, or
+  `<employee>@<date>` for missing attendance. Existing keys are unchanged.
+- Editing a schedule re-evaluates all dates its employees are on it, past
+  ones included; finalized payroll will keep its own figures (Phase 8).
+
 ## Database
 
 Drift over SQLite with versioned, tested migrations. Conventions (UUIDv7 keys,
@@ -252,8 +277,8 @@ Nothing in V1 talks to a server, but the design leaves room:
 | 2 | Authentication and employee management |
 | 3 | Attendance engine |
 | 4 | Attendance UI and kiosk mode |
-| 5 | Exceptions and corrections (current) |
-| 6 | Work schedules |
+| 5 | Exceptions and corrections |
+| 6 | Work schedules (current) |
 | 7 | Payroll engine |
 | 8 | Payroll UI |
 | 9 | Reports and PDF |
@@ -264,8 +289,8 @@ Nothing in V1 talks to a server, but the design leaves room:
 
 ## Current boundaries
 
-After Phase 5: employees clock in and out at the kiosk; administrators see
-daily attendance, review and settle exceptions, and correct attendance.
-Still deferred: schedules with late/early detection (Phase 6), administrator
-password change and recovery, session timeout, settings persistence, and
-payroll.
+After Phase 6: employees clock in and out at the kiosk; administrators
+manage schedules, see daily attendance against them (late, absent, day
+off), review and settle exceptions, and correct attendance. Still deferred:
+administrator password change and recovery, session timeout, settings
+persistence, and payroll.

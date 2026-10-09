@@ -50,6 +50,9 @@ final class LocalDate implements Comparable<LocalDate> {
   final int month;
   final int day;
 
+  /// ISO weekday: [DateTime.monday] (1) to [DateTime.sunday] (7).
+  int get weekday => DateTime.utc(year, month, day).weekday;
+
   /// The date [days] days later (or earlier, when negative).
   LocalDate addDays(int days) {
     return LocalDate.fromDateTime(DateTime.utc(year, month, day + days));

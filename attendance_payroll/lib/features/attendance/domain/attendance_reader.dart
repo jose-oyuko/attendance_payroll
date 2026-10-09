@@ -9,6 +9,7 @@ import 'package:attendance_payroll/features/attendance/domain/attendance_excepti
 import 'package:attendance_payroll/features/attendance/domain/attendance_policy.dart';
 import 'package:attendance_payroll/features/attendance/domain/attendance_session.dart';
 import 'package:attendance_payroll/features/attendance/domain/attendance_settings_repository.dart';
+import 'package:attendance_payroll/features/attendance/domain/day_schedule.dart';
 import 'package:attendance_payroll/features/attendance/domain/session_builder.dart';
 import 'package:attendance_payroll/features/company/domain/company_repository.dart';
 import 'package:attendance_payroll/features/employees/domain/employee.dart';
@@ -24,6 +25,7 @@ final class AttendanceSnapshot {
     required this.employees,
     required this.timelines,
     required this.reviews,
+    required this._schedules,
   });
 
   final LocalDate from;
@@ -40,6 +42,12 @@ final class AttendanceSnapshot {
 
   /// Review decisions for exceptions around the range, oldest first.
   final List<ExceptionReview> reviews;
+
+  final Map<String, ScheduleLookup> _schedules;
+
+  /// What [employeeId] was expected to work on [date].
+  DaySchedule scheduleOn(String employeeId, LocalDate date) =>
+      _schedules[employeeId]?.call(date) ?? const Unscheduled();
 
   bool _inRange(LocalDate date) => !date.isBefore(from) && !date.isAfter(to);
 
@@ -71,6 +79,7 @@ final class AttendanceReader {
     required this._events,
     required this._settings,
     required this._reviews,
+    required this._schedules,
     this._clock = systemClockUtc,
   });
 
@@ -81,6 +90,7 @@ final class AttendanceReader {
   final AttendanceEventRepository _events;
   final AttendanceSettingsRepository _settings;
   final ExceptionReviewRepository _reviews;
+  final ScheduleSource _schedules;
   final Clock _clock;
 
   /// The company's attendance policy.
@@ -143,6 +153,11 @@ final class AttendanceReader {
         to: end,
       )).unwrap();
 
+      final schedules = (await _schedules.forCompany(
+        companyId,
+        timeZone: zone,
+      )).unwrap();
+
       final byEmployee = <String, List<AttendanceEvent>>{};
       for (final event in events) {
         (byEmployee[event.employeeId] ??= []).add(event);
@@ -150,21 +165,39 @@ final class AttendanceReader {
       final builder = SessionBuilder(policy: policy, timeZone: zone);
       final accepted = acceptedIssueKeys(reviews);
       final now = _clock();
+      final timelines = <String, AttendanceTimeline>{};
+      for (final employee in employees) {
+        final schedule =
+            schedules[employee.id] ?? (LocalDate _) => const Unscheduled();
+        final built = builder.build(
+          byEmployee[employee.id] ?? const [],
+          now: now,
+          acceptedIssueKeys: accepted,
+          schedule: schedule,
+        );
+        final missing = builder.missingAttendance(
+          employee.id,
+          built.sessions,
+          from: from,
+          to: to,
+          now: now,
+          schedule: schedule,
+        );
+        timelines[employee.id] = AttendanceTimeline(
+          sessions: built.sessions,
+          issues: [...built.issues, ...missing]
+            ..sort((a, b) => a.occurredAt.compareTo(b.occurredAt)),
+        );
+      }
       return AttendanceSnapshot(
         from: from,
         to: to,
         timeZone: zone,
         policy: policy,
         employees: employees,
-        timelines: {
-          for (final employee in employees)
-            employee.id: builder.build(
-              byEmployee[employee.id] ?? const [],
-              now: now,
-              acceptedIssueKeys: accepted,
-            ),
-        },
+        timelines: timelines,
         reviews: reviews,
+        schedules: schedules,
       );
     });
   }

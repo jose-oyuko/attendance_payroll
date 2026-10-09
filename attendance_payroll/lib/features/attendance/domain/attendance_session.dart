@@ -1,14 +1,13 @@
 import 'package:attendance_payroll/core/utils/local_date.dart';
 import 'package:attendance_payroll/features/attendance/domain/attendance_event.dart';
 
-/// Anomalies found while deriving sessions. Phase 5 turns these into
-/// reviewable attendance exceptions; late arrival and early departure are
-/// added with work schedules (Phase 6).
+/// Anomalies found while deriving attendance, reviewed as exceptions.
 enum AttendanceIssueType {
   /// An open session was never closed.
   missingClockOut(blocksPayroll: true),
 
-  /// The session ends on a later company-local date than it starts.
+  /// The session ends on a later company-local date than it starts, and the
+  /// employee's schedule does not expect that.
   overnightSession(blocksPayroll: true),
 
   /// The session is longer than the policy allows without review.
@@ -22,37 +21,65 @@ enum AttendanceIssueType {
 
   /// A clock-out with no clock-in before it, so some work time may be
   /// unrecorded. It affects no session's time.
-  clockOutWithoutClockIn(blocksPayroll: false);
+  clockOutWithoutClockIn(blocksPayroll: false),
+
+  /// The day's first clock-in is later than the scheduled start plus the
+  /// late tolerance.
+  lateArrival(blocksPayroll: false),
+
+  /// The day's last clock-out is earlier than the scheduled end minus the
+  /// early-departure tolerance.
+  earlyDeparture(blocksPayroll: false),
+
+  /// A scheduled shift ended without any attendance.
+  missingAttendance(blocksPayroll: false);
 
   const AttendanceIssueType({required this.blocksPayroll});
 
   /// Whether the session's time must be reviewed before it can be paid.
+  /// Lateness, early departure and absence are reported but never block:
+  /// pay follows the time actually worked.
   final bool blocksPayroll;
 }
 
-/// One anomaly, anchored to the event that revealed it.
+/// One anomaly, anchored to what revealed it: an event, or for missing
+/// attendance the employee and date.
 final class AttendanceIssue {
   const AttendanceIssue({
     required this.type,
-    required this.eventId,
+    required this.employeeId,
+    required this.anchor,
     required this.occurredAt,
+    this.eventId,
     this.sessionKey,
   });
 
   final AttendanceIssueType type;
-  final String eventId;
+  final String employeeId;
+
+  /// The event id, or `<employee id>@<date>` when no event exists.
+  final String anchor;
+
+  /// The event that revealed it, if any.
+  final String? eventId;
+
+  /// When it happened (for missing attendance: the scheduled start).
   final DateTime occurredAt;
 
   /// The session it concerns, if any.
   final String? sessionKey;
 
-  /// Stable identity: the same issue revealed by the same event always has
+  /// Stable identity: the same issue revealed by the same anchor always has
   /// the same key, so review decisions can refer to it. A correction that
   /// replaces the event yields a new key, and with it a fresh review.
-  String get key => keyFor(type, eventId);
+  String get key => keyFor(type, anchor);
 
-  static String keyFor(AttendanceIssueType type, String eventId) =>
-      '${type.name}:$eventId';
+  static String keyFor(AttendanceIssueType type, String anchor) =>
+      '${type.name}:$anchor';
+
+  /// The anchor of an issue about a whole day without events.
+  static String dayAnchor(String employeeId, LocalDate date) =>
+      '$employeeId@${date.toIsoString()}';
 }
 
 enum SessionStatus {

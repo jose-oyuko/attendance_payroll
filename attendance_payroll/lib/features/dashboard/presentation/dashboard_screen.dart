@@ -70,9 +70,18 @@ class DashboardScreen extends ConsumerWidget {
                   onTap: () => context.go(AttendanceRoutes.exceptions),
                 ),
                 _StatusCard(
+                  icon: Icons.schedule_outlined,
+                  title: 'Late',
+                  value: '${value.late}',
+                  accent: semantic.warning,
+                ),
+                _StatusCard(
                   icon: Icons.person_off_outlined,
-                  title: 'Not clocked in',
-                  value: '${value.notClockedIn}',
+                  title: 'Absent',
+                  value: '${value.absent}',
+                  caption: value.expected > 0
+                      ? '${value.expected} still expected today'
+                      : null,
                   accent: semantic.neutral,
                 ),
               ],

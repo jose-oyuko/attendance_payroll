@@ -17,6 +17,9 @@ extension AttendanceIssueLabel on AttendanceIssueType {
     AttendanceIssueType.duplicateClockIn => 'Repeated clock-in (ignored)',
     AttendanceIssueType.duplicateClockOut => 'Repeated clock-out (ignored)',
     AttendanceIssueType.clockOutWithoutClockIn => 'Clock-out with no clock-in',
+    AttendanceIssueType.lateArrival => 'Late arrival',
+    AttendanceIssueType.earlyDeparture => 'Left early',
+    AttendanceIssueType.missingAttendance => 'Absent on a scheduled day',
   };
 
   /// What happened and what the administrator can do about it.
@@ -39,16 +42,31 @@ extension AttendanceIssueLabel on AttendanceIssueType {
     AttendanceIssueType.clockOutWithoutClockIn =>
       'A clock-out with no clock-in before it, so some work may be '
           'unrecorded. Add the missing clock-in, or remove the clock-out.',
+    AttendanceIssueType.lateArrival =>
+      'The first clock-in of the day was after the scheduled start plus the '
+          'allowed lateness. Excuse it if there was a reason, or correct the '
+          'time if it was recorded wrongly.',
+    AttendanceIssueType.earlyDeparture =>
+      'The last clock-out of the day was before the scheduled end, beyond '
+          'the allowed margin. Excuse it, or correct the time if it was '
+          'recorded wrongly.',
+    AttendanceIssueType.missingAttendance =>
+      'The employee was scheduled to work but has no attendance that day. '
+          'Excuse it (for example leave or a holiday), or add the clock-in and '
+          'clock-out if they worked.',
   };
 
-  /// The kind of entry the issue points at.
-  AttendanceEventType get eventType => switch (this) {
+  /// The kind of entry the issue points at, or `null` for a whole day.
+  AttendanceEventType? get eventType => switch (this) {
     AttendanceIssueType.missingClockOut ||
-    AttendanceIssueType.duplicateClockIn => AttendanceEventType.clockIn,
+    AttendanceIssueType.duplicateClockIn ||
+    AttendanceIssueType.lateArrival => AttendanceEventType.clockIn,
     AttendanceIssueType.overnightSession ||
     AttendanceIssueType.excessiveDuration ||
     AttendanceIssueType.duplicateClockOut ||
-    AttendanceIssueType.clockOutWithoutClockIn => AttendanceEventType.clockOut,
+    AttendanceIssueType.clockOutWithoutClockIn ||
+    AttendanceIssueType.earlyDeparture => AttendanceEventType.clockOut,
+    AttendanceIssueType.missingAttendance => null,
   };
 }
 

@@ -28,7 +28,6 @@ enum AdminDestination {
     label: 'Schedules',
     icon: Icons.calendar_month_outlined,
     selectedIcon: Icons.calendar_month,
-    plannedPhase: 6,
   ),
   payroll(
     path: '/payroll',

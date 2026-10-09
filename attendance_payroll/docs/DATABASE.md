@@ -29,6 +29,7 @@ tables are in `lib/core/database/tables.dart`. Only repositories in feature
 | 4 | Phase 3 follow-up | `attendance_settings`, `attendance_corrections` |
 | 5 | Phase 4 | `device_settings` |
 | 6 | Phase 5 | `exception_reviews` |
+| 7 | Phase 6 | `work_schedules`, `work_schedule_days`, `schedule_assignments`; `exception_reviews.event_id` optional |
 
 ### Version 1
 
@@ -107,6 +108,24 @@ Migration 4 → 5 only creates this table.
   `related_correction_id`. Exceptions themselves are derived, not stored.
 
 Migration 5 → 6 only creates this table and its indexes.
+
+### Version 7
+
+- **work_schedules** — `company_id`, `name` (unique per company),
+  `late_tolerance_minutes`, `early_departure_tolerance_minutes`, and
+  `break_after_minutes` / `break_minutes` (both or neither).
+- **work_schedule_days** — one row per working weekday (1 = Monday):
+  `start_minute`, `end_minute` after local midnight; an end before the start
+  means the shift ends the next day. Replaced as a whole when the schedule is
+  saved. Days without a row are days off.
+- **schedule_assignments** — `employee_id`, `schedule_id` (null = no
+  schedule), `effective_from`, `effective_to` (inclusive, null while
+  current); unique per employee and start date. A new assignment closes the
+  previous one; back-dating is refused.
+- **exception_reviews.event_id** becomes nullable, for issues about a whole
+  day (missing attendance), keyed `missingAttendance:<employee>@<date>`.
+  SQLite cannot drop NOT NULL in place, so the migration rebuilds the table
+  (`alterTable`); rows and indexes are kept (covered by a migration test).
 
 Indexes come from the unique keys: `(company_id, employee_number)` serves
 lookups by company and by number; `(company_id, username)` and

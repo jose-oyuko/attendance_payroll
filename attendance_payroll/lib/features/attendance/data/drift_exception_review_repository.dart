@@ -33,7 +33,7 @@ final class DriftExceptionReviewRepository
               employeeId: review.employeeId,
               issueKey: issue.key,
               issueType: issue.type.name,
-              eventId: issue.eventId,
+              eventId: Value(issue.eventId),
               sessionKey: Value(issue.sessionKey),
               issueOccurredAt: issue.occurredAt,
               status: review.decision.name,

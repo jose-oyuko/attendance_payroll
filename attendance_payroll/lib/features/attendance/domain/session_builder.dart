@@ -1,7 +1,11 @@
 import 'package:attendance_payroll/core/time/company_time_zone.dart';
+import 'package:attendance_payroll/core/utils/local_date.dart';
 import 'package:attendance_payroll/features/attendance/domain/attendance_event.dart';
 import 'package:attendance_payroll/features/attendance/domain/attendance_policy.dart';
 import 'package:attendance_payroll/features/attendance/domain/attendance_session.dart';
+import 'package:attendance_payroll/features/attendance/domain/day_schedule.dart';
+
+DaySchedule _unscheduled(LocalDate date) => const Unscheduled();
 
 /// Derives sessions from one employee's events.
 ///
@@ -16,11 +20,14 @@ final class SessionBuilder {
   final CompanyTimeZone timeZone;
 
   /// [acceptedIssueKeys] are issues an administrator accepted as recorded
-  /// (see `ExceptionReview`); they no longer block payroll.
+  /// (see `ExceptionReview`); they no longer block payroll. [schedule] says
+  /// what the employee was expected to work each day: it decides the break,
+  /// whether crossing midnight is expected, and lateness and early departure.
   AttendanceTimeline build(
     Iterable<AttendanceEvent> events, {
     required DateTime now,
     Set<String> acceptedIssueKeys = const {},
+    ScheduleLookup schedule = _unscheduled,
   }) {
     final accepted = acceptedIssueKeys;
     final sorted = [...events]..sort(AttendanceEvent.compareChronologically);
@@ -54,7 +61,7 @@ final class SessionBuilder {
           }
         case AttendanceEventType.clockOut:
           if (open != null) {
-            sessions.add(_closed(open, event, accepted));
+            sessions.add(_closed(open, event, accepted, schedule));
             open = null;
             closingRun = true;
           } else if (_isDuplicate(previous, event)) {
@@ -85,11 +92,79 @@ final class SessionBuilder {
       );
     }
 
+    final checked = _compareWithSchedule(sessions, schedule, accepted);
     final issues = [
-      for (final session in sessions) ...session.issues,
+      for (final session in checked) ...session.issues,
       ...looseIssues,
     ]..sort((a, b) => a.occurredAt.compareTo(b.occurredAt));
-    return AttendanceTimeline(sessions: sessions, issues: issues);
+    return AttendanceTimeline(sessions: checked, issues: issues);
+  }
+
+  /// Scheduled shifts on dates [from] to [to] that ended by [now] with no
+  /// session starting that day.
+  List<AttendanceIssue> missingAttendance(
+    String employeeId,
+    List<AttendanceSession> sessions, {
+    required LocalDate from,
+    required LocalDate to,
+    required DateTime now,
+    required ScheduleLookup schedule,
+  }) {
+    final worked = {for (final s in sessions) s.workDate};
+    final issues = <AttendanceIssue>[];
+    for (var date = from; !date.isAfter(to); date = date.addDays(1)) {
+      if (schedule(date) case final ScheduledShift shift
+          when !worked.contains(date) && !now.isBefore(shift.end)) {
+        issues.add(
+          AttendanceIssue(
+            type: AttendanceIssueType.missingAttendance,
+            employeeId: employeeId,
+            anchor: AttendanceIssue.dayAnchor(employeeId, date),
+            occurredAt: shift.start,
+          ),
+        );
+      }
+    }
+    return issues;
+  }
+
+  /// Adds lateness (the day's first session) and early departure (the day's
+  /// last session, once clocked out) for scheduled days.
+  List<AttendanceSession> _compareWithSchedule(
+    List<AttendanceSession> sessions,
+    ScheduleLookup schedule,
+    Set<String> accepted,
+  ) {
+    final result = [...sessions];
+    final byDate = <LocalDate, List<int>>{};
+    for (final (index, session) in result.indexed) {
+      (byDate[session.workDate] ??= []).add(index);
+    }
+    for (final MapEntry(key: date, value: indexes) in byDate.entries) {
+      final shift = schedule(date);
+      if (shift is! ScheduledShift) {
+        continue;
+      }
+      final first = result[indexes.first];
+      if (first.start.isAfter(shift.start.add(shift.lateTolerance))) {
+        result[indexes.first] = _withIssue(
+          first,
+          _issue(AttendanceIssueType.lateArrival, first.clockIn, first.key),
+          accepted,
+        );
+      }
+      final last = result[indexes.last];
+      final clockOut = last.clockOut;
+      final earliestEnd = shift.end.subtract(shift.earlyDepartureTolerance);
+      if (clockOut != null && clockOut.occurredAt.isBefore(earliestEnd)) {
+        result[indexes.last] = _withIssue(
+          last,
+          _issue(AttendanceIssueType.earlyDeparture, clockOut, last.key),
+          accepted,
+        );
+      }
+    }
+    return result;
   }
 
   /// The same action repeated within the duplicate window.
@@ -109,12 +184,19 @@ final class SessionBuilder {
     _OpenSession open,
     AttendanceEvent clockOut,
     Set<String> accepted,
+    ScheduleLookup schedule,
   ) {
     final workDate = timeZone.dateOf(open.clockIn.occurredAt);
     final duration = clockOut.occurredAt.difference(open.clockIn.occurredAt);
+    final shift = schedule(workDate);
+    final nightShift = shift is ScheduledShift && shift.crossesMidnight;
+    // A scheduled day uses the schedule's break rule, even "no break".
+    final automaticBreak = shift is ScheduledShift
+        ? shift.automaticBreak
+        : policy.automaticBreak;
     final issues = [
       ...open.issues,
-      if (timeZone.dateOf(clockOut.occurredAt) != workDate)
+      if (timeZone.dateOf(clockOut.occurredAt) != workDate && !nightShift)
         _issue(AttendanceIssueType.overnightSession, clockOut, open.key),
       if (duration > policy.excessiveDurationAfter)
         _issue(AttendanceIssueType.excessiveDuration, clockOut, open.key),
@@ -125,7 +207,7 @@ final class SessionBuilder {
       workDate: workDate,
       status: _statusFor(issues, accepted, isOpen: false),
       issues: issues,
-      breakDuration: policy.automaticBreak?.breakFor(duration) ?? Duration.zero,
+      breakDuration: automaticBreak?.breakFor(duration) ?? Duration.zero,
     );
   }
 
@@ -199,6 +281,8 @@ final class SessionBuilder {
   ) {
     return AttendanceIssue(
       type: type,
+      employeeId: event.employeeId,
+      anchor: event.id,
       eventId: event.id,
       occurredAt: event.occurredAt,
       sessionKey: sessionKey,

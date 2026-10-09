@@ -40,7 +40,8 @@ final class AttendanceExceptionService {
   ///
   /// - A missing clock-out has no end time to accept: it must be corrected.
   /// - Overnight and excessive sessions can be accepted as recorded.
-  /// - Informational issues can be dismissed.
+  /// - Informational issues can be dismissed (for lateness, early departure
+  ///   and absence: excused).
   static Set<ReviewDecision> decisionsFor(AttendanceIssueType type) {
     return switch (type) {
       AttendanceIssueType.missingClockOut => {ReviewDecision.reviewed},
@@ -51,7 +52,10 @@ final class AttendanceExceptionService {
       },
       AttendanceIssueType.duplicateClockIn ||
       AttendanceIssueType.duplicateClockOut ||
-      AttendanceIssueType.clockOutWithoutClockIn => {
+      AttendanceIssueType.clockOutWithoutClockIn ||
+      AttendanceIssueType.lateArrival ||
+      AttendanceIssueType.earlyDeparture ||
+      AttendanceIssueType.missingAttendance => {
         ReviewDecision.reviewed,
         ReviewDecision.dismissed,
       },

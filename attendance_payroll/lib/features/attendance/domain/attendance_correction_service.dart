@@ -238,8 +238,7 @@ final class AttendanceCorrectionService {
         ),
       )).unwrap();
       if (resolves != null) {
-        final revealedBy = (await _events.getById(resolves.eventId)).unwrap();
-        if (revealedBy.event.employeeId != correction.employeeId) {
+        if (resolves.employeeId != correction.employeeId) {
           throw const ValidationFailure(
             userMessage: 'That exception belongs to another employee.',
           );

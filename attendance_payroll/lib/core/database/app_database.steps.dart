@@ -2394,12 +2394,585 @@ i1.GeneratedColumn<String> _column_77(String aliasedName) =>
       type: i1.DriftSqlType.string,
       $customConstraints: 'NULL REFERENCES attendance_corrections(id)',
     );
+
+final class Schema7 extends i0.VersionedSchema {
+  Schema7({required super.database}) : super(version: 7);
+  @override
+  late final List<i1.DatabaseSchemaEntity> entities = [
+    companies,
+    adminUsers,
+    employees,
+    employeeRates,
+    credentials,
+    auditLog,
+    deviceIdentity,
+    attendanceEvents,
+    attendanceSettings,
+    attendanceCorrections,
+    deviceSettings,
+    exceptionReviews,
+    workSchedules,
+    workScheduleDays,
+    scheduleAssignments,
+    auditLogCompanyTime,
+    auditLogEntity,
+    attendanceEventsEmployeeTime,
+    attendanceEventsTime,
+    attendanceCorrectionsOriginal,
+    attendanceCorrectionsEmployee,
+    exceptionReviewsIssue,
+    exceptionReviewsCompanyTime,
+  ];
+  late final Shape0 companies = Shape0(
+    source: i0.VersionedTable(
+      entityName: 'companies',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)'],
+      columns: [
+        _column_0,
+        _column_1,
+        _column_2,
+        _column_3,
+        _column_4,
+        _column_5,
+        _column_6,
+        _column_7,
+        _column_8,
+        _column_9,
+        _column_10,
+        _column_11,
+        _column_12,
+        _column_13,
+        _column_14,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape1 adminUsers = Shape1(
+    source: i0.VersionedTable(
+      entityName: 'admin_users',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)', 'UNIQUE(company_id, username)'],
+      columns: [
+        _column_0,
+        _column_1,
+        _column_2,
+        _column_3,
+        _column_4,
+        _column_5,
+        _column_15,
+        _column_16,
+        _column_17,
+        _column_18,
+        _column_19,
+        _column_20,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape2 employees = Shape2(
+    source: i0.VersionedTable(
+      entityName: 'employees',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [
+        'PRIMARY KEY(id)',
+        'UNIQUE(company_id, employee_number)',
+        'CHECK(employment_end_date IS NULL OR employment_end_date >= employment_start_date)',
+      ],
+      columns: [
+        _column_0,
+        _column_1,
+        _column_2,
+        _column_3,
+        _column_4,
+        _column_5,
+        _column_15,
+        _column_21,
+        _column_22,
+        _column_23,
+        _column_24,
+        _column_25,
+        _column_9,
+        _column_10,
+        _column_26,
+        _column_27,
+        _column_28,
+        _column_29,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape3 employeeRates = Shape3(
+    source: i0.VersionedTable(
+      entityName: 'employee_rates',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [
+        'PRIMARY KEY(id)',
+        'UNIQUE(employee_id, effective_from)',
+        'CHECK(amount_minor > 0)',
+        'CHECK(effective_to IS NULL OR effective_to >= effective_from)',
+      ],
+      columns: [
+        _column_0,
+        _column_1,
+        _column_2,
+        _column_3,
+        _column_4,
+        _column_5,
+        _column_30,
+        _column_31,
+        _column_32,
+        _column_12,
+        _column_33,
+        _column_34,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape4 credentials = Shape4(
+    source: i0.VersionedTable(
+      entityName: 'credentials',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [
+        'PRIMARY KEY(id)',
+        'CHECK((admin_user_id IS NULL)<>(employee_id IS NULL))',
+        'CHECK(failed_attempts >= 0)',
+      ],
+      columns: [
+        _column_0,
+        _column_35,
+        _column_36,
+        _column_37,
+        _column_38,
+        _column_39,
+        _column_40,
+        _column_41,
+        _column_42,
+        _column_2,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape5 auditLog = Shape5(
+    source: i0.VersionedTable(
+      entityName: 'audit_log',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)'],
+      columns: [
+        _column_0,
+        _column_15,
+        _column_43,
+        _column_44,
+        _column_45,
+        _column_46,
+        _column_47,
+        _column_48,
+        _column_49,
+        _column_50,
+        _column_4,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape6 deviceIdentity = Shape6(
+    source: i0.VersionedTable(
+      entityName: 'device_identity',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)'],
+      columns: [_column_0, _column_1],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape7 attendanceEvents = Shape7(
+    source: i0.VersionedTable(
+      entityName: 'attendance_events',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)'],
+      columns: [
+        _column_0,
+        _column_1,
+        _column_2,
+        _column_3,
+        _column_4,
+        _column_5,
+        _column_30,
+        _column_51,
+        _column_48,
+        _column_52,
+        _column_53,
+        _column_49,
+        _column_54,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape8 attendanceSettings = Shape8(
+    source: i0.VersionedTable(
+      entityName: 'attendance_settings',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [
+        'PRIMARY KEY(id)',
+        'CHECK(duplicate_window_minutes >= 0)',
+        'CHECK(stale_open_session_minutes > 0)',
+        'CHECK(excessive_duration_minutes > 0)',
+        'CHECK((break_after_minutes IS NULL)=(break_minutes IS NULL))',
+      ],
+      columns: [
+        _column_0,
+        _column_1,
+        _column_2,
+        _column_3,
+        _column_4,
+        _column_5,
+        _column_55,
+        _column_56,
+        _column_57,
+        _column_58,
+        _column_59,
+        _column_60,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape9 attendanceCorrections = Shape9(
+    source: i0.VersionedTable(
+      entityName: 'attendance_corrections',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [
+        'PRIMARY KEY(id)',
+        'CHECK(original_event_id IS NOT NULL OR replacement_event_id IS NOT NULL)',
+      ],
+      columns: [
+        _column_0,
+        _column_1,
+        _column_2,
+        _column_3,
+        _column_4,
+        _column_5,
+        _column_30,
+        _column_35,
+        _column_51,
+        _column_61,
+        _column_62,
+        _column_63,
+        _column_64,
+        _column_65,
+        _column_66,
+        _column_67,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape10 deviceSettings = Shape10(
+    source: i0.VersionedTable(
+      entityName: 'device_settings',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)', 'CHECK(id = \'this_device\')'],
+      columns: [_column_0, _column_68, _column_2],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape11 exceptionReviews = Shape11(
+    source: i0.VersionedTable(
+      entityName: 'exception_reviews',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: ['PRIMARY KEY(id)'],
+      columns: [
+        _column_0,
+        _column_1,
+        _column_2,
+        _column_3,
+        _column_4,
+        _column_5,
+        _column_15,
+        _column_30,
+        _column_69,
+        _column_70,
+        _column_78,
+        _column_72,
+        _column_73,
+        _column_74,
+        _column_65,
+        _column_75,
+        _column_76,
+        _column_77,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape12 workSchedules = Shape12(
+    source: i0.VersionedTable(
+      entityName: 'work_schedules',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [
+        'PRIMARY KEY(id)',
+        'UNIQUE(company_id, name)',
+        'CHECK(late_tolerance_minutes >= 0)',
+        'CHECK(early_departure_tolerance_minutes >= 0)',
+        'CHECK((break_after_minutes IS NULL)=(break_minutes IS NULL))',
+      ],
+      columns: [
+        _column_0,
+        _column_1,
+        _column_2,
+        _column_3,
+        _column_4,
+        _column_5,
+        _column_15,
+        _column_6,
+        _column_79,
+        _column_80,
+        _column_59,
+        _column_60,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape13 workScheduleDays = Shape13(
+    source: i0.VersionedTable(
+      entityName: 'work_schedule_days',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [
+        'PRIMARY KEY(id)',
+        'UNIQUE(schedule_id, weekday)',
+        'CHECK(weekday BETWEEN 1 AND 7)',
+        'CHECK(start_minute BETWEEN 0 AND 1439)',
+        'CHECK(end_minute BETWEEN 0 AND 1439)',
+        'CHECK(start_minute <> end_minute)',
+      ],
+      columns: [_column_0, _column_81, _column_82, _column_83, _column_84],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  late final Shape14 scheduleAssignments = Shape14(
+    source: i0.VersionedTable(
+      entityName: 'schedule_assignments',
+      withoutRowId: false,
+      isStrict: false,
+      tableConstraints: [
+        'PRIMARY KEY(id)',
+        'UNIQUE(employee_id, effective_from)',
+        'CHECK(effective_to IS NULL OR effective_to >= effective_from)',
+      ],
+      columns: [
+        _column_0,
+        _column_1,
+        _column_2,
+        _column_3,
+        _column_4,
+        _column_5,
+        _column_30,
+        _column_85,
+        _column_33,
+        _column_34,
+      ],
+      attachedDatabase: database,
+    ),
+    alias: null,
+  );
+  final i1.Index auditLogCompanyTime = i1.Index(
+    'audit_log_company_time',
+    'CREATE INDEX audit_log_company_time ON audit_log (company_id, occurred_at)',
+  );
+  final i1.Index auditLogEntity = i1.Index(
+    'audit_log_entity',
+    'CREATE INDEX audit_log_entity ON audit_log (entity_type, entity_id)',
+  );
+  final i1.Index attendanceEventsEmployeeTime = i1.Index(
+    'attendance_events_employee_time',
+    'CREATE INDEX attendance_events_employee_time ON attendance_events (employee_id, occurred_at)',
+  );
+  final i1.Index attendanceEventsTime = i1.Index(
+    'attendance_events_time',
+    'CREATE INDEX attendance_events_time ON attendance_events (occurred_at)',
+  );
+  final i1.Index attendanceCorrectionsOriginal = i1.Index(
+    'attendance_corrections_original',
+    'CREATE INDEX attendance_corrections_original ON attendance_corrections (original_event_id)',
+  );
+  final i1.Index attendanceCorrectionsEmployee = i1.Index(
+    'attendance_corrections_employee',
+    'CREATE INDEX attendance_corrections_employee ON attendance_corrections (employee_id, corrected_at)',
+  );
+  final i1.Index exceptionReviewsIssue = i1.Index(
+    'exception_reviews_issue',
+    'CREATE INDEX exception_reviews_issue ON exception_reviews (issue_key)',
+  );
+  final i1.Index exceptionReviewsCompanyTime = i1.Index(
+    'exception_reviews_company_time',
+    'CREATE INDEX exception_reviews_company_time ON exception_reviews (company_id, issue_occurred_at)',
+  );
+}
+
+i1.GeneratedColumn<String> _column_78(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'event_id',
+      aliasedName,
+      true,
+      type: i1.DriftSqlType.string,
+      $customConstraints: 'NULL REFERENCES attendance_events(id)',
+    );
+
+class Shape12 extends i0.VersionedTable {
+  Shape12({required super.source, required super.alias}) : super.aliased();
+  i1.GeneratedColumn<String> get id =>
+      columnsByName['id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get createdAt =>
+      columnsByName['created_at']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get updatedAt =>
+      columnsByName['updated_at']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<int> get version =>
+      columnsByName['version']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<String> get syncState =>
+      columnsByName['sync_state']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get deletedAt =>
+      columnsByName['deleted_at']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get companyId =>
+      columnsByName['company_id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get name =>
+      columnsByName['name']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<int> get lateToleranceMinutes =>
+      columnsByName['late_tolerance_minutes']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get earlyDepartureToleranceMinutes =>
+      columnsByName['early_departure_tolerance_minutes']!
+          as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get breakAfterMinutes =>
+      columnsByName['break_after_minutes']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get breakMinutes =>
+      columnsByName['break_minutes']! as i1.GeneratedColumn<int>;
+}
+
+i1.GeneratedColumn<int> _column_79(String aliasedName) =>
+    i1.GeneratedColumn<int>(
+      'late_tolerance_minutes',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.int,
+      $customConstraints: 'NOT NULL',
+    );
+i1.GeneratedColumn<int> _column_80(String aliasedName) =>
+    i1.GeneratedColumn<int>(
+      'early_departure_tolerance_minutes',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.int,
+      $customConstraints: 'NOT NULL',
+    );
+
+class Shape13 extends i0.VersionedTable {
+  Shape13({required super.source, required super.alias}) : super.aliased();
+  i1.GeneratedColumn<String> get id =>
+      columnsByName['id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get scheduleId =>
+      columnsByName['schedule_id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<int> get weekday =>
+      columnsByName['weekday']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get startMinute =>
+      columnsByName['start_minute']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<int> get endMinute =>
+      columnsByName['end_minute']! as i1.GeneratedColumn<int>;
+}
+
+i1.GeneratedColumn<String> _column_81(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'schedule_id',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.string,
+      $customConstraints: 'NOT NULL REFERENCES work_schedules(id)',
+    );
+i1.GeneratedColumn<int> _column_82(String aliasedName) =>
+    i1.GeneratedColumn<int>(
+      'weekday',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.int,
+      $customConstraints: 'NOT NULL',
+    );
+i1.GeneratedColumn<int> _column_83(String aliasedName) =>
+    i1.GeneratedColumn<int>(
+      'start_minute',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.int,
+      $customConstraints: 'NOT NULL',
+    );
+i1.GeneratedColumn<int> _column_84(String aliasedName) =>
+    i1.GeneratedColumn<int>(
+      'end_minute',
+      aliasedName,
+      false,
+      type: i1.DriftSqlType.int,
+      $customConstraints: 'NOT NULL',
+    );
+
+class Shape14 extends i0.VersionedTable {
+  Shape14({required super.source, required super.alias}) : super.aliased();
+  i1.GeneratedColumn<String> get id =>
+      columnsByName['id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get createdAt =>
+      columnsByName['created_at']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get updatedAt =>
+      columnsByName['updated_at']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<int> get version =>
+      columnsByName['version']! as i1.GeneratedColumn<int>;
+  i1.GeneratedColumn<String> get syncState =>
+      columnsByName['sync_state']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get deletedAt =>
+      columnsByName['deleted_at']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get employeeId =>
+      columnsByName['employee_id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get scheduleId =>
+      columnsByName['schedule_id']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get effectiveFrom =>
+      columnsByName['effective_from']! as i1.GeneratedColumn<String>;
+  i1.GeneratedColumn<String> get effectiveTo =>
+      columnsByName['effective_to']! as i1.GeneratedColumn<String>;
+}
+
+i1.GeneratedColumn<String> _column_85(String aliasedName) =>
+    i1.GeneratedColumn<String>(
+      'schedule_id',
+      aliasedName,
+      true,
+      type: i1.DriftSqlType.string,
+      $customConstraints: 'NULL REFERENCES work_schedules(id)',
+    );
 i0.MigrationStepWithVersion migrationSteps({
   required Future<void> Function(i1.Migrator m, Schema2 schema) from1To2,
   required Future<void> Function(i1.Migrator m, Schema3 schema) from2To3,
   required Future<void> Function(i1.Migrator m, Schema4 schema) from3To4,
   required Future<void> Function(i1.Migrator m, Schema5 schema) from4To5,
   required Future<void> Function(i1.Migrator m, Schema6 schema) from5To6,
+  required Future<void> Function(i1.Migrator m, Schema7 schema) from6To7,
 }) {
   return (currentVersion, database) async {
     switch (currentVersion) {
@@ -2428,6 +3001,11 @@ i0.MigrationStepWithVersion migrationSteps({
         final migrator = i1.Migrator(database, schema);
         await from5To6(migrator, schema);
         return 6;
+      case 6:
+        final schema = Schema7(database: database);
+        final migrator = i1.Migrator(database, schema);
+        await from6To7(migrator, schema);
+        return 7;
       default:
         throw ArgumentError.value('Unknown migration from $currentVersion');
     }
@@ -2440,6 +3018,7 @@ i1.OnUpgrade stepByStep({
   required Future<void> Function(i1.Migrator m, Schema4 schema) from3To4,
   required Future<void> Function(i1.Migrator m, Schema5 schema) from4To5,
   required Future<void> Function(i1.Migrator m, Schema6 schema) from5To6,
+  required Future<void> Function(i1.Migrator m, Schema7 schema) from6To7,
 }) => i0.VersionedSchema.stepByStepHelper(
   step: migrationSteps(
     from1To2: from1To2,
@@ -2447,5 +3026,6 @@ i1.OnUpgrade stepByStep({
     from3To4: from3To4,
     from4To5: from4To5,
     from5To6: from5To6,
+    from6To7: from6To7,
   ),
 );

@@ -11,6 +11,7 @@ import 'generated/schema_v3.dart' as v3;
 import 'generated/schema_v4.dart' as v4;
 import 'generated/schema_v5.dart' as v5;
 import 'generated/schema_v6.dart' as v6;
+import 'generated/schema_v7.dart' as v7;
 
 // Generated first by `dart run drift_dev make-migrations`, then completed by
 // hand. That command does not overwrite this file: when adding version N,
@@ -367,6 +368,99 @@ void main() {
           v6.DeviceSettingsData.fromJson(device.toJson()),
         ]);
         expect(await newDb.select(newDb.exceptionReviews).get(), isEmpty);
+      },
+    );
+  });
+
+  test('v6 → v7 keeps exception reviews through the table rebuild', () async {
+    const at = '2026-10-08T05:00:00.000Z';
+    const company = v6.CompaniesData(
+      id: 'co-1',
+      createdAt: at,
+      updatedAt: at,
+      version: 1,
+      syncState: 'localOnly',
+      name: 'Acme Ltd',
+      currencyCode: 'KES',
+      timezone: 'Africa/Nairobi',
+    );
+    const admin = v6.AdminUsersData(
+      id: 'adm-1',
+      createdAt: at,
+      updatedAt: at,
+      version: 1,
+      syncState: 'localOnly',
+      companyId: 'co-1',
+      username: 'owner',
+      displayName: 'Jane Owner',
+      role: 'owner',
+      active: 1,
+    );
+    const employee = v6.EmployeesData(
+      id: 'emp-1',
+      createdAt: at,
+      updatedAt: at,
+      version: 1,
+      syncState: 'localOnly',
+      companyId: 'co-1',
+      employeeNumber: 'E0001',
+      firstName: 'John',
+      lastName: 'Kamau',
+      employmentStatus: 'active',
+      employmentStartDate: '2026-01-01',
+    );
+    const event = v6.AttendanceEventsData(
+      id: 'ev-1',
+      createdAt: at,
+      updatedAt: at,
+      version: 1,
+      syncState: 'localOnly',
+      employeeId: 'emp-1',
+      eventType: 'clockOut',
+      occurredAt: at,
+      recordedAt: at,
+      source: 'kiosk',
+      deviceId: 'device-1',
+      createdBy: 'emp-1',
+    );
+    const review = v6.ExceptionReviewsData(
+      id: 'rev-1',
+      createdAt: at,
+      updatedAt: at,
+      version: 1,
+      syncState: 'localOnly',
+      companyId: 'co-1',
+      employeeId: 'emp-1',
+      issueKey: 'excessiveDuration:ev-1',
+      issueType: 'excessiveDuration',
+      eventId: 'ev-1',
+      issueOccurredAt: at,
+      status: 'resolved',
+      reason: 'Stocktaking',
+      reviewedBy: 'adm-1',
+      reviewedAt: at,
+    );
+
+    await verifier.testWithDataIntegrity(
+      oldVersion: 6,
+      newVersion: 7,
+      createOld: v6.DatabaseAtV6.new,
+      createNew: v7.DatabaseAtV7.new,
+      openTestedDatabase: AppDatabase.new,
+      createItems: (batch, oldDb) {
+        batch
+          ..insert(oldDb.companies, company)
+          ..insert(oldDb.adminUsers, admin)
+          ..insert(oldDb.employees, employee)
+          ..insert(oldDb.attendanceEvents, event)
+          ..insert(oldDb.exceptionReviews, review);
+      },
+      validateItems: (newDb) async {
+        expect(await newDb.select(newDb.exceptionReviews).get(), [
+          v7.ExceptionReviewsData.fromJson(review.toJson()),
+        ]);
+        expect(await newDb.select(newDb.workSchedules).get(), isEmpty);
+        expect(await newDb.select(newDb.scheduleAssignments).get(), isEmpty);
       },
     );
   });

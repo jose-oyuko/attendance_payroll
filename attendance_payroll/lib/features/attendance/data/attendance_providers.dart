@@ -15,6 +15,7 @@ import 'package:attendance_payroll/features/attendance/domain/attendance_setting
 import 'package:attendance_payroll/features/audit/data/audit_providers.dart';
 import 'package:attendance_payroll/features/company/data/company_providers.dart';
 import 'package:attendance_payroll/features/employees/data/employee_providers.dart';
+import 'package:attendance_payroll/features/schedules/data/schedule_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final attendanceEventRepositoryProvider = Provider<AttendanceEventRepository>(
@@ -44,6 +45,7 @@ final attendanceReaderProvider = Provider<AttendanceReader>(
     events: ref.watch(attendanceEventRepositoryProvider),
     settings: ref.watch(attendanceSettingsRepositoryProvider),
     reviews: ref.watch(exceptionReviewRepositoryProvider),
+    schedules: ref.watch(scheduleSourceProvider),
   ),
 );
 

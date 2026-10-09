@@ -135,6 +135,17 @@ Follow-up to Phase 3:
 - Dashboard: open exceptions count, linking to the list
 - Database schema version 6
 
+## What Phase 6 adds
+
+- Schedules area: create and edit work schedules (working days, hours,
+  night shifts, allowed lateness and early leaving, optional break)
+- Assign a schedule to an employee from a date (history is kept)
+- Late arrival, early departure and absence on a scheduled day are detected
+  and listed as exceptions (excuse, note or correct them); pay still follows
+  the time worked
+- Daily view and dashboard: late and absent counts; expected / day off
+- Database schema version 7
+
 ## Project layout
 
 ```

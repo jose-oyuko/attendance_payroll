@@ -112,11 +112,14 @@ final class AttendanceService {
     );
     return snapshot.map((s) {
       final days = <EmployeeDay>[];
+      final now = _clock();
       for (final employee in s.employees) {
         final day = EmployeeDay(
           employee: employee,
           sessions: s.sessionsFor(employee.id),
           issues: s.issuesFor(employee.id),
+          schedule: s.scheduleOn(employee.id, date),
+          now: now,
         );
         final active =
             employee.details.employmentStatus == EmploymentStatus.active;

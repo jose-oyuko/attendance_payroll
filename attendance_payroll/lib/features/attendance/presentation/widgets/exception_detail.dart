@@ -20,6 +20,12 @@ import 'package:attendance_payroll/shared/widgets/busy_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+/// Lateness, early departure and absence are excused rather than dismissed.
+bool _isExcusable(AttendanceIssueType type) =>
+    type == AttendanceIssueType.lateArrival ||
+    type == AttendanceIssueType.earlyDeparture ||
+    type == AttendanceIssueType.missingAttendance;
+
 /// Colours for an exception status.
 SemanticColorSet exceptionStatusColors(
   BuildContext context,
@@ -203,6 +209,8 @@ class _ActionsState extends ConsumerState<_Actions> {
     final decisions = AttendanceExceptionService.decisionsFor(exception.type);
     final date = widget.zone.dateOf(exception.occurredAt);
 
+    final eventId = issue.eventId;
+    final clockIn = session?.clockIn;
     final corrections = <(String, CorrectionRequest)>[
       ...switch (exception.type) {
         AttendanceIssueType.missingClockOut => [
@@ -214,18 +222,19 @@ class _ActionsState extends ConsumerState<_Actions> {
               type: AttendanceEventType.clockOut,
             ),
           ),
-          if (session != null)
+          if (clockIn != null)
             (
               'Remove clock-in',
               RemoveEntryRequest(
-                eventId: session.clockIn.id,
+                eventId: clockIn.id,
                 type: AttendanceEventType.clockIn,
-                occurredAt: session.start,
+                occurredAt: clockIn.occurredAt,
               ),
             ),
         ],
         AttendanceIssueType.overnightSession ||
-        AttendanceIssueType.excessiveDuration => [
+        AttendanceIssueType.excessiveDuration ||
+        AttendanceIssueType.earlyDeparture => [
           if (clockOut != null)
             (
               'Change clock-out time',
@@ -236,30 +245,49 @@ class _ActionsState extends ConsumerState<_Actions> {
               ),
             ),
         ],
+        AttendanceIssueType.lateArrival => [
+          if (clockIn != null)
+            (
+              'Change clock-in time',
+              ChangeTimeRequest(
+                eventId: clockIn.id,
+                type: AttendanceEventType.clockIn,
+                occurredAt: clockIn.occurredAt,
+              ),
+            ),
+        ],
+        AttendanceIssueType.missingAttendance => [
+          (
+            'Add clock-in',
+            AddEntryRequest(employeeId: exception.employee.id, date: date),
+          ),
+        ],
         AttendanceIssueType.clockOutWithoutClockIn => [
           (
             'Add clock-in',
             AddEntryRequest(employeeId: exception.employee.id, date: date),
           ),
-          (
-            'Remove clock-out',
-            RemoveEntryRequest(
-              eventId: issue.eventId,
-              type: AttendanceEventType.clockOut,
-              occurredAt: issue.occurredAt,
+          if (eventId != null)
+            (
+              'Remove clock-out',
+              RemoveEntryRequest(
+                eventId: eventId,
+                type: AttendanceEventType.clockOut,
+                occurredAt: issue.occurredAt,
+              ),
             ),
-          ),
         ],
         AttendanceIssueType.duplicateClockIn ||
         AttendanceIssueType.duplicateClockOut => [
-          (
-            'Remove repeated entry',
-            RemoveEntryRequest(
-              eventId: issue.eventId,
-              type: exception.type.eventType,
-              occurredAt: issue.occurredAt,
+          if (eventId != null)
+            (
+              'Remove repeated entry',
+              RemoveEntryRequest(
+                eventId: eventId,
+                type: exception.type.eventType!,
+                occurredAt: issue.occurredAt,
+              ),
             ),
-          ),
         ],
       },
     ];
@@ -281,7 +309,7 @@ class _ActionsState extends ConsumerState<_Actions> {
         if (decisions.contains(ReviewDecision.dismissed))
           OutlinedButton(
             onPressed: () => _decide(ReviewDecision.dismissed),
-            child: const Text('Dismiss'),
+            child: Text(_isExcusable(exception.type) ? 'Excuse' : 'Dismiss'),
           ),
         TextButton(
           onPressed: () => _decide(ReviewDecision.reviewed),
@@ -319,6 +347,12 @@ class _DecisionDialogState extends ConsumerState<_DecisionDialog> {
       'Accept as recorded?',
       'The recorded times will be paid as they are. Say why they are right.',
       'Accept',
+    ),
+    ReviewDecision.dismissed when _isExcusable(widget.exception.type) => (
+      'Excuse this?',
+      'It will be recorded as excused. Say why, for example leave or a '
+          'transport problem.',
+      'Excuse',
     ),
     ReviewDecision.dismissed => (
       'Dismiss this exception?',

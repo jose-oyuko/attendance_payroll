@@ -189,16 +189,19 @@ class DaySummary extends StatelessWidget {
             value: day.working,
             colors: semantic.info,
           ),
+        _Count(label: 'Late', value: day.late, colors: semantic.warning),
+        _Count(label: 'Absent', value: day.absent, colors: semantic.warning),
         _Count(
           label: 'Needs review',
           value: day.needsReview,
           colors: semantic.warning,
         ),
-        _Count(
-          label: 'Not clocked in',
-          value: day.notClockedIn,
-          colors: semantic.neutral,
-        ),
+        if (day.notClockedIn > 0)
+          _Count(
+            label: 'No schedule, not in',
+            value: day.notClockedIn,
+            colors: semantic.neutral,
+          ),
       ],
     );
   }
@@ -284,10 +287,17 @@ class _EmployeeRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final semantic = context.semanticColors;
+    final late = row.isLate ? ' · late' : '';
     final (label, colors) = switch (row.status) {
       DayStatus.needsReview => ('Needs review', semantic.warning),
-      DayStatus.working => ('Working', semantic.info),
-      DayStatus.present => (formatWorkDuration(row.payable), semantic.success),
+      DayStatus.working => ('Working$late', semantic.info),
+      DayStatus.present => (
+        '${formatWorkDuration(row.payable)}$late',
+        semantic.success,
+      ),
+      DayStatus.expected => ('Expected', semantic.neutral),
+      DayStatus.absent => ('Absent', semantic.warning),
+      DayStatus.dayOff => ('Day off', semantic.neutral),
       DayStatus.notClockedIn => ('Not clocked in', semantic.neutral),
     };
     final times = [

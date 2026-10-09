@@ -1,11 +1,31 @@
 import 'package:attendance_payroll/core/utils/local_date.dart';
 import 'package:attendance_payroll/features/attendance/domain/attendance_session.dart';
+import 'package:attendance_payroll/features/attendance/domain/day_schedule.dart';
 import 'package:attendance_payroll/features/employees/domain/employee.dart';
 
-/// Where an employee stands on a given day. Without work schedules (Phase 6)
-/// a day with no attendance cannot yet be told apart from a day off, so it is
-/// reported neutrally as "not clocked in".
-enum DayStatus { notClockedIn, working, present, needsReview }
+/// Where an employee stands on a given day.
+enum DayStatus {
+  /// Has attendance that needs an administrator's review.
+  needsReview,
+
+  /// Clocked in right now.
+  working,
+
+  /// Has attendance for the day.
+  present,
+
+  /// Scheduled, and the shift has not started (plus tolerance) yet.
+  expected,
+
+  /// Scheduled, past the start (plus tolerance), and no attendance.
+  absent,
+
+  /// Not scheduled to work this day.
+  dayOff,
+
+  /// No schedule is assigned, and no attendance.
+  notClockedIn,
+}
 
 /// One employee's attendance on one company date.
 final class EmployeeDay {
@@ -13,6 +33,8 @@ final class EmployeeDay {
     required this.employee,
     required this.sessions,
     required this.issues,
+    required this.schedule,
+    required this.now,
   });
 
   final Employee employee;
@@ -20,17 +42,29 @@ final class EmployeeDay {
   /// Sessions that started on the day, chronological.
   final List<AttendanceSession> sessions;
 
-  /// Issues revealed by events on the day, including those not tied to a
-  /// session.
+  /// Issues revealed on the day, including those not tied to a session.
   final List<AttendanceIssue> issues;
+
+  /// What the employee was expected to work.
+  final DaySchedule schedule;
+
+  /// When this was worked out, to tell "expected" from "absent".
+  final DateTime now;
 
   /// Clocked in right now.
   bool get isWorking =>
       sessions.any((s) => s.clockOut == null && s.status == SessionStatus.open);
 
+  bool get isLate =>
+      issues.any((i) => i.type == AttendanceIssueType.lateArrival);
+
   bool get needsReview =>
       sessions.any((s) => s.status == SessionStatus.exception) ||
-      issues.any((i) => i.sessionKey == null);
+      issues.any(
+        (i) =>
+            i.sessionKey == null &&
+            i.type != AttendanceIssueType.missingAttendance,
+      );
 
   DayStatus get status {
     if (needsReview) {
@@ -39,11 +73,21 @@ final class EmployeeDay {
     if (isWorking) {
       return DayStatus.working;
     }
-    return sessions.isEmpty ? DayStatus.notClockedIn : DayStatus.present;
+    if (sessions.isNotEmpty) {
+      return DayStatus.present;
+    }
+    return switch (schedule) {
+      Unscheduled() => DayStatus.notClockedIn,
+      DayOff() => DayStatus.dayOff,
+      ScheduledShift(:final start, :final lateTolerance) =>
+        now.isBefore(start.add(lateTolerance))
+            ? DayStatus.expected
+            : DayStatus.absent,
+    };
   }
 
-  /// Payable time of the day's completed sessions. Sessions awaiting review
-  /// contribute nothing until reviewed.
+  /// Payable time of the day's completed or approved sessions. Sessions
+  /// awaiting review contribute nothing until reviewed.
   Duration get payable => sessions.fold(
     Duration.zero,
     (total, s) => total + (s.payableDuration ?? Duration.zero),
@@ -59,11 +103,22 @@ final class DailyAttendance {
   /// Active employees, plus anyone else with attendance that day, by name.
   final List<EmployeeDay> employees;
 
-  int get present => employees.where((e) => e.sessions.isNotEmpty).length;
+  int _count(bool Function(EmployeeDay) test) => employees.where(test).length;
 
-  int get working => employees.where((e) => e.isWorking).length;
+  int get present => _count((e) => e.sessions.isNotEmpty);
 
-  int get needsReview => employees.where((e) => e.needsReview).length;
+  int get working => _count((e) => e.isWorking);
 
-  int get notClockedIn => employees.where((e) => e.sessions.isEmpty).length;
+  int get late => _count((e) => e.isLate);
+
+  int get needsReview => _count((e) => e.needsReview);
+
+  int get absent => _count((e) => e.status == DayStatus.absent);
+
+  int get expected => _count((e) => e.status == DayStatus.expected);
+
+  int get dayOff => _count((e) => e.status == DayStatus.dayOff);
+
+  /// Without a schedule and without attendance.
+  int get notClockedIn => _count((e) => e.status == DayStatus.notClockedIn);
 }
