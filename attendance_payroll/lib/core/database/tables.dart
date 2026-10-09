@@ -340,3 +340,39 @@ class DeviceSettings extends Table {
   @override
   List<String> get customConstraints => ["CHECK (id = 'this_device')"];
 }
+
+/// Administrator decisions about attendance exceptions. Exceptions are
+/// derived from events like sessions; only the decisions are stored, keyed by
+/// the exception's stable `issue_key` (`<type>:<event id>`). Rows are never
+/// changed: a later decision is a new row, so the review history is kept.
+@DataClassName('ExceptionReviewRow')
+@TableIndex(name: 'exception_reviews_issue', columns: {#issueKey})
+@TableIndex(
+  name: 'exception_reviews_company_time',
+  columns: {#companyId, #issueOccurredAt},
+)
+class ExceptionReviews extends Table with EntityColumns {
+  TextColumn get companyId => text().references(Companies, #id)();
+  TextColumn get employeeId => text().references(Employees, #id)();
+  TextColumn get issueKey => text()();
+
+  /// The issue as it was when reviewed, so the record stays meaningful after
+  /// a correction makes the issue disappear.
+  TextColumn get issueType => text()();
+  TextColumn get eventId => text().references(AttendanceEvents, #id)();
+  TextColumn get sessionKey => text().nullable()();
+  DateTimeColumn get issueOccurredAt => dateTime()();
+
+  /// `reviewed`, `resolved` or `dismissed`.
+  TextColumn get status => text()();
+  TextColumn get reason => text()();
+  TextColumn get reviewedBy => text().references(AdminUsers, #id)();
+  DateTimeColumn get reviewedAt => dateTime()();
+
+  /// The correction that resolved it, if any.
+  TextColumn get relatedCorrectionId =>
+      text().nullable().references(AttendanceCorrections, #id)();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+}

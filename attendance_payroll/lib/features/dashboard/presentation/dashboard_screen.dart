@@ -3,6 +3,7 @@ import 'package:attendance_payroll/app/theme/semantic_colors.dart';
 import 'package:attendance_payroll/core/constants/app_spacing.dart';
 import 'package:attendance_payroll/core/errors/app_failure.dart';
 import 'package:attendance_payroll/core/extensions/build_context_extensions.dart';
+import 'package:attendance_payroll/features/attendance/presentation/attendance_routes.dart';
 import 'package:attendance_payroll/features/attendance/presentation/attendance_view_providers.dart';
 import 'package:attendance_payroll/features/company/presentation/current_company_provider.dart';
 import 'package:attendance_payroll/shared/responsive/adaptive_grid.dart';
@@ -19,6 +20,7 @@ class DashboardScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final company = ref.watch(currentCompanyProvider).value;
     final today = ref.watch(todaysAttendanceProvider);
+    final openExceptions = ref.watch(openExceptionCountProvider).value;
     final semantic = context.semanticColors;
 
     return PageContainer(
@@ -59,12 +61,13 @@ class DashboardScreen extends ConsumerWidget {
                 ),
                 _StatusCard(
                   icon: Icons.report_outlined,
-                  title: 'Needs review',
-                  value: '${value.needsReview}',
-                  caption: value.needsReview == 0
+                  title: 'Open exceptions',
+                  value: '${openExceptions ?? '…'}',
+                  caption: openExceptions == 0
                       ? 'Everything looks good.'
-                      : 'Open attendance to review.',
+                      : 'In the last $recentExceptionDays days.',
                   accent: semantic.warning,
+                  onTap: () => context.go(AttendanceRoutes.exceptions),
                 ),
                 _StatusCard(
                   icon: Icons.person_off_outlined,
@@ -92,8 +95,10 @@ class _StatusCard extends StatelessWidget {
     required this.value,
     required this.accent,
     this.caption,
+    this.onTap,
   });
 
+  final VoidCallback? onTap;
   final IconData icon;
   final String title;
   final String value;
@@ -105,42 +110,46 @@ class _StatusCard extends StatelessWidget {
     final caption = this.caption;
     return MergeSemantics(
       child: Card.outlined(
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.md),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              DecoratedBox(
-                decoration: BoxDecoration(
-                  color: accent.container,
-                  borderRadius: BorderRadius.circular(AppSpacing.sm),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: accent.container,
+                    borderRadius: BorderRadius.circular(AppSpacing.sm),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppSpacing.sm),
+                    child: Icon(icon, color: accent.onContainer),
+                  ),
                 ),
-                child: Padding(
-                  padding: const EdgeInsets.all(AppSpacing.sm),
-                  child: Icon(icon, color: accent.onContainer),
-                ),
-              ),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(title, style: context.textStyles.labelLarge),
-                    const SizedBox(height: AppSpacing.xs),
-                    Text(value, style: context.textStyles.titleMedium),
-                    if (caption != null) ...[
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(title, style: context.textStyles.labelLarge),
                       const SizedBox(height: AppSpacing.xs),
-                      Text(
-                        caption,
-                        style: context.textStyles.bodySmall?.copyWith(
-                          color: context.colors.onSurfaceVariant,
+                      Text(value, style: context.textStyles.titleMedium),
+                      if (caption != null) ...[
+                        const SizedBox(height: AppSpacing.xs),
+                        Text(
+                          caption,
+                          style: context.textStyles.bodySmall?.copyWith(
+                            color: context.colors.onSurfaceVariant,
+                          ),
                         ),
-                      ),
+                      ],
                     ],
-                  ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

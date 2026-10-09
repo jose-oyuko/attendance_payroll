@@ -10,6 +10,7 @@ import 'generated/schema_v2.dart' as v2;
 import 'generated/schema_v3.dart' as v3;
 import 'generated/schema_v4.dart' as v4;
 import 'generated/schema_v5.dart' as v5;
+import 'generated/schema_v6.dart' as v6;
 
 // Generated first by `dart run drift_dev make-migrations`, then completed by
 // hand. That command does not overwrite this file: when adding version N,
@@ -328,6 +329,44 @@ void main() {
           v5.AttendanceSettingsData.fromJson(settings.toJson()),
         ]);
         expect(await newDb.select(newDb.deviceSettings).get(), isEmpty);
+      },
+    );
+  });
+
+  test('v5 → v6 keeps the kiosk setting unchanged', () async {
+    const at = '2026-10-08T05:00:00.000Z';
+    const company = v5.CompaniesData(
+      id: 'co-1',
+      createdAt: at,
+      updatedAt: at,
+      version: 1,
+      syncState: 'localOnly',
+      name: 'Acme Ltd',
+      currencyCode: 'KES',
+      timezone: 'Africa/Nairobi',
+    );
+    const device = v5.DeviceSettingsData(
+      id: 'this_device',
+      kioskCompanyId: 'co-1',
+      updatedAt: at,
+    );
+
+    await verifier.testWithDataIntegrity(
+      oldVersion: 5,
+      newVersion: 6,
+      createOld: v5.DatabaseAtV5.new,
+      createNew: v6.DatabaseAtV6.new,
+      openTestedDatabase: AppDatabase.new,
+      createItems: (batch, oldDb) {
+        batch
+          ..insert(oldDb.companies, company)
+          ..insert(oldDb.deviceSettings, device);
+      },
+      validateItems: (newDb) async {
+        expect(await newDb.select(newDb.deviceSettings).get(), [
+          v6.DeviceSettingsData.fromJson(device.toJson()),
+        ]);
+        expect(await newDb.select(newDb.exceptionReviews).get(), isEmpty);
       },
     );
   });

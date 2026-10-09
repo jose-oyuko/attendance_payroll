@@ -2,21 +2,18 @@ import 'package:attendance_payroll/core/database/transaction_runner.dart';
 import 'package:attendance_payroll/core/errors/app_failure.dart';
 import 'package:attendance_payroll/core/platform/device_identity_repository.dart';
 import 'package:attendance_payroll/core/result/result.dart';
-import 'package:attendance_payroll/core/time/company_time_zone.dart';
 import 'package:attendance_payroll/core/utils/clock.dart';
 import 'package:attendance_payroll/core/utils/local_date.dart';
 import 'package:attendance_payroll/features/attendance/domain/attendance_event.dart';
 import 'package:attendance_payroll/features/attendance/domain/attendance_event_repository.dart';
 import 'package:attendance_payroll/features/attendance/domain/attendance_policy.dart';
+import 'package:attendance_payroll/features/attendance/domain/attendance_reader.dart';
 import 'package:attendance_payroll/features/attendance/domain/attendance_session.dart';
-import 'package:attendance_payroll/features/attendance/domain/attendance_settings_repository.dart';
 import 'package:attendance_payroll/features/attendance/domain/attendance_state.dart';
 import 'package:attendance_payroll/features/attendance/domain/daily_attendance.dart';
-import 'package:attendance_payroll/features/attendance/domain/session_builder.dart';
 import 'package:attendance_payroll/features/authentication/domain/admin_session.dart';
 import 'package:attendance_payroll/features/authentication/domain/admin_user.dart';
 import 'package:attendance_payroll/features/authentication/domain/employee_pin_service.dart';
-import 'package:attendance_payroll/features/company/domain/company_repository.dart';
 import 'package:attendance_payroll/features/employees/domain/employee.dart';
 import 'package:attendance_payroll/features/employees/domain/employee_repository.dart';
 
@@ -34,23 +31,22 @@ final class ClockResult {
 final class AttendanceService {
   AttendanceService({
     required this._employees,
-    required this._companies,
     required this._events,
     required this._devices,
     required this._transactions,
-    required this._settings,
+    required this._reader,
     this._clock = systemClockUtc,
   });
 
   static const String pinChangeRequiredRule = 'pin_change_required';
-  static const String unknownTimeZoneRule = 'unknown_time_zone';
+  static const String unknownTimeZoneRule =
+      AttendanceReader.unknownTimeZoneRule;
 
   final EmployeeRepository _employees;
-  final CompanyRepository _companies;
   final AttendanceEventRepository _events;
   final DeviceIdentityRepository _devices;
   final TransactionRunner _transactions;
-  final AttendanceSettingsRepository _settings;
+  final AttendanceReader _reader;
   final Clock _clock;
 
   /// The employee's current state, to show the right action at the kiosk.
@@ -61,7 +57,7 @@ final class AttendanceService {
     if (_checkVerification(verification, now) case final failure?) {
       return Err(failure);
     }
-    final policy = await _policyFor(verification.employee.companyId);
+    final policy = await _reader.policyFor(verification.employee.companyId);
     if (policy case Err(:final failure)) {
       return Err(failure);
     }
@@ -91,57 +87,13 @@ final class AttendanceService {
     if (session.check(Permission.viewAttendance) case final denied?) {
       return Err(denied);
     }
-    if (to.isBefore(from)) {
-      return const Err(
-        ValidationFailure(
-          field: 'to',
-          userMessage: 'The end date cannot be before the start date.',
-        ),
-      );
-    }
-    final employee = await _employees.getInCompany(
+    final snapshot = await _reader.read(
       session.companyId,
-      employeeId,
+      from: from,
+      to: to,
+      employeeId: employeeId,
     );
-    if (employee case Err(:final failure)) {
-      return Err(failure);
-    }
-    final timeZone = await _companyTimeZone(session.companyId);
-    if (timeZone case Err(:final failure)) {
-      return Err(failure);
-    }
-    final loadedPolicy = await _policyFor(session.companyId);
-    if (loadedPolicy case Err(:final failure)) {
-      return Err(failure);
-    }
-    final policy = loadedPolicy.valueOrNull!;
-    final zone = timeZone.valueOrNull!;
-    final range = zone.rangeOf(from, to);
-    // Load context either side so sessions crossing the range boundaries,
-    // and duplicates near them, are interpreted exactly as in a wider view.
-    final events = await _events.between(
-      employeeId,
-      from: range.start.subtract(policy.sessionLookaround),
-      to: range.end.add(policy.sessionLookaround),
-    );
-    return events.map((loaded) {
-      final full = SessionBuilder(
-        policy: policy,
-        timeZone: zone,
-      ).build(loaded, now: _clock());
-      bool inRange(DateTime instant) =>
-          !instant.isBefore(range.start) && instant.isBefore(range.end);
-      return AttendanceTimeline(
-        sessions: [
-          for (final s in full.sessions)
-            if (!s.workDate.isBefore(from) && !s.workDate.isAfter(to)) s,
-        ],
-        issues: [
-          for (final issue in full.issues)
-            if (inRange(issue.occurredAt)) issue,
-        ],
-      );
-    });
+    return snapshot.map((s) => s.timelineFor(employeeId));
   }
 
   /// Everyone's attendance on company date [date]: active employees and
@@ -153,52 +105,18 @@ final class AttendanceService {
     if (session.check(Permission.viewAttendance) case final denied?) {
       return Err(denied);
     }
-    final timeZone = await _companyTimeZone(session.companyId);
-    if (timeZone case Err(:final failure)) {
-      return Err(failure);
-    }
-    final loadedPolicy = await _policyFor(session.companyId);
-    if (loadedPolicy case Err(:final failure)) {
-      return Err(failure);
-    }
-    final employees = await _employees.listByCompany(
+    final snapshot = await _reader.read(
       session.companyId,
-      includeArchived: true,
+      from: date,
+      to: date,
     );
-    if (employees case Err(:final failure)) {
-      return Err(failure);
-    }
-    final policy = loadedPolicy.valueOrNull!;
-    final zone = timeZone.valueOrNull!;
-    final range = zone.rangeOf(date, date);
-    final events = await _events.betweenForCompany(
-      session.companyId,
-      from: range.start.subtract(policy.sessionLookaround),
-      to: range.end.add(policy.sessionLookaround),
-    );
-    return events.map((loaded) {
-      final byEmployee = <String, List<AttendanceEvent>>{};
-      for (final event in loaded) {
-        (byEmployee[event.employeeId] ??= []).add(event);
-      }
-      final builder = SessionBuilder(policy: policy, timeZone: zone);
-      final now = _clock();
+    return snapshot.map((s) {
       final days = <EmployeeDay>[];
-      for (final employee in employees.valueOrNull!) {
-        final timeline = builder.build(
-          byEmployee[employee.id] ?? const [],
-          now: now,
-        );
+      for (final employee in s.employees) {
         final day = EmployeeDay(
           employee: employee,
-          sessions: [
-            for (final s in timeline.sessions)
-              if (s.workDate == date) s,
-          ],
-          issues: [
-            for (final issue in timeline.issues)
-              if (zone.dateOf(issue.occurredAt) == date) issue,
-          ],
+          sessions: s.sessionsFor(employee.id),
+          issues: s.issuesFor(employee.id),
         );
         final active =
             employee.details.employmentStatus == EmploymentStatus.active;
@@ -228,7 +146,9 @@ final class AttendanceService {
       return Err(failure);
     }
     final employeeId = verification.employee.id;
-    final loadedPolicy = await _policyFor(verification.employee.companyId);
+    final loadedPolicy = await _reader.policyFor(
+      verification.employee.companyId,
+    );
     if (loadedPolicy case Err(:final failure)) {
       return Err(failure);
     }
@@ -286,26 +206,5 @@ final class AttendanceService {
       );
     }
     return null;
-  }
-
-  Future<Result<AttendancePolicy>> _policyFor(String companyId) async {
-    return (await _settings.forCompany(companyId)).map((s) => s.policy);
-  }
-
-  Future<Result<CompanyTimeZone>> _companyTimeZone(String companyId) async {
-    final company = await _companies.getById(companyId);
-    return switch (company) {
-      Err(:final failure) => Err(failure),
-      Ok(:final value) when !CompanyTimeZone.isKnown(value.details.timezone) =>
-        const Err(
-          BusinessRuleFailure(
-            rule: unknownTimeZoneRule,
-            userMessage:
-                "The company's timezone is not recognised. Update it in the "
-                'company settings.',
-          ),
-        ),
-      Ok(:final value) => Ok(CompanyTimeZone(value.details.timezone)),
-    };
   }
 }

@@ -7705,6 +7705,1049 @@ class DeviceSettingsCompanion extends UpdateCompanion<DeviceSettingsRow> {
   }
 }
 
+class $ExceptionReviewsTable extends ExceptionReviews
+    with TableInfo<$ExceptionReviewsTable, ExceptionReviewRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ExceptionReviewsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _versionMeta = const VerificationMeta(
+    'version',
+  );
+  @override
+  late final GeneratedColumn<int> version = GeneratedColumn<int>(
+    'version',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<SyncState, String> syncState =
+      GeneratedColumn<String>(
+        'sync_state',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultValue: Constant(SyncState.localOnly.name),
+      ).withConverter<SyncState>($ExceptionReviewsTable.$convertersyncState);
+  static const VerificationMeta _deletedAtMeta = const VerificationMeta(
+    'deletedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> deletedAt = GeneratedColumn<DateTime>(
+    'deleted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _companyIdMeta = const VerificationMeta(
+    'companyId',
+  );
+  @override
+  late final GeneratedColumn<String> companyId = GeneratedColumn<String>(
+    'company_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES companies (id)',
+    ),
+  );
+  static const VerificationMeta _employeeIdMeta = const VerificationMeta(
+    'employeeId',
+  );
+  @override
+  late final GeneratedColumn<String> employeeId = GeneratedColumn<String>(
+    'employee_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES employees (id)',
+    ),
+  );
+  static const VerificationMeta _issueKeyMeta = const VerificationMeta(
+    'issueKey',
+  );
+  @override
+  late final GeneratedColumn<String> issueKey = GeneratedColumn<String>(
+    'issue_key',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _issueTypeMeta = const VerificationMeta(
+    'issueType',
+  );
+  @override
+  late final GeneratedColumn<String> issueType = GeneratedColumn<String>(
+    'issue_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _eventIdMeta = const VerificationMeta(
+    'eventId',
+  );
+  @override
+  late final GeneratedColumn<String> eventId = GeneratedColumn<String>(
+    'event_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES attendance_events (id)',
+    ),
+  );
+  static const VerificationMeta _sessionKeyMeta = const VerificationMeta(
+    'sessionKey',
+  );
+  @override
+  late final GeneratedColumn<String> sessionKey = GeneratedColumn<String>(
+    'session_key',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _issueOccurredAtMeta = const VerificationMeta(
+    'issueOccurredAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> issueOccurredAt =
+      GeneratedColumn<DateTime>(
+        'issue_occurred_at',
+        aliasedName,
+        false,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  @override
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+    'status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _reasonMeta = const VerificationMeta('reason');
+  @override
+  late final GeneratedColumn<String> reason = GeneratedColumn<String>(
+    'reason',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _reviewedByMeta = const VerificationMeta(
+    'reviewedBy',
+  );
+  @override
+  late final GeneratedColumn<String> reviewedBy = GeneratedColumn<String>(
+    'reviewed_by',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES admin_users (id)',
+    ),
+  );
+  static const VerificationMeta _reviewedAtMeta = const VerificationMeta(
+    'reviewedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> reviewedAt = GeneratedColumn<DateTime>(
+    'reviewed_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _relatedCorrectionIdMeta =
+      const VerificationMeta('relatedCorrectionId');
+  @override
+  late final GeneratedColumn<String> relatedCorrectionId =
+      GeneratedColumn<String>(
+        'related_correction_id',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+        defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'REFERENCES attendance_corrections (id)',
+        ),
+      );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    createdAt,
+    updatedAt,
+    version,
+    syncState,
+    deletedAt,
+    companyId,
+    employeeId,
+    issueKey,
+    issueType,
+    eventId,
+    sessionKey,
+    issueOccurredAt,
+    status,
+    reason,
+    reviewedBy,
+    reviewedAt,
+    relatedCorrectionId,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'exception_reviews';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ExceptionReviewRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    if (data.containsKey('version')) {
+      context.handle(
+        _versionMeta,
+        version.isAcceptableOrUnknown(data['version']!, _versionMeta),
+      );
+    }
+    if (data.containsKey('deleted_at')) {
+      context.handle(
+        _deletedAtMeta,
+        deletedAt.isAcceptableOrUnknown(data['deleted_at']!, _deletedAtMeta),
+      );
+    }
+    if (data.containsKey('company_id')) {
+      context.handle(
+        _companyIdMeta,
+        companyId.isAcceptableOrUnknown(data['company_id']!, _companyIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_companyIdMeta);
+    }
+    if (data.containsKey('employee_id')) {
+      context.handle(
+        _employeeIdMeta,
+        employeeId.isAcceptableOrUnknown(data['employee_id']!, _employeeIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_employeeIdMeta);
+    }
+    if (data.containsKey('issue_key')) {
+      context.handle(
+        _issueKeyMeta,
+        issueKey.isAcceptableOrUnknown(data['issue_key']!, _issueKeyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_issueKeyMeta);
+    }
+    if (data.containsKey('issue_type')) {
+      context.handle(
+        _issueTypeMeta,
+        issueType.isAcceptableOrUnknown(data['issue_type']!, _issueTypeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_issueTypeMeta);
+    }
+    if (data.containsKey('event_id')) {
+      context.handle(
+        _eventIdMeta,
+        eventId.isAcceptableOrUnknown(data['event_id']!, _eventIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_eventIdMeta);
+    }
+    if (data.containsKey('session_key')) {
+      context.handle(
+        _sessionKeyMeta,
+        sessionKey.isAcceptableOrUnknown(data['session_key']!, _sessionKeyMeta),
+      );
+    }
+    if (data.containsKey('issue_occurred_at')) {
+      context.handle(
+        _issueOccurredAtMeta,
+        issueOccurredAt.isAcceptableOrUnknown(
+          data['issue_occurred_at']!,
+          _issueOccurredAtMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_issueOccurredAtMeta);
+    }
+    if (data.containsKey('status')) {
+      context.handle(
+        _statusMeta,
+        status.isAcceptableOrUnknown(data['status']!, _statusMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_statusMeta);
+    }
+    if (data.containsKey('reason')) {
+      context.handle(
+        _reasonMeta,
+        reason.isAcceptableOrUnknown(data['reason']!, _reasonMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_reasonMeta);
+    }
+    if (data.containsKey('reviewed_by')) {
+      context.handle(
+        _reviewedByMeta,
+        reviewedBy.isAcceptableOrUnknown(data['reviewed_by']!, _reviewedByMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_reviewedByMeta);
+    }
+    if (data.containsKey('reviewed_at')) {
+      context.handle(
+        _reviewedAtMeta,
+        reviewedAt.isAcceptableOrUnknown(data['reviewed_at']!, _reviewedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_reviewedAtMeta);
+    }
+    if (data.containsKey('related_correction_id')) {
+      context.handle(
+        _relatedCorrectionIdMeta,
+        relatedCorrectionId.isAcceptableOrUnknown(
+          data['related_correction_id']!,
+          _relatedCorrectionIdMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  ExceptionReviewRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ExceptionReviewRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+      version: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}version'],
+      )!,
+      syncState: $ExceptionReviewsTable.$convertersyncState.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}sync_state'],
+        )!,
+      ),
+      deletedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}deleted_at'],
+      ),
+      companyId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}company_id'],
+      )!,
+      employeeId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}employee_id'],
+      )!,
+      issueKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}issue_key'],
+      )!,
+      issueType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}issue_type'],
+      )!,
+      eventId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}event_id'],
+      )!,
+      sessionKey: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}session_key'],
+      ),
+      issueOccurredAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}issue_occurred_at'],
+      )!,
+      status: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}status'],
+      )!,
+      reason: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}reason'],
+      )!,
+      reviewedBy: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}reviewed_by'],
+      )!,
+      reviewedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}reviewed_at'],
+      )!,
+      relatedCorrectionId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}related_correction_id'],
+      ),
+    );
+  }
+
+  @override
+  $ExceptionReviewsTable createAlias(String alias) {
+    return $ExceptionReviewsTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<SyncState, String, String> $convertersyncState =
+      const EnumNameConverter<SyncState>(SyncState.values);
+}
+
+class ExceptionReviewRow extends DataClass
+    implements Insertable<ExceptionReviewRow> {
+  final String id;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  final int version;
+  final SyncState syncState;
+  final DateTime? deletedAt;
+  final String companyId;
+  final String employeeId;
+  final String issueKey;
+
+  /// The issue as it was when reviewed, so the record stays meaningful after
+  /// a correction makes the issue disappear.
+  final String issueType;
+  final String eventId;
+  final String? sessionKey;
+  final DateTime issueOccurredAt;
+
+  /// `reviewed`, `resolved` or `dismissed`.
+  final String status;
+  final String reason;
+  final String reviewedBy;
+  final DateTime reviewedAt;
+
+  /// The correction that resolved it, if any.
+  final String? relatedCorrectionId;
+  const ExceptionReviewRow({
+    required this.id,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.version,
+    required this.syncState,
+    this.deletedAt,
+    required this.companyId,
+    required this.employeeId,
+    required this.issueKey,
+    required this.issueType,
+    required this.eventId,
+    this.sessionKey,
+    required this.issueOccurredAt,
+    required this.status,
+    required this.reason,
+    required this.reviewedBy,
+    required this.reviewedAt,
+    this.relatedCorrectionId,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    map['version'] = Variable<int>(version);
+    {
+      map['sync_state'] = Variable<String>(
+        $ExceptionReviewsTable.$convertersyncState.toSql(syncState),
+      );
+    }
+    if (!nullToAbsent || deletedAt != null) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt);
+    }
+    map['company_id'] = Variable<String>(companyId);
+    map['employee_id'] = Variable<String>(employeeId);
+    map['issue_key'] = Variable<String>(issueKey);
+    map['issue_type'] = Variable<String>(issueType);
+    map['event_id'] = Variable<String>(eventId);
+    if (!nullToAbsent || sessionKey != null) {
+      map['session_key'] = Variable<String>(sessionKey);
+    }
+    map['issue_occurred_at'] = Variable<DateTime>(issueOccurredAt);
+    map['status'] = Variable<String>(status);
+    map['reason'] = Variable<String>(reason);
+    map['reviewed_by'] = Variable<String>(reviewedBy);
+    map['reviewed_at'] = Variable<DateTime>(reviewedAt);
+    if (!nullToAbsent || relatedCorrectionId != null) {
+      map['related_correction_id'] = Variable<String>(relatedCorrectionId);
+    }
+    return map;
+  }
+
+  ExceptionReviewsCompanion toCompanion(bool nullToAbsent) {
+    return ExceptionReviewsCompanion(
+      id: Value(id),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+      version: Value(version),
+      syncState: Value(syncState),
+      deletedAt: deletedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deletedAt),
+      companyId: Value(companyId),
+      employeeId: Value(employeeId),
+      issueKey: Value(issueKey),
+      issueType: Value(issueType),
+      eventId: Value(eventId),
+      sessionKey: sessionKey == null && nullToAbsent
+          ? const Value.absent()
+          : Value(sessionKey),
+      issueOccurredAt: Value(issueOccurredAt),
+      status: Value(status),
+      reason: Value(reason),
+      reviewedBy: Value(reviewedBy),
+      reviewedAt: Value(reviewedAt),
+      relatedCorrectionId: relatedCorrectionId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(relatedCorrectionId),
+    );
+  }
+
+  factory ExceptionReviewRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ExceptionReviewRow(
+      id: serializer.fromJson<String>(json['id']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+      version: serializer.fromJson<int>(json['version']),
+      syncState: $ExceptionReviewsTable.$convertersyncState.fromJson(
+        serializer.fromJson<String>(json['syncState']),
+      ),
+      deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
+      companyId: serializer.fromJson<String>(json['companyId']),
+      employeeId: serializer.fromJson<String>(json['employeeId']),
+      issueKey: serializer.fromJson<String>(json['issueKey']),
+      issueType: serializer.fromJson<String>(json['issueType']),
+      eventId: serializer.fromJson<String>(json['eventId']),
+      sessionKey: serializer.fromJson<String?>(json['sessionKey']),
+      issueOccurredAt: serializer.fromJson<DateTime>(json['issueOccurredAt']),
+      status: serializer.fromJson<String>(json['status']),
+      reason: serializer.fromJson<String>(json['reason']),
+      reviewedBy: serializer.fromJson<String>(json['reviewedBy']),
+      reviewedAt: serializer.fromJson<DateTime>(json['reviewedAt']),
+      relatedCorrectionId: serializer.fromJson<String?>(
+        json['relatedCorrectionId'],
+      ),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+      'version': serializer.toJson<int>(version),
+      'syncState': serializer.toJson<String>(
+        $ExceptionReviewsTable.$convertersyncState.toJson(syncState),
+      ),
+      'deletedAt': serializer.toJson<DateTime?>(deletedAt),
+      'companyId': serializer.toJson<String>(companyId),
+      'employeeId': serializer.toJson<String>(employeeId),
+      'issueKey': serializer.toJson<String>(issueKey),
+      'issueType': serializer.toJson<String>(issueType),
+      'eventId': serializer.toJson<String>(eventId),
+      'sessionKey': serializer.toJson<String?>(sessionKey),
+      'issueOccurredAt': serializer.toJson<DateTime>(issueOccurredAt),
+      'status': serializer.toJson<String>(status),
+      'reason': serializer.toJson<String>(reason),
+      'reviewedBy': serializer.toJson<String>(reviewedBy),
+      'reviewedAt': serializer.toJson<DateTime>(reviewedAt),
+      'relatedCorrectionId': serializer.toJson<String?>(relatedCorrectionId),
+    };
+  }
+
+  ExceptionReviewRow copyWith({
+    String? id,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    int? version,
+    SyncState? syncState,
+    Value<DateTime?> deletedAt = const Value.absent(),
+    String? companyId,
+    String? employeeId,
+    String? issueKey,
+    String? issueType,
+    String? eventId,
+    Value<String?> sessionKey = const Value.absent(),
+    DateTime? issueOccurredAt,
+    String? status,
+    String? reason,
+    String? reviewedBy,
+    DateTime? reviewedAt,
+    Value<String?> relatedCorrectionId = const Value.absent(),
+  }) => ExceptionReviewRow(
+    id: id ?? this.id,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+    version: version ?? this.version,
+    syncState: syncState ?? this.syncState,
+    deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
+    companyId: companyId ?? this.companyId,
+    employeeId: employeeId ?? this.employeeId,
+    issueKey: issueKey ?? this.issueKey,
+    issueType: issueType ?? this.issueType,
+    eventId: eventId ?? this.eventId,
+    sessionKey: sessionKey.present ? sessionKey.value : this.sessionKey,
+    issueOccurredAt: issueOccurredAt ?? this.issueOccurredAt,
+    status: status ?? this.status,
+    reason: reason ?? this.reason,
+    reviewedBy: reviewedBy ?? this.reviewedBy,
+    reviewedAt: reviewedAt ?? this.reviewedAt,
+    relatedCorrectionId: relatedCorrectionId.present
+        ? relatedCorrectionId.value
+        : this.relatedCorrectionId,
+  );
+  ExceptionReviewRow copyWithCompanion(ExceptionReviewsCompanion data) {
+    return ExceptionReviewRow(
+      id: data.id.present ? data.id.value : this.id,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      version: data.version.present ? data.version.value : this.version,
+      syncState: data.syncState.present ? data.syncState.value : this.syncState,
+      deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
+      companyId: data.companyId.present ? data.companyId.value : this.companyId,
+      employeeId: data.employeeId.present
+          ? data.employeeId.value
+          : this.employeeId,
+      issueKey: data.issueKey.present ? data.issueKey.value : this.issueKey,
+      issueType: data.issueType.present ? data.issueType.value : this.issueType,
+      eventId: data.eventId.present ? data.eventId.value : this.eventId,
+      sessionKey: data.sessionKey.present
+          ? data.sessionKey.value
+          : this.sessionKey,
+      issueOccurredAt: data.issueOccurredAt.present
+          ? data.issueOccurredAt.value
+          : this.issueOccurredAt,
+      status: data.status.present ? data.status.value : this.status,
+      reason: data.reason.present ? data.reason.value : this.reason,
+      reviewedBy: data.reviewedBy.present
+          ? data.reviewedBy.value
+          : this.reviewedBy,
+      reviewedAt: data.reviewedAt.present
+          ? data.reviewedAt.value
+          : this.reviewedAt,
+      relatedCorrectionId: data.relatedCorrectionId.present
+          ? data.relatedCorrectionId.value
+          : this.relatedCorrectionId,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ExceptionReviewRow(')
+          ..write('id: $id, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('version: $version, ')
+          ..write('syncState: $syncState, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('companyId: $companyId, ')
+          ..write('employeeId: $employeeId, ')
+          ..write('issueKey: $issueKey, ')
+          ..write('issueType: $issueType, ')
+          ..write('eventId: $eventId, ')
+          ..write('sessionKey: $sessionKey, ')
+          ..write('issueOccurredAt: $issueOccurredAt, ')
+          ..write('status: $status, ')
+          ..write('reason: $reason, ')
+          ..write('reviewedBy: $reviewedBy, ')
+          ..write('reviewedAt: $reviewedAt, ')
+          ..write('relatedCorrectionId: $relatedCorrectionId')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    createdAt,
+    updatedAt,
+    version,
+    syncState,
+    deletedAt,
+    companyId,
+    employeeId,
+    issueKey,
+    issueType,
+    eventId,
+    sessionKey,
+    issueOccurredAt,
+    status,
+    reason,
+    reviewedBy,
+    reviewedAt,
+    relatedCorrectionId,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ExceptionReviewRow &&
+          other.id == this.id &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.version == this.version &&
+          other.syncState == this.syncState &&
+          other.deletedAt == this.deletedAt &&
+          other.companyId == this.companyId &&
+          other.employeeId == this.employeeId &&
+          other.issueKey == this.issueKey &&
+          other.issueType == this.issueType &&
+          other.eventId == this.eventId &&
+          other.sessionKey == this.sessionKey &&
+          other.issueOccurredAt == this.issueOccurredAt &&
+          other.status == this.status &&
+          other.reason == this.reason &&
+          other.reviewedBy == this.reviewedBy &&
+          other.reviewedAt == this.reviewedAt &&
+          other.relatedCorrectionId == this.relatedCorrectionId);
+}
+
+class ExceptionReviewsCompanion extends UpdateCompanion<ExceptionReviewRow> {
+  final Value<String> id;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<int> version;
+  final Value<SyncState> syncState;
+  final Value<DateTime?> deletedAt;
+  final Value<String> companyId;
+  final Value<String> employeeId;
+  final Value<String> issueKey;
+  final Value<String> issueType;
+  final Value<String> eventId;
+  final Value<String?> sessionKey;
+  final Value<DateTime> issueOccurredAt;
+  final Value<String> status;
+  final Value<String> reason;
+  final Value<String> reviewedBy;
+  final Value<DateTime> reviewedAt;
+  final Value<String?> relatedCorrectionId;
+  final Value<int> rowid;
+  const ExceptionReviewsCompanion({
+    this.id = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.version = const Value.absent(),
+    this.syncState = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    this.companyId = const Value.absent(),
+    this.employeeId = const Value.absent(),
+    this.issueKey = const Value.absent(),
+    this.issueType = const Value.absent(),
+    this.eventId = const Value.absent(),
+    this.sessionKey = const Value.absent(),
+    this.issueOccurredAt = const Value.absent(),
+    this.status = const Value.absent(),
+    this.reason = const Value.absent(),
+    this.reviewedBy = const Value.absent(),
+    this.reviewedAt = const Value.absent(),
+    this.relatedCorrectionId = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ExceptionReviewsCompanion.insert({
+    required String id,
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.version = const Value.absent(),
+    this.syncState = const Value.absent(),
+    this.deletedAt = const Value.absent(),
+    required String companyId,
+    required String employeeId,
+    required String issueKey,
+    required String issueType,
+    required String eventId,
+    this.sessionKey = const Value.absent(),
+    required DateTime issueOccurredAt,
+    required String status,
+    required String reason,
+    required String reviewedBy,
+    required DateTime reviewedAt,
+    this.relatedCorrectionId = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt),
+       companyId = Value(companyId),
+       employeeId = Value(employeeId),
+       issueKey = Value(issueKey),
+       issueType = Value(issueType),
+       eventId = Value(eventId),
+       issueOccurredAt = Value(issueOccurredAt),
+       status = Value(status),
+       reason = Value(reason),
+       reviewedBy = Value(reviewedBy),
+       reviewedAt = Value(reviewedAt);
+  static Insertable<ExceptionReviewRow> custom({
+    Expression<String>? id,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? version,
+    Expression<String>? syncState,
+    Expression<DateTime>? deletedAt,
+    Expression<String>? companyId,
+    Expression<String>? employeeId,
+    Expression<String>? issueKey,
+    Expression<String>? issueType,
+    Expression<String>? eventId,
+    Expression<String>? sessionKey,
+    Expression<DateTime>? issueOccurredAt,
+    Expression<String>? status,
+    Expression<String>? reason,
+    Expression<String>? reviewedBy,
+    Expression<DateTime>? reviewedAt,
+    Expression<String>? relatedCorrectionId,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (version != null) 'version': version,
+      if (syncState != null) 'sync_state': syncState,
+      if (deletedAt != null) 'deleted_at': deletedAt,
+      if (companyId != null) 'company_id': companyId,
+      if (employeeId != null) 'employee_id': employeeId,
+      if (issueKey != null) 'issue_key': issueKey,
+      if (issueType != null) 'issue_type': issueType,
+      if (eventId != null) 'event_id': eventId,
+      if (sessionKey != null) 'session_key': sessionKey,
+      if (issueOccurredAt != null) 'issue_occurred_at': issueOccurredAt,
+      if (status != null) 'status': status,
+      if (reason != null) 'reason': reason,
+      if (reviewedBy != null) 'reviewed_by': reviewedBy,
+      if (reviewedAt != null) 'reviewed_at': reviewedAt,
+      if (relatedCorrectionId != null)
+        'related_correction_id': relatedCorrectionId,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ExceptionReviewsCompanion copyWith({
+    Value<String>? id,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<int>? version,
+    Value<SyncState>? syncState,
+    Value<DateTime?>? deletedAt,
+    Value<String>? companyId,
+    Value<String>? employeeId,
+    Value<String>? issueKey,
+    Value<String>? issueType,
+    Value<String>? eventId,
+    Value<String?>? sessionKey,
+    Value<DateTime>? issueOccurredAt,
+    Value<String>? status,
+    Value<String>? reason,
+    Value<String>? reviewedBy,
+    Value<DateTime>? reviewedAt,
+    Value<String?>? relatedCorrectionId,
+    Value<int>? rowid,
+  }) {
+    return ExceptionReviewsCompanion(
+      id: id ?? this.id,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      version: version ?? this.version,
+      syncState: syncState ?? this.syncState,
+      deletedAt: deletedAt ?? this.deletedAt,
+      companyId: companyId ?? this.companyId,
+      employeeId: employeeId ?? this.employeeId,
+      issueKey: issueKey ?? this.issueKey,
+      issueType: issueType ?? this.issueType,
+      eventId: eventId ?? this.eventId,
+      sessionKey: sessionKey ?? this.sessionKey,
+      issueOccurredAt: issueOccurredAt ?? this.issueOccurredAt,
+      status: status ?? this.status,
+      reason: reason ?? this.reason,
+      reviewedBy: reviewedBy ?? this.reviewedBy,
+      reviewedAt: reviewedAt ?? this.reviewedAt,
+      relatedCorrectionId: relatedCorrectionId ?? this.relatedCorrectionId,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (version.present) {
+      map['version'] = Variable<int>(version.value);
+    }
+    if (syncState.present) {
+      map['sync_state'] = Variable<String>(
+        $ExceptionReviewsTable.$convertersyncState.toSql(syncState.value),
+      );
+    }
+    if (deletedAt.present) {
+      map['deleted_at'] = Variable<DateTime>(deletedAt.value);
+    }
+    if (companyId.present) {
+      map['company_id'] = Variable<String>(companyId.value);
+    }
+    if (employeeId.present) {
+      map['employee_id'] = Variable<String>(employeeId.value);
+    }
+    if (issueKey.present) {
+      map['issue_key'] = Variable<String>(issueKey.value);
+    }
+    if (issueType.present) {
+      map['issue_type'] = Variable<String>(issueType.value);
+    }
+    if (eventId.present) {
+      map['event_id'] = Variable<String>(eventId.value);
+    }
+    if (sessionKey.present) {
+      map['session_key'] = Variable<String>(sessionKey.value);
+    }
+    if (issueOccurredAt.present) {
+      map['issue_occurred_at'] = Variable<DateTime>(issueOccurredAt.value);
+    }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
+    if (reason.present) {
+      map['reason'] = Variable<String>(reason.value);
+    }
+    if (reviewedBy.present) {
+      map['reviewed_by'] = Variable<String>(reviewedBy.value);
+    }
+    if (reviewedAt.present) {
+      map['reviewed_at'] = Variable<DateTime>(reviewedAt.value);
+    }
+    if (relatedCorrectionId.present) {
+      map['related_correction_id'] = Variable<String>(
+        relatedCorrectionId.value,
+      );
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ExceptionReviewsCompanion(')
+          ..write('id: $id, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('version: $version, ')
+          ..write('syncState: $syncState, ')
+          ..write('deletedAt: $deletedAt, ')
+          ..write('companyId: $companyId, ')
+          ..write('employeeId: $employeeId, ')
+          ..write('issueKey: $issueKey, ')
+          ..write('issueType: $issueType, ')
+          ..write('eventId: $eventId, ')
+          ..write('sessionKey: $sessionKey, ')
+          ..write('issueOccurredAt: $issueOccurredAt, ')
+          ..write('status: $status, ')
+          ..write('reason: $reason, ')
+          ..write('reviewedBy: $reviewedBy, ')
+          ..write('reviewedAt: $reviewedAt, ')
+          ..write('relatedCorrectionId: $relatedCorrectionId, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -7723,6 +8766,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $AttendanceCorrectionsTable attendanceCorrections =
       $AttendanceCorrectionsTable(this);
   late final $DeviceSettingsTable deviceSettings = $DeviceSettingsTable(this);
+  late final $ExceptionReviewsTable exceptionReviews = $ExceptionReviewsTable(
+    this,
+  );
   late final Index auditLogCompanyTime = Index(
     'audit_log_company_time',
     'CREATE INDEX audit_log_company_time ON audit_log (company_id, occurred_at)',
@@ -7747,6 +8793,14 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     'attendance_corrections_employee',
     'CREATE INDEX attendance_corrections_employee ON attendance_corrections (employee_id, corrected_at)',
   );
+  late final Index exceptionReviewsIssue = Index(
+    'exception_reviews_issue',
+    'CREATE INDEX exception_reviews_issue ON exception_reviews (issue_key)',
+  );
+  late final Index exceptionReviewsCompanyTime = Index(
+    'exception_reviews_company_time',
+    'CREATE INDEX exception_reviews_company_time ON exception_reviews (company_id, issue_occurred_at)',
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -7763,12 +8817,15 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     attendanceSettings,
     attendanceCorrections,
     deviceSettings,
+    exceptionReviews,
     auditLogCompanyTime,
     auditLogEntity,
     attendanceEventsEmployeeTime,
     attendanceEventsTime,
     attendanceCorrectionsOriginal,
     attendanceCorrectionsEmployee,
+    exceptionReviewsIssue,
+    exceptionReviewsCompanyTime,
   ];
   @override
   DriftDatabaseOptions get options =>
@@ -7909,6 +8966,26 @@ final class $$CompaniesTableReferences
     ).filter((f) => f.kioskCompanyId.id.sqlEquals($_itemColumn<String>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_deviceSettingsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$ExceptionReviewsTable, List<ExceptionReviewRow>>
+  _exceptionReviewsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.exceptionReviews,
+    aliasName: 'companies__id__exception_reviews__company_id',
+  );
+
+  $$ExceptionReviewsTableProcessedTableManager get exceptionReviewsRefs {
+    final manager = $$ExceptionReviewsTableTableManager(
+      $_db,
+      $_db.exceptionReviews,
+    ).filter((f) => f.companyId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _exceptionReviewsRefsTable($_db),
+    );
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -8116,6 +9193,31 @@ class $$CompaniesTableFilterComposer
           }) => $$DeviceSettingsTableFilterComposer(
             $db: $db,
             $table: $db.deviceSettings,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> exceptionReviewsRefs(
+    Expression<bool> Function($$ExceptionReviewsTableFilterComposer f) f,
+  ) {
+    final $$ExceptionReviewsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.exceptionReviews,
+      getReferencedColumn: (t) => t.companyId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ExceptionReviewsTableFilterComposer(
+            $db: $db,
+            $table: $db.exceptionReviews,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -8394,6 +9496,31 @@ class $$CompaniesTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> exceptionReviewsRefs<T extends Object>(
+    Expression<T> Function($$ExceptionReviewsTableAnnotationComposer a) f,
+  ) {
+    final $$ExceptionReviewsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.exceptionReviews,
+      getReferencedColumn: (t) => t.companyId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ExceptionReviewsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.exceptionReviews,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$CompaniesTableTableManager
@@ -8415,6 +9542,7 @@ class $$CompaniesTableTableManager
             bool auditLogRefs,
             bool attendanceSettingsRefs,
             bool deviceSettingsRefs,
+            bool exceptionReviewsRefs,
           })
         > {
   $$CompaniesTableTableManager(_$AppDatabase db, $CompaniesTable table)
@@ -8515,6 +9643,7 @@ class $$CompaniesTableTableManager
                 auditLogRefs = false,
                 attendanceSettingsRefs = false,
                 deviceSettingsRefs = false,
+                exceptionReviewsRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -8524,6 +9653,7 @@ class $$CompaniesTableTableManager
                     if (auditLogRefs) db.auditLog,
                     if (attendanceSettingsRefs) db.attendanceSettings,
                     if (deviceSettingsRefs) db.deviceSettings,
+                    if (exceptionReviewsRefs) db.exceptionReviews,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
@@ -8633,6 +9763,27 @@ class $$CompaniesTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (exceptionReviewsRefs)
+                        await $_getPrefetchedData<
+                          CompanyRow,
+                          $CompaniesTable,
+                          ExceptionReviewRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$CompaniesTableReferences
+                              ._exceptionReviewsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$CompaniesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).exceptionReviewsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.companyId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -8659,6 +9810,7 @@ typedef $$CompaniesTableProcessedTableManager =
         bool auditLogRefs,
         bool attendanceSettingsRefs,
         bool deviceSettingsRefs,
+        bool exceptionReviewsRefs,
       })
     >;
 typedef $$AdminUsersTableCreateCompanionBuilder =
@@ -8752,6 +9904,26 @@ final class $$AdminUsersTableReferences
 
     final cache = $_typedResult.readTableOrNull(
       _attendanceCorrectionsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$ExceptionReviewsTable, List<ExceptionReviewRow>>
+  _exceptionReviewsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.exceptionReviews,
+    aliasName: 'admin_users__id__exception_reviews__reviewed_by',
+  );
+
+  $$ExceptionReviewsTableProcessedTableManager get exceptionReviewsRefs {
+    final manager = $$ExceptionReviewsTableTableManager(
+      $_db,
+      $_db.exceptionReviews,
+    ).filter((f) => f.reviewedBy.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _exceptionReviewsRefsTable($_db),
     );
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
@@ -8895,6 +10067,31 @@ class $$AdminUsersTableFilterComposer
                     $removeJoinBuilderFromRootComposer,
               ),
         );
+    return f(composer);
+  }
+
+  Expression<bool> exceptionReviewsRefs(
+    Expression<bool> Function($$ExceptionReviewsTableFilterComposer f) f,
+  ) {
+    final $$ExceptionReviewsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.exceptionReviews,
+      getReferencedColumn: (t) => t.reviewedBy,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ExceptionReviewsTableFilterComposer(
+            $db: $db,
+            $table: $db.exceptionReviews,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
     return f(composer);
   }
 }
@@ -9106,6 +10303,31 @@ class $$AdminUsersTableAnnotationComposer
         );
     return f(composer);
   }
+
+  Expression<T> exceptionReviewsRefs<T extends Object>(
+    Expression<T> Function($$ExceptionReviewsTableAnnotationComposer a) f,
+  ) {
+    final $$ExceptionReviewsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.exceptionReviews,
+      getReferencedColumn: (t) => t.reviewedBy,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ExceptionReviewsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.exceptionReviews,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$AdminUsersTableTableManager
@@ -9125,6 +10347,7 @@ class $$AdminUsersTableTableManager
             bool companyId,
             bool credentialsRefs,
             bool attendanceCorrectionsRefs,
+            bool exceptionReviewsRefs,
           })
         > {
   $$AdminUsersTableTableManager(_$AppDatabase db, $AdminUsersTable table)
@@ -9211,12 +10434,14 @@ class $$AdminUsersTableTableManager
                 companyId = false,
                 credentialsRefs = false,
                 attendanceCorrectionsRefs = false,
+                exceptionReviewsRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
                   explicitlyWatchedTables: [
                     if (credentialsRefs) db.credentials,
                     if (attendanceCorrectionsRefs) db.attendanceCorrections,
+                    if (exceptionReviewsRefs) db.exceptionReviews,
                   ],
                   addJoins:
                       <
@@ -9295,6 +10520,27 @@ class $$AdminUsersTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (exceptionReviewsRefs)
+                        await $_getPrefetchedData<
+                          AdminUserRow,
+                          $AdminUsersTable,
+                          ExceptionReviewRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$AdminUsersTableReferences
+                              ._exceptionReviewsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$AdminUsersTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).exceptionReviewsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.reviewedBy == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -9319,6 +10565,7 @@ typedef $$AdminUsersTableProcessedTableManager =
         bool companyId,
         bool credentialsRefs,
         bool attendanceCorrectionsRefs,
+        bool exceptionReviewsRefs,
       })
     >;
 typedef $$EmployeesTableCreateCompanionBuilder =
@@ -9462,6 +10709,26 @@ final class $$EmployeesTableReferences
 
     final cache = $_typedResult.readTableOrNull(
       _attendanceCorrectionsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$ExceptionReviewsTable, List<ExceptionReviewRow>>
+  _exceptionReviewsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.exceptionReviews,
+    aliasName: 'employees__id__exception_reviews__employee_id',
+  );
+
+  $$ExceptionReviewsTableProcessedTableManager get exceptionReviewsRefs {
+    final manager = $$ExceptionReviewsTableTableManager(
+      $_db,
+      $_db.exceptionReviews,
+    ).filter((f) => f.employeeId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _exceptionReviewsRefsTable($_db),
     );
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
@@ -9687,6 +10954,31 @@ class $$EmployeesTableFilterComposer
                     $removeJoinBuilderFromRootComposer,
               ),
         );
+    return f(composer);
+  }
+
+  Expression<bool> exceptionReviewsRefs(
+    Expression<bool> Function($$ExceptionReviewsTableFilterComposer f) f,
+  ) {
+    final $$ExceptionReviewsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.exceptionReviews,
+      getReferencedColumn: (t) => t.employeeId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ExceptionReviewsTableFilterComposer(
+            $db: $db,
+            $table: $db.exceptionReviews,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
     return f(composer);
   }
 }
@@ -10006,6 +11298,31 @@ class $$EmployeesTableAnnotationComposer
         );
     return f(composer);
   }
+
+  Expression<T> exceptionReviewsRefs<T extends Object>(
+    Expression<T> Function($$ExceptionReviewsTableAnnotationComposer a) f,
+  ) {
+    final $$ExceptionReviewsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.exceptionReviews,
+      getReferencedColumn: (t) => t.employeeId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ExceptionReviewsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.exceptionReviews,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$EmployeesTableTableManager
@@ -10027,6 +11344,7 @@ class $$EmployeesTableTableManager
             bool credentialsRefs,
             bool attendanceEventsRefs,
             bool attendanceCorrectionsRefs,
+            bool exceptionReviewsRefs,
           })
         > {
   $$EmployeesTableTableManager(_$AppDatabase db, $EmployeesTable table)
@@ -10139,6 +11457,7 @@ class $$EmployeesTableTableManager
                 credentialsRefs = false,
                 attendanceEventsRefs = false,
                 attendanceCorrectionsRefs = false,
+                exceptionReviewsRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -10147,6 +11466,7 @@ class $$EmployeesTableTableManager
                     if (credentialsRefs) db.credentials,
                     if (attendanceEventsRefs) db.attendanceEvents,
                     if (attendanceCorrectionsRefs) db.attendanceCorrections,
+                    if (exceptionReviewsRefs) db.exceptionReviews,
                   ],
                   addJoins:
                       <
@@ -10266,6 +11586,27 @@ class $$EmployeesTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (exceptionReviewsRefs)
+                        await $_getPrefetchedData<
+                          EmployeeRow,
+                          $EmployeesTable,
+                          ExceptionReviewRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$EmployeesTableReferences
+                              ._exceptionReviewsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$EmployeesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).exceptionReviewsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.employeeId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -10292,6 +11633,7 @@ typedef $$EmployeesTableProcessedTableManager =
         bool credentialsRefs,
         bool attendanceEventsRefs,
         bool attendanceCorrectionsRefs,
+        bool exceptionReviewsRefs,
       })
     >;
 typedef $$EmployeeRatesTableCreateCompanionBuilder =
@@ -11926,6 +13268,26 @@ final class $$AttendanceEventsTableReferences
       manager.$state.copyWith(prefetchedData: [item]),
     );
   }
+
+  static MultiTypedResultKey<$ExceptionReviewsTable, List<ExceptionReviewRow>>
+  _exceptionReviewsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.exceptionReviews,
+    aliasName: 'attendance_events__id__exception_reviews__event_id',
+  );
+
+  $$ExceptionReviewsTableProcessedTableManager get exceptionReviewsRefs {
+    final manager = $$ExceptionReviewsTableTableManager(
+      $_db,
+      $_db.exceptionReviews,
+    ).filter((f) => f.eventId.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _exceptionReviewsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$AttendanceEventsTableFilterComposer
@@ -12019,6 +13381,31 @@ class $$AttendanceEventsTableFilterComposer
           ),
     );
     return composer;
+  }
+
+  Expression<bool> exceptionReviewsRefs(
+    Expression<bool> Function($$ExceptionReviewsTableFilterComposer f) f,
+  ) {
+    final $$ExceptionReviewsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.exceptionReviews,
+      getReferencedColumn: (t) => t.eventId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ExceptionReviewsTableFilterComposer(
+            $db: $db,
+            $table: $db.exceptionReviews,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
   }
 }
 
@@ -12186,6 +13573,31 @@ class $$AttendanceEventsTableAnnotationComposer
     );
     return composer;
   }
+
+  Expression<T> exceptionReviewsRefs<T extends Object>(
+    Expression<T> Function($$ExceptionReviewsTableAnnotationComposer a) f,
+  ) {
+    final $$ExceptionReviewsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.exceptionReviews,
+      getReferencedColumn: (t) => t.eventId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ExceptionReviewsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.exceptionReviews,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$AttendanceEventsTableTableManager
@@ -12201,7 +13613,7 @@ class $$AttendanceEventsTableTableManager
           $$AttendanceEventsTableUpdateCompanionBuilder,
           (AttendanceEventRow, $$AttendanceEventsTableReferences),
           AttendanceEventRow,
-          PrefetchHooks Function({bool employeeId})
+          PrefetchHooks Function({bool employeeId, bool exceptionReviewsRefs})
         > {
   $$AttendanceEventsTableTableManager(
     _$AppDatabase db,
@@ -12290,49 +13702,74 @@ class $$AttendanceEventsTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({employeeId = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [],
-              addJoins:
-                  <
-                    T extends TableManagerState<
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic
-                    >
-                  >(state) {
-                    if (employeeId) {
-                      state =
-                          state.withJoin(
-                                currentTable: table,
-                                currentColumn: table.employeeId,
-                                referencedTable:
-                                    $$AttendanceEventsTableReferences
-                                        ._employeeIdTable(db),
-                                referencedColumn:
-                                    $$AttendanceEventsTableReferences
-                                        ._employeeIdTable(db)
-                                        .id,
-                              )
-                              as T;
-                    }
+          prefetchHooksCallback:
+              ({employeeId = false, exceptionReviewsRefs = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (exceptionReviewsRefs) db.exceptionReviews,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (employeeId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.employeeId,
+                                    referencedTable:
+                                        $$AttendanceEventsTableReferences
+                                            ._employeeIdTable(db),
+                                    referencedColumn:
+                                        $$AttendanceEventsTableReferences
+                                            ._employeeIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
 
-                    return state;
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (exceptionReviewsRefs)
+                        await $_getPrefetchedData<
+                          AttendanceEventRow,
+                          $AttendanceEventsTable,
+                          ExceptionReviewRow
+                        >(
+                          currentTable: table,
+                          referencedTable: $$AttendanceEventsTableReferences
+                              ._exceptionReviewsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$AttendanceEventsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).exceptionReviewsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.eventId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
                   },
-              getPrefetchedDataCallback: (items) async {
-                return [];
+                );
               },
-            );
-          },
         ),
       );
 }
@@ -12349,7 +13786,7 @@ typedef $$AttendanceEventsTableProcessedTableManager =
       $$AttendanceEventsTableUpdateCompanionBuilder,
       (AttendanceEventRow, $$AttendanceEventsTableReferences),
       AttendanceEventRow,
-      PrefetchHooks Function({bool employeeId})
+      PrefetchHooks Function({bool employeeId, bool exceptionReviewsRefs})
     >;
 typedef $$AttendanceSettingsTableCreateCompanionBuilder =
     AttendanceSettingsCompanion Function({
@@ -12955,6 +14392,28 @@ final class $$AttendanceCorrectionsTableReferences
       manager.$state.copyWith(prefetchedData: [item]),
     );
   }
+
+  static MultiTypedResultKey<$ExceptionReviewsTable, List<ExceptionReviewRow>>
+  _exceptionReviewsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.exceptionReviews,
+    aliasName:
+        'attendance_corrections__id__exception_reviews__related_correction_id',
+  );
+
+  $$ExceptionReviewsTableProcessedTableManager get exceptionReviewsRefs {
+    final manager =
+        $$ExceptionReviewsTableTableManager($_db, $_db.exceptionReviews).filter(
+          (f) =>
+              f.relatedCorrectionId.id.sqlEquals($_itemColumn<String>('id')!),
+        );
+
+    final cache = $_typedResult.readTableOrNull(
+      _exceptionReviewsRefsTable($_db),
+    );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$AttendanceCorrectionsTableFilterComposer
@@ -13117,6 +14576,31 @@ class $$AttendanceCorrectionsTableFilterComposer
           ),
     );
     return composer;
+  }
+
+  Expression<bool> exceptionReviewsRefs(
+    Expression<bool> Function($$ExceptionReviewsTableFilterComposer f) f,
+  ) {
+    final $$ExceptionReviewsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.exceptionReviews,
+      getReferencedColumn: (t) => t.relatedCorrectionId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ExceptionReviewsTableFilterComposer(
+            $db: $db,
+            $table: $db.exceptionReviews,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
   }
 }
 
@@ -13424,6 +14908,31 @@ class $$AttendanceCorrectionsTableAnnotationComposer
     );
     return composer;
   }
+
+  Expression<T> exceptionReviewsRefs<T extends Object>(
+    Expression<T> Function($$ExceptionReviewsTableAnnotationComposer a) f,
+  ) {
+    final $$ExceptionReviewsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.exceptionReviews,
+      getReferencedColumn: (t) => t.relatedCorrectionId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ExceptionReviewsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.exceptionReviews,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$AttendanceCorrectionsTableTableManager
@@ -13444,6 +14953,7 @@ class $$AttendanceCorrectionsTableTableManager
             bool originalEventId,
             bool replacementEventId,
             bool correctedBy,
+            bool exceptionReviewsRefs,
           })
         > {
   $$AttendanceCorrectionsTableTableManager(
@@ -13561,10 +15071,13 @@ class $$AttendanceCorrectionsTableTableManager
                 originalEventId = false,
                 replacementEventId = false,
                 correctedBy = false,
+                exceptionReviewsRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
-                  explicitlyWatchedTables: [],
+                  explicitlyWatchedTables: [
+                    if (exceptionReviewsRefs) db.exceptionReviews,
+                  ],
                   addJoins:
                       <
                         T extends TableManagerState<
@@ -13645,7 +15158,30 @@ class $$AttendanceCorrectionsTableTableManager
                         return state;
                       },
                   getPrefetchedDataCallback: (items) async {
-                    return [];
+                    return [
+                      if (exceptionReviewsRefs)
+                        await $_getPrefetchedData<
+                          AttendanceCorrectionRow,
+                          $AttendanceCorrectionsTable,
+                          ExceptionReviewRow
+                        >(
+                          currentTable: table,
+                          referencedTable:
+                              $$AttendanceCorrectionsTableReferences
+                                  ._exceptionReviewsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$AttendanceCorrectionsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).exceptionReviewsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.relatedCorrectionId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
                   },
                 );
               },
@@ -13670,6 +15206,7 @@ typedef $$AttendanceCorrectionsTableProcessedTableManager =
         bool originalEventId,
         bool replacementEventId,
         bool correctedBy,
+        bool exceptionReviewsRefs,
       })
     >;
 typedef $$DeviceSettingsTableCreateCompanionBuilder =
@@ -13959,6 +15496,970 @@ typedef $$DeviceSettingsTableProcessedTableManager =
       DeviceSettingsRow,
       PrefetchHooks Function({bool kioskCompanyId})
     >;
+typedef $$ExceptionReviewsTableCreateCompanionBuilder =
+    ExceptionReviewsCompanion Function({
+      required String id,
+      required DateTime createdAt,
+      required DateTime updatedAt,
+      Value<int> version,
+      Value<SyncState> syncState,
+      Value<DateTime?> deletedAt,
+      required String companyId,
+      required String employeeId,
+      required String issueKey,
+      required String issueType,
+      required String eventId,
+      Value<String?> sessionKey,
+      required DateTime issueOccurredAt,
+      required String status,
+      required String reason,
+      required String reviewedBy,
+      required DateTime reviewedAt,
+      Value<String?> relatedCorrectionId,
+      Value<int> rowid,
+    });
+typedef $$ExceptionReviewsTableUpdateCompanionBuilder =
+    ExceptionReviewsCompanion Function({
+      Value<String> id,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<int> version,
+      Value<SyncState> syncState,
+      Value<DateTime?> deletedAt,
+      Value<String> companyId,
+      Value<String> employeeId,
+      Value<String> issueKey,
+      Value<String> issueType,
+      Value<String> eventId,
+      Value<String?> sessionKey,
+      Value<DateTime> issueOccurredAt,
+      Value<String> status,
+      Value<String> reason,
+      Value<String> reviewedBy,
+      Value<DateTime> reviewedAt,
+      Value<String?> relatedCorrectionId,
+      Value<int> rowid,
+    });
+
+final class $$ExceptionReviewsTableReferences
+    extends
+        BaseReferences<
+          _$AppDatabase,
+          $ExceptionReviewsTable,
+          ExceptionReviewRow
+        > {
+  $$ExceptionReviewsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $CompaniesTable _companyIdTable(_$AppDatabase db) =>
+      db.companies.createAlias('exception_reviews__company_id__companies__id');
+
+  $$CompaniesTableProcessedTableManager get companyId {
+    final $_column = $_itemColumn<String>('company_id')!;
+
+    final manager = $$CompaniesTableTableManager(
+      $_db,
+      $_db.companies,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_companyIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $EmployeesTable _employeeIdTable(_$AppDatabase db) =>
+      db.employees.createAlias('exception_reviews__employee_id__employees__id');
+
+  $$EmployeesTableProcessedTableManager get employeeId {
+    final $_column = $_itemColumn<String>('employee_id')!;
+
+    final manager = $$EmployeesTableTableManager(
+      $_db,
+      $_db.employees,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_employeeIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $AttendanceEventsTable _eventIdTable(_$AppDatabase db) => db
+      .attendanceEvents
+      .createAlias('exception_reviews__event_id__attendance_events__id');
+
+  $$AttendanceEventsTableProcessedTableManager get eventId {
+    final $_column = $_itemColumn<String>('event_id')!;
+
+    final manager = $$AttendanceEventsTableTableManager(
+      $_db,
+      $_db.attendanceEvents,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_eventIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $AdminUsersTable _reviewedByTable(_$AppDatabase db) => db.adminUsers
+      .createAlias('exception_reviews__reviewed_by__admin_users__id');
+
+  $$AdminUsersTableProcessedTableManager get reviewedBy {
+    final $_column = $_itemColumn<String>('reviewed_by')!;
+
+    final manager = $$AdminUsersTableTableManager(
+      $_db,
+      $_db.adminUsers,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_reviewedByTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $AttendanceCorrectionsTable _relatedCorrectionIdTable(
+    _$AppDatabase db,
+  ) => db.attendanceCorrections.createAlias(
+    'exception_reviews__related_correction_id__attendance_corrections__id',
+  );
+
+  $$AttendanceCorrectionsTableProcessedTableManager? get relatedCorrectionId {
+    final $_column = $_itemColumn<String>('related_correction_id');
+    if ($_column == null) return null;
+    final manager = $$AttendanceCorrectionsTableTableManager(
+      $_db,
+      $_db.attendanceCorrections,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_relatedCorrectionIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$ExceptionReviewsTableFilterComposer
+    extends Composer<_$AppDatabase, $ExceptionReviewsTable> {
+  $$ExceptionReviewsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get version => $composableBuilder(
+    column: $table.version,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<SyncState, SyncState, String> get syncState =>
+      $composableBuilder(
+        column: $table.syncState,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  ColumnFilters<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get issueKey => $composableBuilder(
+    column: $table.issueKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get issueType => $composableBuilder(
+    column: $table.issueType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get sessionKey => $composableBuilder(
+    column: $table.sessionKey,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get issueOccurredAt => $composableBuilder(
+    column: $table.issueOccurredAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get reason => $composableBuilder(
+    column: $table.reason,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get reviewedAt => $composableBuilder(
+    column: $table.reviewedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$CompaniesTableFilterComposer get companyId {
+    final $$CompaniesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.companyId,
+      referencedTable: $db.companies,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CompaniesTableFilterComposer(
+            $db: $db,
+            $table: $db.companies,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$EmployeesTableFilterComposer get employeeId {
+    final $$EmployeesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.employeeId,
+      referencedTable: $db.employees,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$EmployeesTableFilterComposer(
+            $db: $db,
+            $table: $db.employees,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$AttendanceEventsTableFilterComposer get eventId {
+    final $$AttendanceEventsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.eventId,
+      referencedTable: $db.attendanceEvents,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AttendanceEventsTableFilterComposer(
+            $db: $db,
+            $table: $db.attendanceEvents,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$AdminUsersTableFilterComposer get reviewedBy {
+    final $$AdminUsersTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.reviewedBy,
+      referencedTable: $db.adminUsers,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AdminUsersTableFilterComposer(
+            $db: $db,
+            $table: $db.adminUsers,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$AttendanceCorrectionsTableFilterComposer get relatedCorrectionId {
+    final $$AttendanceCorrectionsTableFilterComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.relatedCorrectionId,
+          referencedTable: $db.attendanceCorrections,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AttendanceCorrectionsTableFilterComposer(
+                $db: $db,
+                $table: $db.attendanceCorrections,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+}
+
+class $$ExceptionReviewsTableOrderingComposer
+    extends Composer<_$AppDatabase, $ExceptionReviewsTable> {
+  $$ExceptionReviewsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get version => $composableBuilder(
+    column: $table.version,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get syncState => $composableBuilder(
+    column: $table.syncState,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get deletedAt => $composableBuilder(
+    column: $table.deletedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get issueKey => $composableBuilder(
+    column: $table.issueKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get issueType => $composableBuilder(
+    column: $table.issueType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get sessionKey => $composableBuilder(
+    column: $table.sessionKey,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get issueOccurredAt => $composableBuilder(
+    column: $table.issueOccurredAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get reason => $composableBuilder(
+    column: $table.reason,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get reviewedAt => $composableBuilder(
+    column: $table.reviewedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$CompaniesTableOrderingComposer get companyId {
+    final $$CompaniesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.companyId,
+      referencedTable: $db.companies,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CompaniesTableOrderingComposer(
+            $db: $db,
+            $table: $db.companies,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$EmployeesTableOrderingComposer get employeeId {
+    final $$EmployeesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.employeeId,
+      referencedTable: $db.employees,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$EmployeesTableOrderingComposer(
+            $db: $db,
+            $table: $db.employees,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$AttendanceEventsTableOrderingComposer get eventId {
+    final $$AttendanceEventsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.eventId,
+      referencedTable: $db.attendanceEvents,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AttendanceEventsTableOrderingComposer(
+            $db: $db,
+            $table: $db.attendanceEvents,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$AdminUsersTableOrderingComposer get reviewedBy {
+    final $$AdminUsersTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.reviewedBy,
+      referencedTable: $db.adminUsers,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AdminUsersTableOrderingComposer(
+            $db: $db,
+            $table: $db.adminUsers,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$AttendanceCorrectionsTableOrderingComposer get relatedCorrectionId {
+    final $$AttendanceCorrectionsTableOrderingComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.relatedCorrectionId,
+          referencedTable: $db.attendanceCorrections,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AttendanceCorrectionsTableOrderingComposer(
+                $db: $db,
+                $table: $db.attendanceCorrections,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+}
+
+class $$ExceptionReviewsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ExceptionReviewsTable> {
+  $$ExceptionReviewsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<int> get version =>
+      $composableBuilder(column: $table.version, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<SyncState, String> get syncState =>
+      $composableBuilder(column: $table.syncState, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get deletedAt =>
+      $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get issueKey =>
+      $composableBuilder(column: $table.issueKey, builder: (column) => column);
+
+  GeneratedColumn<String> get issueType =>
+      $composableBuilder(column: $table.issueType, builder: (column) => column);
+
+  GeneratedColumn<String> get sessionKey => $composableBuilder(
+    column: $table.sessionKey,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get issueOccurredAt => $composableBuilder(
+    column: $table.issueOccurredAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumn<String> get reason =>
+      $composableBuilder(column: $table.reason, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get reviewedAt => $composableBuilder(
+    column: $table.reviewedAt,
+    builder: (column) => column,
+  );
+
+  $$CompaniesTableAnnotationComposer get companyId {
+    final $$CompaniesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.companyId,
+      referencedTable: $db.companies,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CompaniesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.companies,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$EmployeesTableAnnotationComposer get employeeId {
+    final $$EmployeesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.employeeId,
+      referencedTable: $db.employees,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$EmployeesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.employees,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$AttendanceEventsTableAnnotationComposer get eventId {
+    final $$AttendanceEventsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.eventId,
+      referencedTable: $db.attendanceEvents,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AttendanceEventsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.attendanceEvents,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$AdminUsersTableAnnotationComposer get reviewedBy {
+    final $$AdminUsersTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.reviewedBy,
+      referencedTable: $db.adminUsers,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$AdminUsersTableAnnotationComposer(
+            $db: $db,
+            $table: $db.adminUsers,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$AttendanceCorrectionsTableAnnotationComposer get relatedCorrectionId {
+    final $$AttendanceCorrectionsTableAnnotationComposer composer =
+        $composerBuilder(
+          composer: this,
+          getCurrentColumn: (t) => t.relatedCorrectionId,
+          referencedTable: $db.attendanceCorrections,
+          getReferencedColumn: (t) => t.id,
+          builder:
+              (
+                joinBuilder, {
+                $addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer,
+              }) => $$AttendanceCorrectionsTableAnnotationComposer(
+                $db: $db,
+                $table: $db.attendanceCorrections,
+                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                joinBuilder: joinBuilder,
+                $removeJoinBuilderFromRootComposer:
+                    $removeJoinBuilderFromRootComposer,
+              ),
+        );
+    return composer;
+  }
+}
+
+class $$ExceptionReviewsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ExceptionReviewsTable,
+          ExceptionReviewRow,
+          $$ExceptionReviewsTableFilterComposer,
+          $$ExceptionReviewsTableOrderingComposer,
+          $$ExceptionReviewsTableAnnotationComposer,
+          $$ExceptionReviewsTableCreateCompanionBuilder,
+          $$ExceptionReviewsTableUpdateCompanionBuilder,
+          (ExceptionReviewRow, $$ExceptionReviewsTableReferences),
+          ExceptionReviewRow,
+          PrefetchHooks Function({
+            bool companyId,
+            bool employeeId,
+            bool eventId,
+            bool reviewedBy,
+            bool relatedCorrectionId,
+          })
+        > {
+  $$ExceptionReviewsTableTableManager(
+    _$AppDatabase db,
+    $ExceptionReviewsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ExceptionReviewsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ExceptionReviewsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ExceptionReviewsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> version = const Value.absent(),
+                Value<SyncState> syncState = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+                Value<String> companyId = const Value.absent(),
+                Value<String> employeeId = const Value.absent(),
+                Value<String> issueKey = const Value.absent(),
+                Value<String> issueType = const Value.absent(),
+                Value<String> eventId = const Value.absent(),
+                Value<String?> sessionKey = const Value.absent(),
+                Value<DateTime> issueOccurredAt = const Value.absent(),
+                Value<String> status = const Value.absent(),
+                Value<String> reason = const Value.absent(),
+                Value<String> reviewedBy = const Value.absent(),
+                Value<DateTime> reviewedAt = const Value.absent(),
+                Value<String?> relatedCorrectionId = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ExceptionReviewsCompanion(
+                id: id,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                version: version,
+                syncState: syncState,
+                deletedAt: deletedAt,
+                companyId: companyId,
+                employeeId: employeeId,
+                issueKey: issueKey,
+                issueType: issueType,
+                eventId: eventId,
+                sessionKey: sessionKey,
+                issueOccurredAt: issueOccurredAt,
+                status: status,
+                reason: reason,
+                reviewedBy: reviewedBy,
+                reviewedAt: reviewedAt,
+                relatedCorrectionId: relatedCorrectionId,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required DateTime createdAt,
+                required DateTime updatedAt,
+                Value<int> version = const Value.absent(),
+                Value<SyncState> syncState = const Value.absent(),
+                Value<DateTime?> deletedAt = const Value.absent(),
+                required String companyId,
+                required String employeeId,
+                required String issueKey,
+                required String issueType,
+                required String eventId,
+                Value<String?> sessionKey = const Value.absent(),
+                required DateTime issueOccurredAt,
+                required String status,
+                required String reason,
+                required String reviewedBy,
+                required DateTime reviewedAt,
+                Value<String?> relatedCorrectionId = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ExceptionReviewsCompanion.insert(
+                id: id,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                version: version,
+                syncState: syncState,
+                deletedAt: deletedAt,
+                companyId: companyId,
+                employeeId: employeeId,
+                issueKey: issueKey,
+                issueType: issueType,
+                eventId: eventId,
+                sessionKey: sessionKey,
+                issueOccurredAt: issueOccurredAt,
+                status: status,
+                reason: reason,
+                reviewedBy: reviewedBy,
+                reviewedAt: reviewedAt,
+                relatedCorrectionId: relatedCorrectionId,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$ExceptionReviewsTable, ExceptionReviewRow>(
+                    table,
+                  ),
+                  $$ExceptionReviewsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({
+                companyId = false,
+                employeeId = false,
+                eventId = false,
+                reviewedBy = false,
+                relatedCorrectionId = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (companyId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.companyId,
+                                    referencedTable:
+                                        $$ExceptionReviewsTableReferences
+                                            ._companyIdTable(db),
+                                    referencedColumn:
+                                        $$ExceptionReviewsTableReferences
+                                            ._companyIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+                        if (employeeId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.employeeId,
+                                    referencedTable:
+                                        $$ExceptionReviewsTableReferences
+                                            ._employeeIdTable(db),
+                                    referencedColumn:
+                                        $$ExceptionReviewsTableReferences
+                                            ._employeeIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+                        if (eventId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.eventId,
+                                    referencedTable:
+                                        $$ExceptionReviewsTableReferences
+                                            ._eventIdTable(db),
+                                    referencedColumn:
+                                        $$ExceptionReviewsTableReferences
+                                            ._eventIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+                        if (reviewedBy) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.reviewedBy,
+                                    referencedTable:
+                                        $$ExceptionReviewsTableReferences
+                                            ._reviewedByTable(db),
+                                    referencedColumn:
+                                        $$ExceptionReviewsTableReferences
+                                            ._reviewedByTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+                        if (relatedCorrectionId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.relatedCorrectionId,
+                                    referencedTable:
+                                        $$ExceptionReviewsTableReferences
+                                            ._relatedCorrectionIdTable(db),
+                                    referencedColumn:
+                                        $$ExceptionReviewsTableReferences
+                                            ._relatedCorrectionIdTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$ExceptionReviewsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ExceptionReviewsTable,
+      ExceptionReviewRow,
+      $$ExceptionReviewsTableFilterComposer,
+      $$ExceptionReviewsTableOrderingComposer,
+      $$ExceptionReviewsTableAnnotationComposer,
+      $$ExceptionReviewsTableCreateCompanionBuilder,
+      $$ExceptionReviewsTableUpdateCompanionBuilder,
+      (ExceptionReviewRow, $$ExceptionReviewsTableReferences),
+      ExceptionReviewRow,
+      PrefetchHooks Function({
+        bool companyId,
+        bool employeeId,
+        bool eventId,
+        bool reviewedBy,
+        bool relatedCorrectionId,
+      })
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -13985,4 +16486,6 @@ class $AppDatabaseManager {
       $$AttendanceCorrectionsTableTableManager(_db, _db.attendanceCorrections);
   $$DeviceSettingsTableTableManager get deviceSettings =>
       $$DeviceSettingsTableTableManager(_db, _db.deviceSettings);
+  $$ExceptionReviewsTableTableManager get exceptionReviews =>
+      $$ExceptionReviewsTableTableManager(_db, _db.exceptionReviews);
 }

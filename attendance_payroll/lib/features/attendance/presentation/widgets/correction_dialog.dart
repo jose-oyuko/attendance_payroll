@@ -5,7 +5,9 @@ import 'package:attendance_payroll/core/utils/local_date.dart';
 import 'package:attendance_payroll/features/attendance/data/attendance_providers.dart';
 import 'package:attendance_payroll/features/attendance/domain/attendance_correction.dart';
 import 'package:attendance_payroll/features/attendance/domain/attendance_event.dart';
+import 'package:attendance_payroll/features/attendance/domain/attendance_session.dart';
 import 'package:attendance_payroll/features/attendance/presentation/attendance_formatting.dart';
+import 'package:attendance_payroll/features/attendance/presentation/attendance_view_providers.dart';
 import 'package:attendance_payroll/features/authentication/presentation/auth_controller.dart';
 import 'package:attendance_payroll/shared/formatting/date_formatting.dart';
 import 'package:attendance_payroll/shared/formatting/time_formatting.dart';
@@ -61,23 +63,32 @@ final class RemoveEntryRequest extends CorrectionRequest {
 }
 
 /// Shows the correction form. Resolves to `true` once a correction is saved.
+/// When the correction fixes an exception, pass it as [resolves] so the
+/// exception is recorded as resolved by this correction.
 Future<bool> showCorrectionDialog(
   BuildContext context, {
   required CorrectionRequest request,
   required CompanyTimeZone zone,
+  AttendanceIssue? resolves,
 }) async {
   final saved = await showDialog<bool>(
     context: context,
-    builder: (_) => _CorrectionDialog(request: request, zone: zone),
+    builder: (_) =>
+        _CorrectionDialog(request: request, zone: zone, resolves: resolves),
   );
   return saved ?? false;
 }
 
 class _CorrectionDialog extends ConsumerStatefulWidget {
-  const _CorrectionDialog({required this.request, required this.zone});
+  const _CorrectionDialog({
+    required this.request,
+    required this.zone,
+    required this.resolves,
+  });
 
   final CorrectionRequest request;
   final CompanyTimeZone zone;
+  final AttendanceIssue? resolves;
 
   @override
   ConsumerState<_CorrectionDialog> createState() => _CorrectionDialogState();
@@ -147,17 +158,20 @@ class _CorrectionDialogState extends ConsumerState<_CorrectionDialog> {
         type: _type,
         occurredAt: _chosenInstant!,
         reason: reason,
+        resolves: widget.resolves,
       ),
       ChangeTimeRequest(:final eventId) => await service.changeTime(
         session,
         eventId,
         newOccurredAt: _chosenInstant!,
         reason: reason,
+        resolves: widget.resolves,
       ),
       RemoveEntryRequest(:final eventId) => await service.removeEntry(
         session,
         eventId,
         reason: reason,
+        resolves: widget.resolves,
       ),
     };
     if (!mounted) {
@@ -165,6 +179,7 @@ class _CorrectionDialogState extends ConsumerState<_CorrectionDialog> {
     }
     switch (result) {
       case Ok():
+        ref.read(attendanceRevisionProvider.notifier).changed();
         Navigator.of(context).pop(true);
       case Err(:final failure):
         setState(() {

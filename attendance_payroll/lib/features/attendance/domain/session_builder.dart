@@ -15,10 +15,14 @@ final class SessionBuilder {
   final AttendancePolicy policy;
   final CompanyTimeZone timeZone;
 
+  /// [acceptedIssueKeys] are issues an administrator accepted as recorded
+  /// (see `ExceptionReview`); they no longer block payroll.
   AttendanceTimeline build(
     Iterable<AttendanceEvent> events, {
     required DateTime now,
+    Set<String> acceptedIssueKeys = const {},
   }) {
+    final accepted = acceptedIssueKeys;
     final sorted = [...events]..sort(AttendanceEvent.compareChronologically);
     assert(
       sorted.map((e) => e.employeeId).toSet().length <= 1,
@@ -50,7 +54,7 @@ final class SessionBuilder {
           }
         case AttendanceEventType.clockOut:
           if (open != null) {
-            sessions.add(_closed(open, event));
+            sessions.add(_closed(open, event, accepted));
             open = null;
             closingRun = true;
           } else if (_isDuplicate(previous, event)) {
@@ -63,7 +67,7 @@ final class SessionBuilder {
             if (closed == null) {
               looseIssues.add(issue);
             } else {
-              sessions.add(_withIssue(closed, issue));
+              sessions.add(_withIssue(closed, issue, accepted));
             }
           } else {
             closingRun = false;
@@ -76,7 +80,9 @@ final class SessionBuilder {
     }
 
     if (open != null) {
-      sessions.add(_isStale(open, now) ? _unclosed(open) : _stillOpen(open));
+      sessions.add(
+        _isStale(open, now) ? _unclosed(open) : _stillOpen(open, accepted),
+      );
     }
 
     final issues = [
@@ -99,7 +105,11 @@ final class SessionBuilder {
         policy.staleOpenSessionAfter;
   }
 
-  AttendanceSession _closed(_OpenSession open, AttendanceEvent clockOut) {
+  AttendanceSession _closed(
+    _OpenSession open,
+    AttendanceEvent clockOut,
+    Set<String> accepted,
+  ) {
     final workDate = timeZone.dateOf(open.clockIn.occurredAt);
     final duration = clockOut.occurredAt.difference(open.clockIn.occurredAt);
     final issues = [
@@ -113,7 +123,7 @@ final class SessionBuilder {
       clockIn: open.clockIn,
       clockOut: clockOut,
       workDate: workDate,
-      status: _statusFor(issues, isOpen: false),
+      status: _statusFor(issues, accepted, isOpen: false),
       issues: issues,
       breakDuration: policy.automaticBreak?.breakFor(duration) ?? Duration.zero,
     );
@@ -134,12 +144,12 @@ final class SessionBuilder {
     );
   }
 
-  AttendanceSession _stillOpen(_OpenSession open) {
+  AttendanceSession _stillOpen(_OpenSession open, Set<String> accepted) {
     return AttendanceSession(
       clockIn: open.clockIn,
       clockOut: null,
       workDate: timeZone.dateOf(open.clockIn.occurredAt),
-      status: _statusFor(open.issues, isOpen: true),
+      status: _statusFor(open.issues, accepted, isOpen: true),
       issues: open.issues,
       breakDuration: Duration.zero,
     );
@@ -148,24 +158,36 @@ final class SessionBuilder {
   AttendanceSession _withIssue(
     AttendanceSession session,
     AttendanceIssue issue,
+    Set<String> accepted,
   ) {
     final issues = [...session.issues, issue];
     return AttendanceSession(
       clockIn: session.clockIn,
       clockOut: session.clockOut,
       workDate: session.workDate,
-      status: _statusFor(issues, isOpen: session.clockOut == null),
+      status: _statusFor(issues, accepted, isOpen: session.clockOut == null),
       issues: issues,
       breakDuration: session.breakDuration,
     );
   }
 
+  /// Blocking issues make a session an exception until every one of them is
+  /// accepted; then it is approved. (A session without a clock-out is built
+  /// by [_unclosed] and is always an exception: there is no time to accept.)
   static SessionStatus _statusFor(
-    List<AttendanceIssue> issues, {
+    List<AttendanceIssue> issues,
+    Set<String> accepted, {
     required bool isOpen,
   }) {
-    if (issues.any((issue) => issue.type.blocksPayroll)) {
+    final blocking = [
+      for (final issue in issues)
+        if (issue.type.blocksPayroll) issue,
+    ];
+    if (blocking.any((issue) => !accepted.contains(issue.key))) {
       return SessionStatus.exception;
+    }
+    if (blocking.isNotEmpty) {
+      return SessionStatus.approved;
     }
     return isOpen ? SessionStatus.open : SessionStatus.completed;
   }

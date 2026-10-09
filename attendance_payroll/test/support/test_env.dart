@@ -7,7 +7,10 @@ import 'package:attendance_payroll/core/security/secret_hasher.dart';
 import 'package:attendance_payroll/features/attendance/data/drift_attendance_correction_repository.dart';
 import 'package:attendance_payroll/features/attendance/data/drift_attendance_event_repository.dart';
 import 'package:attendance_payroll/features/attendance/data/drift_attendance_settings_repository.dart';
+import 'package:attendance_payroll/features/attendance/data/drift_exception_review_repository.dart';
 import 'package:attendance_payroll/features/attendance/domain/attendance_correction_service.dart';
+import 'package:attendance_payroll/features/attendance/domain/attendance_exception_service.dart';
+import 'package:attendance_payroll/features/attendance/domain/attendance_reader.dart';
 import 'package:attendance_payroll/features/attendance/domain/attendance_service.dart';
 import 'package:attendance_payroll/features/attendance/domain/attendance_settings_service.dart';
 import 'package:attendance_payroll/features/audit/data/drift_audit_log_repository.dart';
@@ -98,13 +101,31 @@ class TestEnv {
     clock: clock.call,
   );
 
+  late final reviews = DriftExceptionReviewRepository(db, clock: clock.call);
+
+  late final reader = AttendanceReader(
+    companies: companies,
+    employees: employees,
+    events: events,
+    settings: attendanceSettings,
+    reviews: reviews,
+    clock: clock.call,
+  );
+
   late final attendance = AttendanceService(
     employees: employees,
-    companies: companies,
     events: events,
     devices: DriftDeviceIdentityRepository(db),
     transactions: transactions,
-    settings: attendanceSettings,
+    reader: reader,
+    clock: clock.call,
+  );
+
+  late final exceptions = AttendanceExceptionService(
+    reader: reader,
+    reviews: reviews,
+    audit: audit,
+    transactions: transactions,
     clock: clock.call,
   );
 
@@ -118,6 +139,7 @@ class TestEnv {
     employees: employees,
     events: events,
     corrections: corrections,
+    reviews: reviews,
     devices: DriftDeviceIdentityRepository(db),
     audit: audit,
     transactions: transactions,

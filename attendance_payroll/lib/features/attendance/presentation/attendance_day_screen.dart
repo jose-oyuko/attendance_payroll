@@ -5,7 +5,9 @@ import 'package:attendance_payroll/core/extensions/build_context_extensions.dart
 import 'package:attendance_payroll/core/time/company_time_zone.dart';
 import 'package:attendance_payroll/core/utils/local_date.dart';
 import 'package:attendance_payroll/features/attendance/domain/daily_attendance.dart';
+import 'package:attendance_payroll/features/attendance/presentation/attendance_routes.dart';
 import 'package:attendance_payroll/features/attendance/presentation/attendance_view_providers.dart';
+import 'package:attendance_payroll/features/attendance/presentation/widgets/attendance_area_tabs.dart';
 import 'package:attendance_payroll/features/authentication/domain/admin_user.dart';
 import 'package:attendance_payroll/features/authentication/presentation/auth_controller.dart';
 import 'package:attendance_payroll/features/company/presentation/current_company_provider.dart';
@@ -20,15 +22,6 @@ import 'package:attendance_payroll/shared/widgets/page_container.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-
-/// Locations inside the Attendance area.
-abstract final class AttendanceRoutes {
-  static const String day = '/attendance';
-  static const String employeeSegment = 'employees/:employeeId';
-  static const String idParameter = 'employeeId';
-
-  static String employee(String id) => '$day/employees/$id';
-}
 
 /// Everyone's attendance on one day, and the way into kiosk mode.
 class AttendanceDayScreen extends ConsumerWidget {
@@ -115,6 +108,7 @@ class _DayViewState extends ConsumerState<_DayView> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         spacing: AppSpacing.md,
         children: [
+          const AttendanceAreaTabs(selected: AttendanceTab.daily),
           Wrap(
             spacing: AppSpacing.sm,
             runSpacing: AppSpacing.sm,

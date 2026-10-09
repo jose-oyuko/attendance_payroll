@@ -15,7 +15,8 @@ enum AuditAction {
   attendanceCorrected('attendance.corrected'),
   attendanceSettingsChanged('attendance.settings_changed'),
   kioskStarted('kiosk.started'),
-  kioskStopped('kiosk.stopped');
+  kioskStopped('kiosk.stopped'),
+  attendanceExceptionReviewed('attendance.exception_reviewed');
 
   const AuditAction(this.code);
 

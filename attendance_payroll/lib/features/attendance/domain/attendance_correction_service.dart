@@ -6,6 +6,8 @@ import 'package:attendance_payroll/core/utils/clock.dart';
 import 'package:attendance_payroll/features/attendance/domain/attendance_correction.dart';
 import 'package:attendance_payroll/features/attendance/domain/attendance_event.dart';
 import 'package:attendance_payroll/features/attendance/domain/attendance_event_repository.dart';
+import 'package:attendance_payroll/features/attendance/domain/attendance_exception.dart';
+import 'package:attendance_payroll/features/attendance/domain/attendance_session.dart';
 import 'package:attendance_payroll/features/audit/domain/audit_entry.dart';
 import 'package:attendance_payroll/features/audit/domain/audit_log_repository.dart';
 import 'package:attendance_payroll/features/authentication/domain/admin_session.dart';
@@ -25,6 +27,7 @@ final class AttendanceCorrectionService {
     required this._employees,
     required this._events,
     required this._corrections,
+    required this._reviews,
     required this._devices,
     required this._audit,
     required this._transactions,
@@ -34,6 +37,7 @@ final class AttendanceCorrectionService {
   final EmployeeRepository _employees;
   final AttendanceEventRepository _events;
   final AttendanceCorrectionRepository _corrections;
+  final ExceptionReviewRepository _reviews;
   final DeviceIdentityRepository _devices;
   final AuditLogRepository _audit;
   final TransactionRunner _transactions;
@@ -46,6 +50,7 @@ final class AttendanceCorrectionService {
     required AttendanceEventType type,
     required DateTime occurredAt,
     required String reason,
+    AttendanceIssue? resolves,
   }) async {
     final now = _clock();
     final invalid =
@@ -62,7 +67,7 @@ final class AttendanceCorrectionService {
     if (employee case Err(:final failure)) {
       return Err(failure);
     }
-    return _apply(session, now, (deviceId) async {
+    return _apply(session, now, resolves, (deviceId) async {
       final added = await _append(
         session,
         deviceId,
@@ -93,6 +98,7 @@ final class AttendanceCorrectionService {
     String eventId, {
     required DateTime newOccurredAt,
     required String reason,
+    AttendanceIssue? resolves,
   }) async {
     final now = _clock();
     final invalid =
@@ -115,7 +121,7 @@ final class AttendanceCorrectionService {
         ),
       );
     }
-    return _apply(session, now, (deviceId) async {
+    return _apply(session, now, resolves, (deviceId) async {
       final replacement = await _append(
         session,
         deviceId,
@@ -145,6 +151,7 @@ final class AttendanceCorrectionService {
     AdminSession session,
     String eventId, {
     required String reason,
+    AttendanceIssue? resolves,
   }) async {
     final now = _clock();
     final invalid =
@@ -161,6 +168,7 @@ final class AttendanceCorrectionService {
     return _apply(
       session,
       now,
+      resolves,
       (_) async => NewAttendanceCorrection(
         employeeId: event.employeeId,
         kind: AttendanceCorrectionKind.removed,
@@ -198,10 +206,12 @@ final class AttendanceCorrectionService {
   }
 
   /// Runs one correction atomically: the new entry (if any), the correction
-  /// record and its audit entry are saved together or not at all.
+  /// record, its audit entry and, when it [resolves] an exception, the
+  /// decision linking the two, are saved together or not at all.
   Future<Result<AttendanceCorrection>> _apply(
     AdminSession session,
     DateTime now,
+    AttendanceIssue? resolves,
     Future<NewAttendanceCorrection> Function(String deviceId) build,
   ) async {
     final device = await _devices.currentDeviceId();
@@ -227,6 +237,26 @@ final class AttendanceCorrectionService {
           },
         ),
       )).unwrap();
+      if (resolves != null) {
+        final revealedBy = (await _events.getById(resolves.eventId)).unwrap();
+        if (revealedBy.event.employeeId != correction.employeeId) {
+          throw const ValidationFailure(
+            userMessage: 'That exception belongs to another employee.',
+          );
+        }
+        (await _reviews.record(
+          NewExceptionReview(
+            companyId: session.companyId,
+            employeeId: correction.employeeId,
+            issue: resolves,
+            decision: ReviewDecision.resolved,
+            reason: correction.reason,
+            reviewedBy: session.admin.id,
+            reviewedAt: now,
+            relatedCorrectionId: correction.id,
+          ),
+        )).unwrap();
+      }
       return correction;
     });
   }

@@ -177,6 +177,33 @@ destination so each area keeps its navigation state.
   corrections. The dashboard shows today's counts. Until schedules exist
   (Phase 6) "not clocked in" cannot distinguish absence from a day off.
 
+## Exceptions and review (Phase 5)
+
+- **Exceptions are derived** like sessions; only decisions are stored
+  (`exception_reviews`). An exception's key is `<type>:<event id>`, stable
+  across rebuilds. If a correction replaces the event, the key changes and
+  the new fact needs a fresh review; an earlier acceptance never carries over.
+- **Statuses**: open → (reviewed) → resolved or dismissed. Allowed decisions
+  depend on the type (`AttendanceExceptionService.decisionsFor`): a missing
+  clock-out can only be fixed by a correction; overnight and excessive
+  sessions can be accepted as recorded; informational issues (duplicates,
+  clock-out without clock-in) can be dismissed; any can get a note.
+- **Payroll effect**: a session whose blocking issues are all accepted is
+  `approved` and payable; one with any unaccepted blocking issue has no
+  payable time. A session without a clock-out is never approvable.
+- **Corrections can resolve exceptions**: passing `resolves:` records a
+  `resolved` decision linked to the correction in the same transaction.
+- **One reader** (`AttendanceReader`) loads events, policy, timezone and
+  decisions and derives attendance for the timeline, the daily view, the
+  exception list and, later, payroll, so they always agree.
+- **UI**: Attendance → Exceptions (badge with the open count): needs action /
+  settled / all, a split view on tablets and a bottom sheet on phones, with
+  the actions above and the review history. Every change bumps
+  `attendanceRevisionProvider`, which all derived attendance views watch, so
+  no screen shows stale data.
+- Late arrival, early departure and missing attendance need schedules and are
+  added in Phase 6 as further issue types.
+
 ## Database
 
 Drift over SQLite with versioned, tested migrations. Conventions (UUIDv7 keys,
@@ -224,8 +251,8 @@ Nothing in V1 talks to a server, but the design leaves room:
 | 1 | Database foundation |
 | 2 | Authentication and employee management |
 | 3 | Attendance engine |
-| 4 | Attendance UI and kiosk mode (current) |
-| 5 | Exceptions and corrections |
+| 4 | Attendance UI and kiosk mode |
+| 5 | Exceptions and corrections (current) |
 | 6 | Work schedules |
 | 7 | Payroll engine |
 | 8 | Payroll UI |
@@ -237,8 +264,8 @@ Nothing in V1 talks to a server, but the design leaves room:
 
 ## Current boundaries
 
-After Phase 4: employees clock in and out at the kiosk; administrators see
-daily attendance, each employee's history, and correct it. Still deferred: reviewing and
-approving flagged sessions (Phase 5), schedules with late/early detection (Phase 6), administrator
+After Phase 5: employees clock in and out at the kiosk; administrators see
+daily attendance, review and settle exceptions, and correct attendance.
+Still deferred: schedules with late/early detection (Phase 6), administrator
 password change and recovery, session timeout, settings persistence, and
 payroll.

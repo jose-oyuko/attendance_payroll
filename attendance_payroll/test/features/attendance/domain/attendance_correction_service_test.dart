@@ -298,6 +298,7 @@ void main() {
       employees: env.employees,
       events: env.events,
       corrections: env.corrections,
+      reviews: env.reviews,
       devices: DriftDeviceIdentityRepository(env.db),
       audit: _FailingAudit(),
       transactions: env.transactions,

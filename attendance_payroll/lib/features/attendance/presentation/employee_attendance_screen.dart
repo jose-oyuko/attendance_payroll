@@ -107,9 +107,6 @@ class _AttendanceViewState extends ConsumerState<_AttendanceView> {
       zone: widget.zone,
     );
     if (saved && mounted) {
-      ref
-        ..invalidate(attendanceTimelineProvider(_query))
-        ..invalidate(correctionHistoryProvider(_query));
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('Attendance corrected.')));
@@ -247,6 +244,10 @@ class _SessionCard extends StatelessWidget {
         semantic.success,
       ),
       SessionStatus.exception => ('Needs review', semantic.warning),
+      SessionStatus.approved => (
+        'Approved · ${formatWorkDuration(payable ?? Duration.zero)}',
+        semantic.success,
+      ),
     };
     final clockOut = session.clockOut;
     return Card.outlined(

@@ -292,4 +292,63 @@ void main() {
       AttendanceIssueType.excessiveDuration,
     ]);
   });
+
+  group('accepted issues', () {
+    test('accepting every blocking issue approves the session', () {
+      final events = [e.clockIn(5, 8, 0), e.clockOut(5, 23, 30)];
+      final flagged = build(events).sessions.single;
+      final key = flagged.issues.single.key;
+
+      final approved = builder
+          .build(events, now: later, acceptedIssueKeys: {key})
+          .sessions
+          .single;
+
+      expect(flagged.status, SessionStatus.exception);
+      expect(approved.status, SessionStatus.approved);
+      expect(approved.payableDuration, const Duration(hours: 15, minutes: 30));
+      expect(approved.issues, hasLength(1), reason: 'the issue stays visible');
+    });
+
+    test('accepting only some blocking issues is not enough', () {
+      // Overnight and excessive: both must be accepted.
+      final events = [e.clockIn(5, 8, 2), e.clockOut(6, 8, 1)];
+      final keys = build(events).sessions.single.issues.map((i) => i.key);
+
+      final partly = builder
+          .build(events, now: later, acceptedIssueKeys: {keys.first})
+          .sessions
+          .single;
+
+      expect(partly.status, SessionStatus.exception);
+      expect(partly.payableDuration, isNull);
+    });
+
+    test('a session without a clock-out can never be approved', () {
+      final events = [e.clockIn(5, 8, 0)];
+      final key = build(events).sessions.single.issues.single.key;
+
+      final session = builder
+          .build(events, now: later, acceptedIssueKeys: {key})
+          .sessions
+          .single;
+
+      expect(session.status, SessionStatus.exception);
+      expect(session.payableDuration, isNull);
+    });
+
+    test('issue keys are stable across rebuilds', () {
+      final events = [
+        e.clockIn(5, 8, 0),
+        e.clockIn(5, 8, 1),
+        e.clockOut(5, 17, 0),
+      ];
+
+      expect(
+        build(events).issues.single.key,
+        build(events.reversed.toList()).issues.single.key,
+      );
+      expect(build(events).issues.single.key, 'duplicateClockIn:ev-002');
+    });
+  });
 }

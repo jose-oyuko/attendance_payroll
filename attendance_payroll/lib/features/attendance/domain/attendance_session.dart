@@ -45,6 +45,14 @@ final class AttendanceIssue {
 
   /// The session it concerns, if any.
   final String? sessionKey;
+
+  /// Stable identity: the same issue revealed by the same event always has
+  /// the same key, so review decisions can refer to it. A correction that
+  /// replaces the event yields a new key, and with it a fresh review.
+  String get key => keyFor(type, eventId);
+
+  static String keyFor(AttendanceIssueType type, String eventId) =>
+      '${type.name}:$eventId';
 }
 
 enum SessionStatus {
@@ -56,6 +64,10 @@ enum SessionStatus {
 
   /// Has an issue that blocks payroll until reviewed.
   exception,
+
+  /// Had issues that blocked payroll; an administrator accepted the time as
+  /// recorded, so it is payable.
+  approved,
 }
 
 /// A period of work derived from a clock-in and its clock-out.
@@ -99,12 +111,14 @@ final class AttendanceSession {
   /// Time between clock-in and clock-out, once clocked out.
   Duration? get duration => end?.difference(start);
 
-  /// Time to pay: only for completed sessions. A session with an exception
-  /// has no payable time until it is reviewed, so payroll never uses
-  /// anomalous attendance blindly.
+  /// Time to pay: only for completed or approved sessions. A session with an
+  /// exception has no payable time until it is reviewed, so payroll never
+  /// uses anomalous attendance blindly.
   Duration? get payableDuration {
     final worked = duration;
-    if (status != SessionStatus.completed || worked == null) {
+    final payable =
+        status == SessionStatus.completed || status == SessionStatus.approved;
+    if (!payable || worked == null) {
       return null;
     }
     return worked - breakDuration;

@@ -28,6 +28,7 @@ tables are in `lib/core/database/tables.dart`. Only repositories in feature
 | 3 | Phase 3 | `attendance_events` |
 | 4 | Phase 3 follow-up | `attendance_settings`, `attendance_corrections` |
 | 5 | Phase 4 | `device_settings` |
+| 6 | Phase 5 | `exception_reviews` |
 
 ### Version 1
 
@@ -95,6 +96,17 @@ Migration 3 → 4 only creates these tables and indexes.
   whose kiosk this device is, or null). Device-local, never synchronised.
 
 Migration 4 → 5 only creates this table.
+
+### Version 6
+
+- **exception_reviews** — administrator decisions about attendance
+  exceptions, append-only (a later decision is a new row): `issue_key`
+  (`<issue type>:<event id>`), the issue as reviewed (`issue_type`,
+  `event_id`, `session_key`, `issue_occurred_at`), `status` (`reviewed`,
+  `resolved`, `dismissed`), `reason`, `reviewed_by`, `reviewed_at`,
+  `related_correction_id`. Exceptions themselves are derived, not stored.
+
+Migration 5 → 6 only creates this table and its indexes.
 
 Indexes come from the unique keys: `(company_id, employee_number)` serves
 lookups by company and by number; `(company_id, username)` and

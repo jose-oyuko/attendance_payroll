@@ -124,6 +124,17 @@ Follow-up to Phase 3:
 - Dashboard: today's present / working now / needs review / not clocked in
 - Database schema version 5
 
+## What Phase 5 adds
+
+- Attendance → Exceptions: every flagged attendance problem across the
+  company, filterable (needs action / settled / all) with a details panel
+- Settle each one: correct it (add/change/remove an entry), accept a long or
+  overnight day as recorded, dismiss a harmless duplicate, or add a note;
+  every decision needs a reason and is kept as history
+- Accepted sessions become payable; unsettled ones stay out of payroll
+- Dashboard: open exceptions count, linking to the list
+- Database schema version 6
+
 ## Project layout
 
 ```
