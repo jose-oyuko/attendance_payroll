@@ -14,6 +14,14 @@ abstract interface class PayrollLock {
     bool orLater = false,
   });
 
+  /// Like [lockedPeriodOn] for any day from [from] to [to] inclusive; a
+  /// `null` [to] means every day from [from] onwards.
+  Future<Result<String?>> lockedPeriodBetween(
+    String companyId,
+    LocalDate from,
+    LocalDate? to,
+  );
+
   /// Like [lockedPeriodOn] for the company date of [instant]. A clock-out
   /// may close a session that started the day before, so with
   /// [includePreviousDay] that day is checked too.

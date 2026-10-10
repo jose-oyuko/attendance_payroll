@@ -45,17 +45,24 @@ final class DriftEmployeeRateRepository implements EmployeeRateRepository {
         }
 
         final now = _clock();
-        final latest = await _latestRow(employeeId);
-        if (latest != null) {
-          if (!normalized.effectiveFrom.isAfter(latest.effectiveFrom)) {
-            throw BusinessRuleFailure(
-              rule: EmployeeRateRules.mustStartAfterLatest,
-              userMessage:
-                  'The new rate must start after '
-                  '${latest.effectiveFrom.toIsoString()}, when the latest '
-                  'rate started.',
-            );
-          }
+        final rows = await _rows(employeeId);
+        final placement = RatePlacement.of(
+          rows.map(_toDomain).toList(),
+          normalized.effectiveFrom,
+        );
+        if (placement == null) {
+          throw BusinessRuleFailure(
+            rule: EmployeeRateRules.overlapsExisting,
+            userMessage:
+                'There is already a rate on '
+                '${normalized.effectiveFrom.toIsoString()}, and rates already '
+                'set cannot be changed. Choose a day without a rate, or a day '
+                'after ${rows.last.effectiveFrom.toIsoString()} to change '
+                'the rate from then on.',
+          );
+        }
+        final latest = rows.lastOrNull;
+        if (latest != null && !placement.fillsGap) {
           final closesOn = normalized.effectiveFrom.addDays(-1);
           // A latest rate that already ended earlier stays as it is.
           if (latest.effectiveTo == null ||
@@ -85,6 +92,7 @@ final class DriftEmployeeRateRepository implements EmployeeRateRepository {
                 amountMinor: normalized.amountMinor,
                 currencyCode: normalized.currencyCode,
                 effectiveFrom: normalized.effectiveFrom,
+                effectiveTo: Value(placement.until),
                 createdAt: now,
                 updatedAt: now,
               ),
@@ -96,16 +104,9 @@ final class DriftEmployeeRateRepository implements EmployeeRateRepository {
 
   @override
   Future<Result<List<EmployeeRate>>> history(String employeeId) {
-    return guardDatabase(() async {
-      final rows =
-          await (_db.select(_db.employeeRates)
-                ..where(
-                  (r) => r.employeeId.equals(employeeId) & r.deletedAt.isNull(),
-                )
-                ..orderBy([(r) => OrderingTerm.asc(r.effectiveFrom)]))
-              .get();
-      return rows.map(_toDomain).toList();
-    });
+    return guardDatabase(
+      () async => (await _rows(employeeId)).map(_toDomain).toList(),
+    );
   }
 
   @override
@@ -131,12 +132,12 @@ final class DriftEmployeeRateRepository implements EmployeeRateRepository {
     });
   }
 
-  Future<EmployeeRateRow?> _latestRow(String employeeId) {
+  /// The employee's rates, oldest first.
+  Future<List<EmployeeRateRow>> _rows(String employeeId) {
     return (_db.select(_db.employeeRates)
           ..where((r) => r.employeeId.equals(employeeId) & r.deletedAt.isNull())
-          ..orderBy([(r) => OrderingTerm.desc(r.effectiveFrom)])
-          ..limit(1))
-        .getSingleOrNull();
+          ..orderBy([(r) => OrderingTerm.asc(r.effectiveFrom)]))
+        .get();
   }
 
   EmployeeRate _toDomain(EmployeeRateRow row) {

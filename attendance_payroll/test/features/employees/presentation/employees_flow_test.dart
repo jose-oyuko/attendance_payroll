@@ -111,6 +111,11 @@ void main() {
     await tester.enterText(_field('Amount per hour'), '500');
     await _tap(tester, find.widgetWithText(FilledButton, 'Save rate'));
 
+    // Saving asks first: a rate cannot be changed once it has been active.
+    expect(find.text('Save this rate?'), findsOneWidget);
+    expect(find.textContaining('cannot be changed'), findsOneWidget);
+    await _tap(tester, find.widgetWithText(FilledButton, 'Save rate').last);
+
     expect(find.text('KES 500.00 per hour'), findsOneWidget);
     expect(find.widgetWithText(FilledButton, 'Change rate'), findsOneWidget);
   });

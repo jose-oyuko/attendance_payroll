@@ -182,12 +182,22 @@ final class EmployeeManagementService {
     if (session.check(Permission.manageEmployees) case final denied?) {
       return Err(denied);
     }
-    // A new rate applies from its start onwards, so it would change any
-    // approved or finalized payroll ending on or after that date.
-    final locked = await _payrollLock.lockedPeriodOn(
+    final history = await _rates.history(employeeId);
+    if (history case Err(:final failure)) {
+      return Err(failure);
+    }
+    // The days the rate would cover: a new current rate applies from its
+    // start onwards, a gap-filling one only until the next rate. Approved or
+    // finalized payroll over any of them must not change. (An overlapping
+    // rate is refused by the repository.)
+    final placement = RatePlacement.of(
+      history.valueOrNull!,
+      rate.effectiveFrom,
+    );
+    final locked = await _payrollLock.lockedPeriodBetween(
       session.companyId,
       rate.effectiveFrom,
-      orLater: true,
+      placement?.until,
     );
     switch (locked) {
       case Err(:final failure):
@@ -213,6 +223,7 @@ final class EmployeeManagementService {
         metadata: {
           'rateType': added.rateType.name,
           'effectiveFrom': added.effectiveFrom.toIsoString(),
+          if (added.effectiveTo case final to?) 'effectiveTo': to.toIsoString(),
         },
       );
       return added;

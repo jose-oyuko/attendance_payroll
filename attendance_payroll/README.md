@@ -169,6 +169,9 @@ Follow-up to Phase 3:
   exception decisions that change pay, new rates and adjustments in that
   period are refused until it is reopened
 - Dashboard card for the current payroll
+- Pay rates can be given to earlier days that had no rate (for example
+  before the first rate); days that already have a rate cannot change, and
+  saving a rate asks for confirmation
 - No schema change (still version 8)
 
 ## Project layout

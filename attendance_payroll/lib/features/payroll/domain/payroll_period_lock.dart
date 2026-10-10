@@ -23,12 +23,21 @@ final class PayrollPeriodLock implements PayrollLock {
     String companyId,
     LocalDate date, {
     bool orLater = false,
-  }) async {
+  }) => lockedPeriodBetween(companyId, date, orLater ? null : date);
+
+  @override
+  Future<Result<String?>> lockedPeriodBetween(
+    String companyId,
+    LocalDate from,
+    LocalDate? to,
+  ) async {
     final periods = await _periods.listByCompany(companyId);
     return periods.map((all) {
       for (final p in all.where(_locked)) {
-        final affected = orLater ? !p.endDate.isBefore(date) : p.contains(date);
-        if (affected) {
+        final overlaps =
+            !p.endDate.isBefore(from) &&
+            (to == null || !p.startDate.isAfter(to));
+        if (overlaps) {
           return p.name;
         }
       }

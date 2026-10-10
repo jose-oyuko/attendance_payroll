@@ -45,8 +45,10 @@ tables are in `lib/core/database/tables.dart`. Only repositories in feature
 - **employee_rates** — `employee_id`, `rate_type`, `amount_minor` (> 0),
   `currency_code`, `effective_from`, `effective_to` (inclusive, null while
   current). Unique per employee and start date. CHECK: period not reversed.
-  Adding a rate closes the current one on the previous day; back-dated rates are
-  rejected so history is never rewritten.
+  Rates already set are never rewritten (`RatePlacement`): a rate starting
+  after the latest one closes it on the previous day; an earlier rate is
+  accepted only on days without a rate, and ends the day before the next
+  rate. No schema change was needed for this.
 
 ### Version 2
 

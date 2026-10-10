@@ -275,8 +275,9 @@ destination so each area keeps its navigation state.
     time (a clock-out is also checked against the previous day, because it
     closes a shift that may have started there);
   - exception decisions that change pay are refused (notes are allowed);
-  - a rate starting on or before the period's end is refused, because it
-    applies to all later dates;
+  - a rate covering any day of the period is refused: a new current rate
+    covers every day from its start, a gap-filling rate only the days up
+    to the next rate (`PayrollLock.lockedPeriodBetween`);
   - adjustments and recalculation are refused.
   The message says the payroll is finalized and must be reopened first.
 - **History** is the audit log: every payroll action is recorded against

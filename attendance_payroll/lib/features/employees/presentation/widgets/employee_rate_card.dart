@@ -13,6 +13,7 @@ import 'package:attendance_payroll/features/employees/presentation/employee_view
 import 'package:attendance_payroll/features/employees/presentation/widgets/section_card.dart';
 import 'package:attendance_payroll/shared/formatting/date_formatting.dart';
 import 'package:attendance_payroll/shared/widgets/busy_button.dart';
+import 'package:attendance_payroll/shared/widgets/confirm_dialog.dart';
 import 'package:attendance_payroll/shared/widgets/date_field.dart';
 import 'package:attendance_payroll/shared/widgets/failure_banner.dart';
 import 'package:flutter/material.dart';
@@ -38,7 +39,8 @@ String _amount(EmployeeRate rate) {
 }
 
 /// Current pay rate and its history. Changing the rate adds a new entry; past
-/// entries are never edited.
+/// entries are never edited, though days without a rate can still be given
+/// one (see `RatePlacement`).
 class EmployeeRateCard extends ConsumerWidget {
   const EmployeeRateCard({required this.employee, super.key});
 
@@ -151,6 +153,51 @@ class _AddRateDialogState extends ConsumerState<_AddRateDialog> {
     super.dispose();
   }
 
+  RatePlacement? get _placement {
+    final from = _from;
+    return from == null ? null : RatePlacement.of(widget.history, from);
+  }
+
+  /// What saving does to the history, for the note under the form.
+  String _effect(BuildContext context) {
+    final placement = _placement;
+    final latest = widget.history.lastOrNull;
+    final until = placement?.until;
+    if (placement == null) {
+      return 'Earlier rates are kept for past payroll.';
+    }
+    if (until != null) {
+      return 'This rate covers ${formatLocalDate(context, placement.from)} – '
+          '${formatLocalDate(context, until)}, days that have no rate. Other '
+          'rates are not changed.';
+    }
+    if (latest == null) {
+      return 'This is the first rate. It applies from this day on.';
+    }
+    return 'The current rate ends the day before. Earlier rates are kept for '
+        'past payroll.';
+  }
+
+  Future<bool> _confirm(String currencyCode, int amount) {
+    final placement = _placement!;
+    final until = placement.until;
+    final days = until == null
+        ? 'from ${formatLocalDate(context, placement.from)}'
+        : 'from ${formatLocalDate(context, placement.from)} to '
+              '${formatLocalDate(context, until)}';
+    return showConfirmDialog(
+      context,
+      title: 'Save this rate?',
+      message:
+          '$currencyCode ${MinorUnits.format(amount)} ${_type.unitLabel}, '
+          '$days.\n\n'
+          'Once saved, the rate cannot be changed for the days it '
+          'has been active. To pay a different amount later, add a new rate '
+          'from that day.',
+      confirmLabel: 'Save rate',
+    );
+  }
+
   Future<void> _save(String currencyCode) async {
     final session = ref.read(adminSessionProvider);
     final from = _from;
@@ -159,7 +206,9 @@ class _AddRateDialogState extends ConsumerState<_AddRateDialog> {
         session == null ||
         from == null ||
         amount == null ||
-        !_formKey.currentState!.validate()) {
+        !_formKey.currentState!.validate() ||
+        !await _confirm(currencyCode, amount) ||
+        !mounted) {
       return;
     }
     setState(() {
@@ -237,12 +286,19 @@ class _AddRateDialogState extends ConsumerState<_AddRateDialog> {
               label: 'Effective from',
               value: _from,
               onChanged: (date) => setState(() => _from = date),
-              validator: (date) => date == null ? 'Choose a date.' : null,
+              validator: (date) {
+                if (date == null) {
+                  return 'Choose a date.';
+                }
+                if (RatePlacement.of(widget.history, date) == null) {
+                  return 'This day already has a rate. Choose a day without '
+                      'one, or a day after '
+                      '${formatLocalDate(context, widget.history.last.effectiveFrom)}.';
+                }
+                return null;
+              },
             ),
-            const Text(
-              'The current rate ends the day before. Earlier rates are kept '
-              'for past payroll.',
-            ),
+            Text(_effect(context)),
           ],
         ),
       ),

@@ -269,6 +269,42 @@ void main() {
 
       expect(rate.isOk, isTrue);
     });
+
+    test(
+      'a rate for days without one is locked only over those days',
+      () async {
+        NewEmployeeRate hourly(LocalDate from) => NewEmployeeRate(
+          rateType: RateType.hourly,
+          amountMinor: 45000,
+          currencyCode: 'KES',
+          effectiveFrom: from,
+        );
+        // John's rates start on 1 January 2026: December 2025 has none, and
+        // filling it does not touch finalized October.
+        final december = await env.management.addRate(
+          admin,
+          john.id,
+          hourly(LocalDate(2025, 12, 1)),
+        );
+        expect(december.valueOrNull?.effectiveTo, LocalDate(2025, 12, 31));
+
+        // Mary's rate starts in November; her October days have none, but
+        // October is finalized.
+        final mary = await env.addEmployee(admin, employeeNumber: 'E0002');
+        (await env.management.addRate(
+          admin,
+          mary.id,
+          hourly(LocalDate(2026, 11, 1)),
+        )).unwrap();
+        final october = await env.management.addRate(
+          admin,
+          mary.id,
+          hourly(LocalDate(2026, 10, 15)),
+        );
+
+        expect(ruleOf(october), payrollLockedRule);
+      },
+    );
   });
 
   test(

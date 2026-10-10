@@ -49,6 +49,46 @@ final class EmployeeRate {
   }
 }
 
+/// Where a new rate starting on a given day fits in an employee's history.
+///
+/// Rates already set are never rewritten, so a new rate may only cover days
+/// that have no rate:
+/// - starting after the latest rate starts, it applies from then on and the
+///   latest rate ends the day before (a change of rate);
+/// - starting earlier, on a day without a rate, it fills that gap and ends
+///   the day before the next rate starts.
+final class RatePlacement {
+  const RatePlacement._(this.from, this.until);
+
+  /// The new rate's place in [history] (any order), or `null` when [from]
+  /// already has a rate that the new one would overwrite.
+  static RatePlacement? of(List<EmployeeRate> history, LocalDate from) {
+    final latest = history.fold<EmployeeRate?>(
+      null,
+      (l, r) => l == null || r.effectiveFrom.isAfter(l.effectiveFrom) ? r : l,
+    );
+    if (latest == null || from.isAfter(latest.effectiveFrom)) {
+      return RatePlacement._(from, null);
+    }
+    if (history.any((r) => r.appliesOn(from))) {
+      return null;
+    }
+    final next = history
+        .map((r) => r.effectiveFrom)
+        .where((start) => start.isAfter(from))
+        .reduce((a, b) => a.isBefore(b) ? a : b);
+    return RatePlacement._(from, next.addDays(-1));
+  }
+
+  final LocalDate from;
+
+  /// The new rate's last day when it fills a gap; `null` when it is the new
+  /// current rate.
+  final LocalDate? until;
+
+  bool get fillsGap => until != null;
+}
+
 /// A rate to add to an employee's history.
 final class NewEmployeeRate {
   const NewEmployeeRate({
