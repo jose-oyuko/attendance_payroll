@@ -31,6 +31,7 @@ import 'package:attendance_payroll/features/kiosk/data/drift_kiosk_mode_reposito
 import 'package:attendance_payroll/features/kiosk/domain/kiosk_service.dart';
 import 'package:attendance_payroll/features/payroll/data/drift_payroll_repositories.dart';
 import 'package:attendance_payroll/features/payroll/data/drift_payroll_run_repository.dart';
+import 'package:attendance_payroll/features/payroll/domain/payroll_period_lock.dart';
 import 'package:attendance_payroll/features/payroll/domain/payroll_service.dart';
 import 'package:attendance_payroll/features/schedules/data/drift_schedule_assignment_repository.dart';
 import 'package:attendance_payroll/features/schedules/data/drift_work_schedule_repository.dart';
@@ -90,11 +91,21 @@ class TestEnv {
     random: Random(7),
   );
 
+  late final payrollPeriods = DriftPayrollPeriodRepository(
+    db,
+    clock: clock.call,
+  );
+  late final payrollLock = PayrollPeriodLock(
+    periods: payrollPeriods,
+    companies: companies,
+  );
+
   late final management = EmployeeManagementService(
     employees: employees,
     rates: rates,
     audit: audit,
     transactions: transactions,
+    payrollLock: payrollLock,
   );
 
   late final events = DriftAttendanceEventRepository(db, clock: clock.call);
@@ -142,7 +153,7 @@ class TestEnv {
     rates: rates,
     attendance: reader,
     settings: DriftPayrollSettingsRepository(db, clock: clock.call),
-    periods: DriftPayrollPeriodRepository(db, clock: clock.call),
+    periods: payrollPeriods,
     adjustments: DriftPayrollAdjustmentRepository(db, clock: clock.call),
     runs: DriftPayrollRunRepository(db, clock: clock.call),
     audit: audit,
@@ -164,6 +175,7 @@ class TestEnv {
     reviews: reviews,
     audit: audit,
     transactions: transactions,
+    payrollLock: payrollLock,
     clock: clock.call,
   );
 
@@ -181,6 +193,7 @@ class TestEnv {
     devices: DriftDeviceIdentityRepository(db),
     audit: audit,
     transactions: transactions,
+    payrollLock: payrollLock,
     clock: clock.call,
   );
 

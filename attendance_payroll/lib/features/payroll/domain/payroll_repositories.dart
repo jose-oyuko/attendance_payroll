@@ -43,6 +43,14 @@ abstract interface class PayrollPeriodRepository {
 
   /// The company's periods, latest first.
   Future<Result<List<PayrollPeriod>>> listByCompany(String companyId);
+
+  /// Moves the period to [status]. Fails with a `ConflictFailure` when
+  /// [expectedVersion] is stale.
+  Future<Result<PayrollPeriod>> setStatus(
+    String id,
+    PayrollPeriodStatus status, {
+    required int expectedVersion,
+  });
 }
 
 abstract interface class PayrollAdjustmentRepository {
@@ -69,10 +77,10 @@ enum PayrollRunStatus {
   /// Replaced by a later calculation; kept as history.
   superseded,
 
-  /// Accepted for payment (Phase 8).
+  /// Accepted for payment.
   approved,
 
-  /// Locked (Phase 8).
+  /// Locked: the record of what was paid.
   finalized,
 }
 
@@ -85,6 +93,10 @@ final class PayrollRun {
     required this.calculatedAt,
     required this.calculatedBy,
     required this.result,
+    this.approvedAt,
+    this.approvedBy,
+    this.finalizedAt,
+    this.finalizedBy,
   });
 
   final String id;
@@ -95,6 +107,10 @@ final class PayrollRun {
 
   /// The lines, items and issues exactly as calculated.
   final PayrollResult result;
+  final DateTime? approvedAt;
+  final String? approvedBy;
+  final DateTime? finalizedAt;
+  final String? finalizedBy;
 }
 
 abstract interface class PayrollRunRepository {
@@ -112,4 +128,13 @@ abstract interface class PayrollRunRepository {
 
   /// How many times the period was calculated.
   Future<Result<int>> countForPeriod(String periodId);
+
+  /// Records an approval or finalization, or undoes an approval by
+  /// returning the run to [PayrollRunStatus.calculated].
+  Future<Result<PayrollRun>> setStatus(
+    String runId,
+    PayrollRunStatus status, {
+    required String by,
+    required DateTime at,
+  });
 }

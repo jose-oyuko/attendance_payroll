@@ -1,5 +1,6 @@
 import 'package:attendance_payroll/core/database/app_database.dart';
 import 'package:attendance_payroll/core/database/database_guard.dart';
+import 'package:attendance_payroll/core/errors/app_failure.dart';
 import 'package:attendance_payroll/core/money/money.dart';
 import 'package:attendance_payroll/core/result/result.dart';
 import 'package:attendance_payroll/core/utils/clock.dart';
@@ -143,6 +144,46 @@ final class DriftPayrollRunRepository implements PayrollRunRepository {
     });
   }
 
+  @override
+  Future<Result<PayrollRun>> setStatus(
+    String runId,
+    PayrollRunStatus status, {
+    required String by,
+    required DateTime at,
+  }) {
+    return guardDatabase(() async {
+      final changes = switch (status) {
+        PayrollRunStatus.approved => PayrollRunsCompanion(
+          approvedAt: Value(at),
+          approvedBy: Value(by),
+        ),
+        PayrollRunStatus.finalized => PayrollRunsCompanion(
+          finalizedAt: Value(at),
+          finalizedBy: Value(by),
+        ),
+        // Undoing an approval clears it; the audit log keeps the history.
+        PayrollRunStatus.calculated => const PayrollRunsCompanion(
+          approvedAt: Value(null),
+          approvedBy: Value(null),
+        ),
+        PayrollRunStatus.superseded => const PayrollRunsCompanion(),
+      };
+      final updated =
+          await (_db.update(
+            _db.payrollRuns,
+          )..where((r) => r.id.equals(runId))).write(
+            changes.copyWith(
+              status: Value(status.name),
+              updatedAt: Value(_clock()),
+            ),
+          );
+      if (updated == 0) {
+        throw const NotFoundFailure(entity: 'payroll run');
+      }
+      return (await _load(runId))!;
+    });
+  }
+
   Future<PayrollRun?> _load(String runId) async {
     final run = await (_db.select(
       _db.payrollRuns,
@@ -191,6 +232,10 @@ final class DriftPayrollRunRepository implements PayrollRunRepository {
       status: PayrollRunStatus.values.byName(run.status),
       calculatedAt: run.calculatedAt,
       calculatedBy: run.calculatedBy,
+      approvedAt: run.approvedAt,
+      approvedBy: run.approvedBy,
+      finalizedAt: run.finalizedAt,
+      finalizedBy: run.finalizedBy,
       result: PayrollResult(
         lines: [
           for (final row in lineRows)

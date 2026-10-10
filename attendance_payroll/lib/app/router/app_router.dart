@@ -17,6 +17,9 @@ import 'package:attendance_payroll/features/employees/presentation/employee_rout
 import 'package:attendance_payroll/features/employees/presentation/employees_screen.dart';
 import 'package:attendance_payroll/features/kiosk/presentation/kiosk_screen.dart';
 import 'package:attendance_payroll/features/kiosk/presentation/kiosk_unlock_screen.dart';
+import 'package:attendance_payroll/features/payroll/presentation/payroll_period_screen.dart';
+import 'package:attendance_payroll/features/payroll/presentation/payroll_routes.dart';
+import 'package:attendance_payroll/features/payroll/presentation/payroll_screen.dart';
 import 'package:attendance_payroll/features/schedules/presentation/schedule_form_screen.dart';
 import 'package:attendance_payroll/features/schedules/presentation/schedule_routes.dart';
 import 'package:attendance_payroll/features/schedules/presentation/schedules_screen.dart';
@@ -144,6 +147,7 @@ Widget _screenFor(AdminDestination destination) {
     AdminDestination.employees => const EmployeesScreen(),
     AdminDestination.attendance => const AttendanceDayScreen(),
     AdminDestination.schedules => const SchedulesScreen(),
+    AdminDestination.payroll => const PayrollScreen(),
     AdminDestination.settings => const SettingsScreen(),
     _ => PlannedFeatureScreen(destination: destination),
   };
@@ -203,6 +207,14 @@ List<RouteBase> _childRoutesFor(AdminDestination destination) {
         path: ScheduleRoutes.editSegment,
         builder: (context, state) => ScheduleFormScreen(
           scheduleId: state.pathParameters[ScheduleRoutes.idParameter],
+        ),
+      ),
+    ],
+    AdminDestination.payroll => [
+      GoRoute(
+        path: PayrollRoutes.periodSegment,
+        builder: (context, state) => PayrollPeriodScreen(
+          periodId: state.pathParameters[PayrollRoutes.idParameter]!,
         ),
       ),
     ],

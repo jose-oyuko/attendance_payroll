@@ -141,4 +141,67 @@ final class PayrollResult {
 
   bool get hasBlockingIssues =>
       issues.any((i) => i.severity == PayrollIssueSeverity.blocking);
+
+  /// Sums per currency, in order of first appearance. Normally one; more
+  /// only when rates disagree with the company currency (a blocking issue).
+  List<PayrollTotals> get totals {
+    final byCurrency = <String, List<PayrollLine>>{};
+    for (final line in lines) {
+      (byCurrency[line.currency] ??= []).add(line);
+    }
+    return [
+      for (final MapEntry(:key, :value) in byCurrency.entries)
+        PayrollTotals(key, value),
+    ];
+  }
+
+  /// Every figure and problem in a stable textual form. Two results with the
+  /// same fingerprint pay exactly the same: used to confirm a stored run is
+  /// still current before it is approved or finalized.
+  String get fingerprint {
+    final buffer = StringBuffer();
+    for (final line in lines) {
+      buffer.writeln(
+        'L|${line.employeeId}|${line.currency}|'
+        '${line.regularHours.inSeconds}|${line.overtimeHours.inSeconds}',
+      );
+      for (final i in line.items) {
+        buffer.writeln(
+          'I|${i.kind.name}|${i.description}|'
+          '${i.amount.minorUnits}|${i.rateType?.name}|'
+          '${i.rate?.minorUnits}|${i.hours?.inSeconds}|${i.days}|'
+          '${i.percent}',
+        );
+      }
+    }
+    for (final issue in issues) {
+      buffer.writeln('P|${issue.code.name}|${issue.employeeId}');
+    }
+    return buffer.toString();
+  }
+}
+
+/// The sums of every line paid in [currency].
+final class PayrollTotals {
+  PayrollTotals(this.currency, Iterable<PayrollLine> lines)
+    : lines = List.unmodifiable(lines);
+
+  final String currency;
+  final List<PayrollLine> lines;
+
+  Money _sum(Money Function(PayrollLine) of) =>
+      Money.sum(currency, lines.map(of));
+
+  Duration _hours(Duration Function(PayrollLine) of) =>
+      lines.fold(Duration.zero, (total, line) => total + of(line));
+
+  late final Duration regularHours = _hours((l) => l.regularHours);
+  late final Duration overtimeHours = _hours((l) => l.overtimeHours);
+  late final Money regularPay = _sum((l) => l.regularPay);
+  late final Money overtimePay = _sum((l) => l.overtimePay);
+  late final Money allowances = _sum((l) => l.allowances);
+  late final Money bonuses = _sum((l) => l.bonuses);
+  late final Money deductions = _sum((l) => l.deductions);
+  late final Money gross = _sum((l) => l.gross);
+  late final Money net = _sum((l) => l.net);
 }

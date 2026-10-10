@@ -140,8 +140,9 @@ Migration 5 → 6 only creates this table and its indexes.
   period: positive `amount_minor` (CHECK > 0), `currency_code`,
   `description`, `created_by`; removal is a soft delete.
 - **payroll_runs** — one per calculation: `status` (`calculated`,
-  `superseded`; `approved`/`finalized` in Phase 8), who and when, approval
-  and finalization fields for Phase 8.
+  `superseded`, `approved`, `finalized`), who calculated it and when, and
+  who approved and finalized it and when (cleared when an approval is
+  withdrawn by a reopen).
 - **payroll_lines** — per employee in a run: hours (seconds) and every total
   in minor units, stored as calculated.
 - **payroll_items** — the explainable lines of each payroll line, ordered:
@@ -151,6 +152,8 @@ Migration 5 → 6 only creates this table and its indexes.
 
 A run is an immutable snapshot: recalculating writes a new run and marks the
 previous one superseded. Migration 7 → 8 only creates tables and indexes.
+Phase 8 (approval, finalization, reopening) uses these columns and needs no
+schema change.
 
 Indexes come from the unique keys: `(company_id, employee_number)` serves
 lookups by company and by number; `(company_id, username)` and

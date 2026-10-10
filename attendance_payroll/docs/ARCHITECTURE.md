@@ -227,7 +227,7 @@ destination so each area keeps its navigation state.
 - **Issue keys** are `<type>:<anchor>`: the event id, or
   `<employee>@<date>` for missing attendance. Existing keys are unchanged.
 - Editing a schedule re-evaluates all dates its employees are on it, past
-  ones included; finalized payroll will keep its own figures (Phase 8).
+  ones included; finalized payroll keeps its own figures.
 
 ## Payroll engine (Phase 7)
 
@@ -254,8 +254,41 @@ destination so each area keeps its navigation state.
   adjustments, reads attendance through `AttendanceReader` for the whole
   weeks around the period, calculates, and stores the run. A stored run never
   changes; a later rate change only affects a recalculation. Approved or
-  finalized periods refuse changes (`payroll_locked`); the approval, finalize
-  and reopen workflow is Phase 8.
+  finalized periods refuse changes (`payroll_locked`).
+
+## Payroll lifecycle and screens (Phase 8)
+
+- **Lifecycle**: `draft` → calculate → `review` → approve → `approved` →
+  finalize → `finalized`; reopen returns approved payroll to `review` and
+  finalized payroll to `reopened` (recalculate, approve and finalize again).
+  `open` and `processing` are reserved. Approve, finalize and reopen need
+  the new `approvePayroll` permission; reopen needs a reason.
+- **No stale approvals**: approve and finalize recompute the period and
+  compare the result's `fingerprint` with the stored run; any difference
+  (attendance, rates, adjustments, settings changed) is a conflict asking
+  for a recalculation. Blocking issues prevent approval.
+- **Locking (§25)** goes through a core port, `core/locking/PayrollLock`,
+  implemented by payroll (`PayrollPeriodLock`) and injected into
+  attendance and employees, so features do not depend on each other.
+  While a period is approved or finalized:
+  - attendance corrections are refused at both the original and the new
+    time (a clock-out is also checked against the previous day, because it
+    closes a shift that may have started there);
+  - exception decisions that change pay are refused (notes are allowed);
+  - a rate starting on or before the period's end is refused, because it
+    applies to all later dates;
+  - adjustments and recalculation are refused.
+  The message says the payroll is finalized and must be reopened first.
+- **History** is the audit log: every payroll action is recorded against
+  the period (`entityType = payroll_period`) with the run or adjustment in
+  its metadata, and `AuditLogRepository.forEntity` reads it back.
+- **Screens** (`features/payroll/presentation`): the period list (new
+  period defaulting to the current company month, overtime rules) and the
+  period page — status actions, lock banner, totals per currency
+  (`PayrollResult.totals`), problems with a link to exceptions, employees
+  with a per-item pay breakdown, adjustments, and history. Wide windows use
+  two columns. `payrollRevisionProvider` refreshes every payroll view,
+  including the dashboard's current-payroll card.
 
 ## Database
 
@@ -307,8 +340,8 @@ Nothing in V1 talks to a server, but the design leaves room:
 | 4 | Attendance UI and kiosk mode |
 | 5 | Exceptions and corrections |
 | 6 | Work schedules |
-| 7 | Payroll engine (current) |
-| 8 | Payroll UI |
+| 7 | Payroll engine |
+| 8 | Payroll UI (current) |
 | 9 | Reports and PDF |
 | 10 | Thermal printing |
 | 11 | Backup and restore |
@@ -317,8 +350,8 @@ Nothing in V1 talks to a server, but the design leaves room:
 
 ## Current boundaries
 
-After Phase 7: attendance, schedules and exceptions are complete, and a
-tested payroll engine calculates and stores runs. Still deferred: payroll
-screens and the approval / finalize / reopen workflow (Phase 8), reports and
-payslips (Phase 9), administrator password change and recovery, session
+After Phase 8: attendance, schedules, exceptions and the full payroll cycle
+(calculate, adjust, approve, finalize, reopen, with locking and history) are
+complete. Still deferred: reports, payslips and PDF (Phase 9), printing
+(Phase 10), backup (Phase 11), administrator password change and recovery, session
 timeout, and settings persistence.

@@ -1,5 +1,6 @@
 import 'package:attendance_payroll/core/database/transaction_runner.dart';
 import 'package:attendance_payroll/core/errors/app_failure.dart';
+import 'package:attendance_payroll/core/locking/payroll_lock.dart';
 import 'package:attendance_payroll/core/platform/device_identity_repository.dart';
 import 'package:attendance_payroll/core/result/result.dart';
 import 'package:attendance_payroll/core/utils/clock.dart';
@@ -31,6 +32,7 @@ final class AttendanceCorrectionService {
     required this._devices,
     required this._audit,
     required this._transactions,
+    required this._payrollLock,
     this._clock = systemClockUtc,
   });
 
@@ -41,6 +43,7 @@ final class AttendanceCorrectionService {
   final DeviceIdentityRepository _devices;
   final AuditLogRepository _audit;
   final TransactionRunner _transactions;
+  final PayrollLock _payrollLock;
   final Clock _clock;
 
   /// Adds a clock action the employee forgot to record, at [occurredAt].
@@ -66,6 +69,9 @@ final class AttendanceCorrectionService {
     );
     if (employee case Err(:final failure)) {
       return Err(failure);
+    }
+    if (await _lockedAt(session, occurredAt, type) case final locked?) {
+      return Err(locked);
     }
     return _apply(session, now, resolves, (deviceId) async {
       final added = await _append(
@@ -113,6 +119,11 @@ final class AttendanceCorrectionService {
       return Err(failure);
     }
     final event = original.valueOrNull!;
+    for (final instant in [event.occurredAt, newOccurredAt]) {
+      if (await _lockedAt(session, instant, event.type) case final locked?) {
+        return Err(locked);
+      }
+    }
     if (event.occurredAt == newOccurredAt) {
       return const Err(
         ValidationFailure(
@@ -165,6 +176,10 @@ final class AttendanceCorrectionService {
       return Err(failure);
     }
     final event = original.valueOrNull!;
+    if (await _lockedAt(session, event.occurredAt, event.type)
+        case final locked?) {
+      return Err(locked);
+    }
     return _apply(
       session,
       now,
@@ -279,6 +294,29 @@ final class AttendanceCorrectionService {
         createdBy: session.admin.id,
       ),
     )).unwrap();
+  }
+
+  /// Refusal when the change would affect approved or finalized payroll. A
+  /// clock-out may close a session that started the day before, so that day
+  /// is checked too.
+  Future<AppFailure?> _lockedAt(
+    AdminSession session,
+    DateTime instant,
+    AttendanceEventType type,
+  ) async {
+    final locked = await _payrollLock.lockedPeriodAt(
+      session.companyId,
+      instant,
+      includePreviousDay: type == AttendanceEventType.clockOut,
+    );
+    return switch (locked) {
+      Err(:final failure) => failure,
+      Ok(value: final name?) => BusinessRuleFailure(
+        rule: payrollLockedRule,
+        userMessage: payrollLockedMessage(name),
+      ),
+      Ok() => null,
+    };
   }
 
   /// The event, if it belongs to the session's company and still counts.

@@ -25,7 +25,10 @@ enum AuditAction {
   payrollAdjustmentAdded('payroll.adjustment_added'),
   payrollAdjustmentRemoved('payroll.adjustment_removed'),
   payrollCalculated('payroll.calculated'),
-  payrollRecalculated('payroll.recalculated');
+  payrollRecalculated('payroll.recalculated'),
+  payrollApproved('payroll.approved'),
+  payrollFinalized('payroll.finalized'),
+  payrollReopened('payroll.reopened');
 
   const AuditAction(this.code);
 

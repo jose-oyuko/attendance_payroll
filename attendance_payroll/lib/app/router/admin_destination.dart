@@ -34,7 +34,6 @@ enum AdminDestination {
     label: 'Payroll',
     icon: Icons.payments_outlined,
     selectedIcon: Icons.payments,
-    plannedPhase: 8,
   ),
   reports(
     path: '/reports',

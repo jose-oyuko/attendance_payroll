@@ -302,6 +302,7 @@ void main() {
       devices: DriftDeviceIdentityRepository(env.db),
       audit: _FailingAudit(),
       transactions: env.transactions,
+      payrollLock: env.payrollLock,
       clock: env.clock.call,
     );
 
@@ -324,5 +325,10 @@ class _FailingAudit implements AuditLogRepository {
   @override
   Future<Result<void>> record(AuditEntry entry) async {
     return const Err(DatabaseFailure());
+  }
+
+  @override
+  Future<Result<List<AuditRecord>>> forEntity(String type, String id) async {
+    return const Ok([]);
   }
 }

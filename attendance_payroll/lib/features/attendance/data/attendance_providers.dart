@@ -15,6 +15,7 @@ import 'package:attendance_payroll/features/attendance/domain/attendance_setting
 import 'package:attendance_payroll/features/audit/data/audit_providers.dart';
 import 'package:attendance_payroll/features/company/data/company_providers.dart';
 import 'package:attendance_payroll/features/employees/data/employee_providers.dart';
+import 'package:attendance_payroll/features/payroll/data/payroll_providers.dart';
 import 'package:attendance_payroll/features/schedules/data/schedule_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -65,6 +66,7 @@ final attendanceExceptionServiceProvider = Provider<AttendanceExceptionService>(
     reviews: ref.watch(exceptionReviewRepositoryProvider),
     audit: ref.watch(auditLogRepositoryProvider),
     transactions: ref.watch(transactionRunnerProvider),
+    payrollLock: ref.watch(payrollLockProvider),
   ),
 );
 
@@ -86,5 +88,6 @@ final attendanceCorrectionServiceProvider =
         devices: ref.watch(deviceIdentityRepositoryProvider),
         audit: ref.watch(auditLogRepositoryProvider),
         transactions: ref.watch(transactionRunnerProvider),
+        payrollLock: ref.watch(payrollLockProvider),
       ),
     );

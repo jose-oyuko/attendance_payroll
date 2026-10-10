@@ -383,7 +383,7 @@ class ExceptionReviews extends Table with EntityColumns {
 
 /// Named weekly working patterns, e.g. "Day shift" Mon–Fri 08:00–17:00.
 /// Durations are whole minutes. Changing a schedule changes how all dates
-/// are evaluated; finalized payroll keeps its own figures (Phase 8).
+/// are evaluated; finalized payroll keeps its own figures.
 @DataClassName('WorkScheduleRow')
 class WorkSchedules extends Table with EntityColumns {
   TextColumn get companyId => text().references(Companies, #id)();

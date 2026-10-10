@@ -1,5 +1,6 @@
 import 'package:attendance_payroll/core/database/transaction_runner.dart';
 import 'package:attendance_payroll/core/errors/app_failure.dart';
+import 'package:attendance_payroll/core/locking/payroll_lock.dart';
 import 'package:attendance_payroll/core/result/result.dart';
 import 'package:attendance_payroll/core/utils/clock.dart';
 import 'package:attendance_payroll/core/utils/local_date.dart';
@@ -24,6 +25,7 @@ final class AttendanceExceptionService {
     required this._reviews,
     required this._audit,
     required this._transactions,
+    required this._payrollLock,
     this._clock = systemClockUtc,
   });
 
@@ -34,6 +36,7 @@ final class AttendanceExceptionService {
   final ExceptionReviewRepository _reviews;
   final AuditLogRepository _audit;
   final TransactionRunner _transactions;
+  final PayrollLock _payrollLock;
   final Clock _clock;
 
   /// Which decisions an issue type allows, besides noting it as reviewed.
@@ -101,6 +104,30 @@ final class AttendanceExceptionService {
               : 'That decision does not apply to this kind of exception.',
         ),
       );
+    }
+
+    // Accepting or dismissing an issue that blocks payroll changes what is
+    // paid, so it must not touch approved or finalized payroll. Notes, and
+    // excusing lateness or absence, change nothing that is paid.
+    if (exception.type.blocksPayroll && decision != ReviewDecision.reviewed) {
+      final locked = await _payrollLock.lockedPeriodAt(
+        session.companyId,
+        exception.occurredAt,
+        includePreviousDay: true,
+      );
+      switch (locked) {
+        case Err(:final failure):
+          return Err(failure);
+        case Ok(value: final name?):
+          return Err(
+            BusinessRuleFailure(
+              rule: payrollLockedRule,
+              userMessage: payrollLockedMessage(name),
+            ),
+          );
+        case Ok():
+          break;
+      }
     }
 
     // Re-derive the employee's attendance to confirm the issue still exists.

@@ -1,4 +1,6 @@
 import 'package:attendance_payroll/core/database/transaction_runner.dart';
+import 'package:attendance_payroll/core/errors/app_failure.dart';
+import 'package:attendance_payroll/core/locking/payroll_lock.dart';
 import 'package:attendance_payroll/core/result/result.dart';
 import 'package:attendance_payroll/features/audit/domain/audit_entry.dart';
 import 'package:attendance_payroll/features/audit/domain/audit_log_repository.dart';
@@ -20,6 +22,7 @@ final class EmployeeManagementService {
     required this._rates,
     required this._audit,
     required this._transactions,
+    required this._payrollLock,
   });
 
   /// Suggested employee numbers look like `E0001`.
@@ -31,6 +34,7 @@ final class EmployeeManagementService {
   final EmployeeRateRepository _rates;
   final AuditLogRepository _audit;
   final TransactionRunner _transactions;
+  final PayrollLock _payrollLock;
 
   Future<Result<List<Employee>>> list(
     AdminSession session, {
@@ -177,6 +181,26 @@ final class EmployeeManagementService {
   ) async {
     if (session.check(Permission.manageEmployees) case final denied?) {
       return Err(denied);
+    }
+    // A new rate applies from its start onwards, so it would change any
+    // approved or finalized payroll ending on or after that date.
+    final locked = await _payrollLock.lockedPeriodOn(
+      session.companyId,
+      rate.effectiveFrom,
+      orLater: true,
+    );
+    switch (locked) {
+      case Err(:final failure):
+        return Err(failure);
+      case Ok(value: final name?):
+        return Err(
+          BusinessRuleFailure(
+            rule: payrollLockedRule,
+            userMessage: payrollLockedMessage(name),
+          ),
+        );
+      case Ok():
+        break;
     }
     return _transactions.run(() async {
       (await _employees.getInCompany(session.companyId, employeeId)).unwrap();

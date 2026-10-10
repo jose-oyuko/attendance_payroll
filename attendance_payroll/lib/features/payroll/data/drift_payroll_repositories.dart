@@ -209,6 +209,31 @@ final class DriftPayrollPeriodRepository implements PayrollPeriodRepository {
     });
   }
 
+  @override
+  Future<Result<PayrollPeriod>> setStatus(
+    String id,
+    PayrollPeriodStatus status, {
+    required int expectedVersion,
+  }) {
+    return guardDatabase(
+      () => _db.transaction(() async {
+        await updateVersioned(
+          _db,
+          _db.payrollPeriods,
+          id: id,
+          expectedVersion: expectedVersion,
+          entity: 'payroll period',
+          changes: PayrollPeriodsCompanion(
+            status: Value(status.name),
+            updatedAt: Value(_clock()),
+            version: Value(expectedVersion + 1),
+          ),
+        );
+        return (await getById(id)).unwrap();
+      }),
+    );
+  }
+
   PayrollPeriod _toDomain(PayrollPeriodRow row) {
     return PayrollPeriod(
       id: row.id,

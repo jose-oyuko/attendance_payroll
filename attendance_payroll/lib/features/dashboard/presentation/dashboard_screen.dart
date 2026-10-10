@@ -6,13 +6,16 @@ import 'package:attendance_payroll/core/extensions/build_context_extensions.dart
 import 'package:attendance_payroll/features/attendance/presentation/attendance_routes.dart';
 import 'package:attendance_payroll/features/attendance/presentation/attendance_view_providers.dart';
 import 'package:attendance_payroll/features/company/presentation/current_company_provider.dart';
+import 'package:attendance_payroll/features/payroll/presentation/payroll_formatting.dart';
+import 'package:attendance_payroll/features/payroll/presentation/payroll_routes.dart';
+import 'package:attendance_payroll/features/payroll/presentation/payroll_view_providers.dart';
 import 'package:attendance_payroll/shared/responsive/adaptive_grid.dart';
 import 'package:attendance_payroll/shared/widgets/page_container.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-/// Today at a glance. Payroll cards are added with payroll (Phase 8).
+/// Today at a glance, and where payroll stands.
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
 
@@ -21,6 +24,8 @@ class DashboardScreen extends ConsumerWidget {
     final company = ref.watch(currentCompanyProvider).value;
     final today = ref.watch(todaysAttendanceProvider);
     final openExceptions = ref.watch(openExceptionCountProvider).value;
+    final periods = ref.watch(payrollPeriodsProvider).value;
+    final latest = periods == null || periods.isEmpty ? null : periods.first;
     final semantic = context.semanticColors;
 
     return PageContainer(
@@ -83,6 +88,20 @@ class DashboardScreen extends ConsumerWidget {
                       ? '${value.expected} still expected today'
                       : null,
                   accent: semantic.neutral,
+                ),
+                _StatusCard(
+                  icon: Icons.payments_outlined,
+                  title: 'Current payroll',
+                  value: latest?.name ?? (periods == null ? '…' : 'None yet'),
+                  caption: latest == null
+                      ? 'No payroll periods have been created.'
+                      : latest.status.label,
+                  accent: semantic.info,
+                  onTap: () => context.go(
+                    latest == null
+                        ? PayrollRoutes.list
+                        : PayrollRoutes.period(latest.id),
+                  ),
                 ),
               ],
             ),

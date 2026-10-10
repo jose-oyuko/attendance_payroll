@@ -5,6 +5,7 @@ import 'package:attendance_payroll/features/employees/data/drift_employee_reposi
 import 'package:attendance_payroll/features/employees/domain/employee_management_service.dart';
 import 'package:attendance_payroll/features/employees/domain/employee_rate_repository.dart';
 import 'package:attendance_payroll/features/employees/domain/employee_repository.dart';
+import 'package:attendance_payroll/features/payroll/data/payroll_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final employeeRepositoryProvider = Provider<EmployeeRepository>(
@@ -21,5 +22,6 @@ final employeeManagementServiceProvider = Provider<EmployeeManagementService>(
     rates: ref.watch(employeeRateRepositoryProvider),
     audit: ref.watch(auditLogRepositoryProvider),
     transactions: ref.watch(transactionRunnerProvider),
+    payrollLock: ref.watch(payrollLockProvider),
   ),
 );

@@ -47,4 +47,37 @@ final class DriftAuditLogRepository implements AuditLogRepository {
           );
     });
   }
+
+  @override
+  Future<Result<List<AuditRecord>>> forEntity(
+    String entityType,
+    String entityId,
+  ) {
+    return guardDatabase(() async {
+      final rows =
+          await (_db.select(_db.auditLog)
+                ..where(
+                  (a) =>
+                      a.entityType.equals(entityType) &
+                      a.entityId.equals(entityId),
+                )
+                ..orderBy([
+                  (a) => OrderingTerm.desc(a.occurredAt),
+                  (a) => OrderingTerm.desc(a.id),
+                ]))
+              .get();
+      return [
+        for (final row in rows)
+          AuditRecord(
+            action: row.action,
+            actorType: AuditActorType.values.byName(row.actorType),
+            actorId: row.actorId,
+            occurredAt: row.occurredAt,
+            metadata: row.metadata == null
+                ? const {}
+                : jsonDecode(row.metadata!) as Map<String, Object?>,
+          ),
+      ];
+    });
+  }
 }

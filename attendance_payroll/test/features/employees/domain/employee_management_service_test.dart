@@ -21,6 +21,11 @@ class _FailingAudit implements AuditLogRepository {
   Future<Result<void>> record(AuditEntry entry) async {
     return const Err(DatabaseFailure());
   }
+
+  @override
+  Future<Result<List<AuditRecord>>> forEntity(String type, String id) async {
+    return const Ok([]);
+  }
 }
 
 void main() {
@@ -117,6 +122,7 @@ void main() {
       rates: env.rates,
       audit: _FailingAudit(),
       transactions: env.transactions,
+      payrollLock: env.payrollLock,
     );
 
     final result = await unaudited.create(session, johnDetails());

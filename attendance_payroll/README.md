@@ -156,7 +156,20 @@ Follow-up to Phase 3:
 - Only settled attendance is paid; anything awaiting review is reported
 - Database schema version 8
 
-There are no payroll screens yet; Phase 8 adds them.
+## What Phase 8 adds
+
+- Payroll area: create periods (the current month by default), set
+  overtime rules, calculate and recalculate
+- Period page: totals, problems to resolve (with a link to exceptions),
+  each employee's pay with a breakdown of how it was worked out,
+  allowances / bonuses / deductions, and the period's history
+- Approve and finalize (blocking problems and out-of-date calculations
+  are refused), and reopen with a reason
+- Approved and finalized payroll is locked: attendance corrections,
+  exception decisions that change pay, new rates and adjustments in that
+  period are refused until it is reopened
+- Dashboard card for the current payroll
+- No schema change (still version 8)
 
 ## Project layout
 

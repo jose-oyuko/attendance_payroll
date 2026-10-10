@@ -3,8 +3,9 @@ import 'package:attendance_payroll/core/money/money.dart';
 import 'package:attendance_payroll/core/utils/local_date.dart';
 import 'package:attendance_payroll/core/utils/validators.dart';
 
-/// Lifecycle of a payroll period. Phase 7 creates and calculates periods
-/// (`draft`); review, approval, finalization and reopening are Phase 8.
+/// Lifecycle of a payroll period: created as `draft`, calculated into
+/// `review`, then `approved` and `finalized`. Reopening finalized payroll
+/// gives `reopened`. `open` and `processing` are reserved.
 enum PayrollPeriodStatus {
   draft,
   open,

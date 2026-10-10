@@ -49,7 +49,10 @@ void main() {
       await tester.tap(find.text('Payroll'));
       await tester.pumpAndSettle();
 
-      expect(find.textContaining('Phase 8'), findsOneWidget);
+      expect(
+        find.text('No payroll periods have been created.'),
+        findsOneWidget,
+      );
     });
   });
 
