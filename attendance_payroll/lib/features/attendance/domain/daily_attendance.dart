@@ -30,12 +30,16 @@ enum DayStatus {
 /// One employee's attendance on one company date.
 final class EmployeeDay {
   const EmployeeDay({
+    required this.date,
     required this.employee,
     required this.sessions,
     required this.issues,
     required this.schedule,
     required this.now,
   });
+
+  /// The company date.
+  final LocalDate date;
 
   final Employee employee;
 
@@ -57,6 +61,13 @@ final class EmployeeDay {
 
   bool get isLate =>
       issues.any((i) => i.type == AttendanceIssueType.lateArrival);
+
+  bool get leftEarly =>
+      issues.any((i) => i.type == AttendanceIssueType.earlyDeparture);
+
+  /// Anything an administrator may want to look at: an issue of any kind
+  /// (lateness, leaving early, absence, attendance to review).
+  bool get hasProblem => issues.isNotEmpty || needsReview;
 
   bool get needsReview =>
       sessions.any((s) => s.status == SessionStatus.exception) ||
@@ -121,4 +132,46 @@ final class DailyAttendance {
 
   /// Without a schedule and without attendance.
   int get notClockedIn => _count((e) => e.status == DayStatus.notClockedIn);
+}
+
+/// Every relevant employee's attendance on each date of a range: one
+/// [EmployeeDay] per employee per date.
+final class AttendanceRange {
+  AttendanceRange({required this.from, required this.to, required this.rows});
+
+  final LocalDate from;
+  final LocalDate to;
+
+  /// By employee name, then by date.
+  final List<EmployeeDay> rows;
+
+  /// Each employee's days, in [rows] order.
+  late final Map<String, List<EmployeeDay>> byEmployee = () {
+    final grouped = <String, List<EmployeeDay>>{};
+    for (final row in rows) {
+      (grouped[row.employee.id] ??= []).add(row);
+    }
+    return grouped;
+  }();
+}
+
+/// One employee's totals over some days.
+final class AttendanceTotals {
+  AttendanceTotals(Iterable<EmployeeDay> days) : _days = List.of(days);
+
+  final List<EmployeeDay> _days;
+
+  int _count(bool Function(EmployeeDay) test) => _days.where(test).length;
+
+  late final int present = _count((d) => d.sessions.isNotEmpty);
+  late final int late = _count((d) => d.isLate);
+  late final int leftEarly = _count((d) => d.leftEarly);
+  late final int absent = _count((d) => d.status == DayStatus.absent);
+  late final int needsReview = _count((d) => d.needsReview);
+
+  /// Payable time of settled sessions; time awaiting review is not counted.
+  late final Duration payable = _days.fold(
+    Duration.zero,
+    (total, d) => total + d.payable,
+  );
 }

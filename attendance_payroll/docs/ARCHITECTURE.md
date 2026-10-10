@@ -176,6 +176,14 @@ destination so each area keeps its navigation state.
   in, with times and payable hours; each row opens the employee's history and
   corrections. The dashboard shows today's counts. Until schedules exist
   (Phase 6) "not clocked in" cannot distinguish absence from a day off.
+- **Range view** (Attendance -> Range, added after Phase 8):
+  `AttendanceService.range` returns one `EmployeeDay` per employee per date
+  (at most `maxRangeDays` = 62), built by the same helper as `day`, so each
+  row matches the daily view of its date. `AttendanceTotals` sums an
+  employee's days (present, late, left early, absent, to review, payable
+  time). The screen filters by employee and "only days with problems"; it
+  shows a table with a total row per employee from medium widths, and
+  cards grouped by employee on phones. Rows open the employee's history.
 
 ## Exceptions and review (Phase 5)
 

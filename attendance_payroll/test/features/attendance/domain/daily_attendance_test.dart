@@ -1,5 +1,7 @@
+import 'package:attendance_payroll/core/errors/app_failure.dart';
 import 'package:attendance_payroll/core/utils/local_date.dart';
 import 'package:attendance_payroll/features/attendance/domain/attendance_event.dart';
+import 'package:attendance_payroll/features/attendance/domain/attendance_service.dart';
 import 'package:attendance_payroll/features/attendance/domain/daily_attendance.dart';
 import 'package:attendance_payroll/features/authentication/domain/admin_session.dart';
 import 'package:attendance_payroll/features/employees/domain/employee.dart';
@@ -124,5 +126,102 @@ void main() {
     )).unwrap();
 
     expect(day.employees, isEmpty);
+  });
+
+  group('range', () {
+    final from = LocalDate(2026, 10, 3);
+    final to = LocalDate(2026, 10, 5);
+
+    test('one row per employee per date, by name then date', () async {
+      final brian = await employee('E2', 'Brian');
+      final amina = await employee('E1', 'Amina');
+      final esther = await employee('E5', 'Esther');
+      await entry(amina, AttendanceEventType.clockIn, 3, 8);
+      await entry(amina, AttendanceEventType.clockOut, 3, 16);
+      await entry(amina, AttendanceEventType.clockIn, 5, 8);
+      await entry(amina, AttendanceEventType.clockOut, 5, 11);
+      // Brian forgot to clock out on the 4th.
+      await entry(brian, AttendanceEventType.clockIn, 4, 8);
+      await entry(esther, AttendanceEventType.clockIn, 4, 9);
+      await entry(esther, AttendanceEventType.clockOut, 4, 10);
+      await env.management.changeStatus(
+        admin,
+        (await env.management.get(admin, esther.id)).unwrap(),
+        EmploymentStatus.archived,
+      );
+
+      final range = (await env.attendance.range(
+        admin,
+        from: from,
+        to: to,
+      )).unwrap();
+
+      // Archived Esther appears only on the day she has attendance.
+      expect(
+        range.rows.map((r) => (r.employee.details.firstName, r.date.day)),
+        [
+          ('Amina', 3),
+          ('Amina', 4),
+          ('Amina', 5),
+          ('Brian', 3),
+          ('Brian', 4),
+          ('Brian', 5),
+          ('Esther', 4),
+        ],
+      );
+      final aminaTotals = AttendanceTotals(range.byEmployee[amina.id]!);
+      expect(aminaTotals.present, 2);
+      expect(aminaTotals.payable, const Duration(hours: 11));
+      final brianDays = range.byEmployee[brian.id]!;
+      expect(brianDays[1].status, DayStatus.needsReview);
+      expect(brianDays.where((d) => d.hasProblem), hasLength(1));
+      expect(AttendanceTotals(brianDays).needsReview, 1);
+    });
+
+    test('each row matches the daily view of its date', () async {
+      final amina = await employee('E1', 'Amina');
+      final brian = await employee('E2', 'Brian');
+      await entry(amina, AttendanceEventType.clockIn, 4, 8);
+      await entry(amina, AttendanceEventType.clockOut, 4, 17);
+      await entry(brian, AttendanceEventType.clockIn, 4, 22);
+      await entry(brian, AttendanceEventType.clockOut, 5, 6);
+
+      final range = (await env.attendance.range(
+        admin,
+        from: from,
+        to: to,
+      )).unwrap();
+
+      for (var date = from; !date.isAfter(to); date = date.addDays(1)) {
+        final day = (await env.attendance.day(admin, date)).unwrap();
+        final rows = range.rows.where((r) => r.date == date).toList();
+        expect(
+          rows.map((r) => (r.employee.id, r.status, r.payable)),
+          day.employees.map((d) => (d.employee.id, d.status, d.payable)),
+          reason: '$date',
+        );
+      }
+    });
+
+    test('is limited to ${AttendanceService.maxRangeDays} days', () async {
+      await employee('E1', 'Amina');
+      final start = LocalDate(2026, 8, 1);
+
+      final longest = await env.attendance.range(
+        admin,
+        from: start,
+        to: start.addDays(AttendanceService.maxRangeDays - 1),
+      );
+      final tooLong = await env.attendance.range(
+        admin,
+        from: start,
+        to: start.addDays(AttendanceService.maxRangeDays),
+      );
+      final reversed = await env.attendance.range(admin, from: to, to: from);
+
+      expect(longest.unwrap().rows, hasLength(AttendanceService.maxRangeDays));
+      expect(tooLong.failureOrNull, isA<ValidationFailure>());
+      expect(reversed.failureOrNull, isA<ValidationFailure>());
+    });
   });
 }

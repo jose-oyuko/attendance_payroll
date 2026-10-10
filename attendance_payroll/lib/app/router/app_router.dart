@@ -3,6 +3,7 @@ import 'package:attendance_payroll/app/shell/admin_shell.dart';
 import 'package:attendance_payroll/app/shell/planned_feature_screen.dart';
 import 'package:attendance_payroll/core/errors/app_failure.dart';
 import 'package:attendance_payroll/features/attendance/presentation/attendance_day_screen.dart';
+import 'package:attendance_payroll/features/attendance/presentation/attendance_range_screen.dart';
 import 'package:attendance_payroll/features/attendance/presentation/attendance_routes.dart';
 import 'package:attendance_payroll/features/attendance/presentation/employee_attendance_screen.dart';
 import 'package:attendance_payroll/features/attendance/presentation/exceptions_screen.dart';
@@ -189,6 +190,10 @@ List<RouteBase> _childRoutesFor(AdminDestination destination) {
       GoRoute(
         path: AttendanceRoutes.exceptionsSegment,
         builder: (context, state) => const ExceptionsScreen(),
+      ),
+      GoRoute(
+        path: AttendanceRoutes.rangeSegment,
+        builder: (context, state) => const AttendanceRangeScreen(),
       ),
       GoRoute(
         path: AttendanceRoutes.employeeSegment,

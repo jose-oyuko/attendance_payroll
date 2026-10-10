@@ -103,6 +103,17 @@ final todaysAttendanceProvider = FutureProvider.autoDispose<DailyAttendance>((
 /// A range of company dates.
 typedef DateRange = ({LocalDate from, LocalDate to});
 
+/// Everyone's attendance on each date of a range.
+final attendanceRangeProvider = FutureProvider.autoDispose
+    .family<AttendanceRange, DateRange>((ref, range) async {
+      ref.watch(attendanceRevisionProvider);
+      final session = requireSession(ref);
+      return (await ref
+              .watch(attendanceServiceProvider)
+              .range(session, from: range.from, to: range.to))
+          .unwrap();
+    });
+
 /// Exceptions revealed in a range, newest first.
 final exceptionsProvider = FutureProvider.autoDispose
     .family<List<AttendanceException>, DateRange>((ref, range) async {

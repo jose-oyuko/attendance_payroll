@@ -172,6 +172,10 @@ Follow-up to Phase 3:
 - Pay rates can be given to earlier days that had no rate (for example
   before the first rate); days that already have a rate cannot change, and
   saving a rate asks for confirmation
+- Attendance -> Range: choose a start and end date (up to 62 days) and see
+  every employee's attendance in a table, one row per employee per day,
+  with clock in/out, time worked, status and exceptions, plus a total per
+  employee; filter by employee or to days with problems
 - No schema change (still version 8)
 
 ## Project layout

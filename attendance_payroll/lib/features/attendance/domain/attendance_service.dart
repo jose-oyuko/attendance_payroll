@@ -110,30 +110,78 @@ final class AttendanceService {
       from: date,
       to: date,
     );
-    return snapshot.map((s) {
-      final days = <EmployeeDay>[];
-      final now = _clock();
-      for (final employee in s.employees) {
+    return snapshot.map(
+      (s) => DailyAttendance(date: date, employees: _rows(s, _clock())),
+    );
+  }
+
+  /// Everyone's attendance on each company date from [from] to [to]: one
+  /// row per employee per date, with the same rows as [day] gives for each
+  /// date. At most [maxRangeDays] days, to keep the view responsive.
+  Future<Result<AttendanceRange>> range(
+    AdminSession session, {
+    required LocalDate from,
+    required LocalDate to,
+  }) async {
+    if (session.check(Permission.viewAttendance) case final denied?) {
+      return Err(denied);
+    }
+    if (!to.isBefore(from.addDays(maxRangeDays))) {
+      return const Err(
+        ValidationFailure(
+          field: 'to',
+          userMessage:
+              'Choose at most $maxRangeDays days. Longer periods are '
+              'available as reports.',
+        ),
+      );
+    }
+    final snapshot = await _reader.read(session.companyId, from: from, to: to);
+    return snapshot.map(
+      (s) => AttendanceRange(from: from, to: to, rows: _rows(s, _clock())),
+    );
+  }
+
+  /// The longest range [range] accepts, in days.
+  static const int maxRangeDays = 62;
+
+  /// One row per employee per date of [s], by employee name then date.
+  /// Active employees appear on every date; anyone else only on dates with
+  /// attendance.
+  static List<EmployeeDay> _rows(AttendanceSnapshot s, DateTime now) {
+    final employees = [...s.employees]
+      ..sort(
+        (a, b) => a.details.shownName.toLowerCase().compareTo(
+          b.details.shownName.toLowerCase(),
+        ),
+      );
+    final rows = <EmployeeDay>[];
+    for (final employee in employees) {
+      final active =
+          employee.details.employmentStatus == EmploymentStatus.active;
+      final sessions = s.sessionsFor(employee.id);
+      final issues = s.issuesFor(employee.id);
+      for (var date = s.from; !date.isAfter(s.to); date = date.addDays(1)) {
         final day = EmployeeDay(
+          date: date,
           employee: employee,
-          sessions: s.sessionsFor(employee.id),
-          issues: s.issuesFor(employee.id),
+          sessions: [
+            for (final x in sessions)
+              if (x.workDate == date) x,
+          ],
+          issues: [
+            for (final i in issues)
+              if (s.timeZone.dateOf(i.occurredAt) == date) i,
+          ],
           schedule: s.scheduleOn(employee.id, date),
           now: now,
         );
-        final active =
-            employee.details.employmentStatus == EmploymentStatus.active;
         if (active || day.sessions.isNotEmpty || day.issues.isNotEmpty) {
-          days.add(day);
+          rows.add(day);
         }
       }
-      days.sort(
-        (a, b) => a.employee.details.shownName.toLowerCase().compareTo(
-          b.employee.details.shownName.toLowerCase(),
-        ),
-      );
-      return DailyAttendance(date: date, employees: days);
-    });
+    }
+    return rows;
   }
 
   Future<Result<ClockResult>> _record(

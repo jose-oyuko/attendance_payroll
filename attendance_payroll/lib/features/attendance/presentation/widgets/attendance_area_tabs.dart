@@ -4,10 +4,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-enum AttendanceTab { daily, exceptions }
+enum AttendanceTab {
+  daily(AttendanceRoutes.day),
+  range(AttendanceRoutes.range),
+  exceptions(AttendanceRoutes.exceptions);
 
-/// Switches between the daily view and the exceptions of the Attendance
-/// area, showing how many exceptions need action.
+  const AttendanceTab(this.location);
+
+  final String location;
+}
+
+/// Switches between the daily view, the date-range table and the
+/// exceptions of the Attendance area, showing how many exceptions need
+/// action.
 class AttendanceAreaTabs extends ConsumerWidget {
   const AttendanceAreaTabs({required this.selected, super.key});
 
@@ -26,6 +35,11 @@ class AttendanceAreaTabs extends ConsumerWidget {
             icon: Icon(Icons.today_outlined),
             label: Text('Daily'),
           ),
+          const ButtonSegment(
+            value: AttendanceTab.range,
+            icon: Icon(Icons.date_range_outlined),
+            label: Text('Range'),
+          ),
           ButtonSegment(
             value: AttendanceTab.exceptions,
             icon: Badge(
@@ -37,11 +51,7 @@ class AttendanceAreaTabs extends ConsumerWidget {
           ),
         ],
         selected: {selected},
-        onSelectionChanged: (selection) => context.go(
-          selection.first == AttendanceTab.daily
-              ? AttendanceRoutes.day
-              : AttendanceRoutes.exceptions,
-        ),
+        onSelectionChanged: (selection) => context.go(selection.first.location),
       ),
     );
   }

@@ -1,6 +1,7 @@
 import 'package:attendance_payroll/features/attendance/domain/attendance_event.dart';
 import 'package:attendance_payroll/features/attendance/domain/attendance_exception.dart';
 import 'package:attendance_payroll/features/attendance/domain/attendance_session.dart';
+import 'package:attendance_payroll/features/attendance/domain/daily_attendance.dart';
 
 extension AttendanceEventTypeLabel on AttendanceEventType {
   String get label => switch (this) {
@@ -84,5 +85,17 @@ extension ReviewDecisionLabel on ReviewDecision {
     ReviewDecision.reviewed => 'Noted',
     ReviewDecision.resolved => 'Resolved',
     ReviewDecision.dismissed => 'Dismissed',
+  };
+}
+
+extension DayStatusLabel on DayStatus {
+  String get label => switch (this) {
+    DayStatus.needsReview => 'Needs review',
+    DayStatus.working => 'Working',
+    DayStatus.present => 'Present',
+    DayStatus.expected => 'Expected',
+    DayStatus.absent => 'Absent',
+    DayStatus.dayOff => 'Day off',
+    DayStatus.notClockedIn => 'Not clocked in',
   };
 }

@@ -5,6 +5,7 @@ import 'package:attendance_payroll/core/extensions/build_context_extensions.dart
 import 'package:attendance_payroll/core/time/company_time_zone.dart';
 import 'package:attendance_payroll/core/utils/local_date.dart';
 import 'package:attendance_payroll/features/attendance/domain/daily_attendance.dart';
+import 'package:attendance_payroll/features/attendance/presentation/attendance_formatting.dart';
 import 'package:attendance_payroll/features/attendance/presentation/attendance_routes.dart';
 import 'package:attendance_payroll/features/attendance/presentation/attendance_view_providers.dart';
 import 'package:attendance_payroll/features/attendance/presentation/widgets/attendance_area_tabs.dart';
@@ -289,16 +290,16 @@ class _EmployeeRow extends StatelessWidget {
     final semantic = context.semanticColors;
     final late = row.isLate ? ' · late' : '';
     final (label, colors) = switch (row.status) {
-      DayStatus.needsReview => ('Needs review', semantic.warning),
-      DayStatus.working => ('Working$late', semantic.info),
+      DayStatus.needsReview => (row.status.label, semantic.warning),
+      DayStatus.working => ('${row.status.label}$late', semantic.info),
       DayStatus.present => (
         '${formatWorkDuration(row.payable)}$late',
         semantic.success,
       ),
-      DayStatus.expected => ('Expected', semantic.neutral),
-      DayStatus.absent => ('Absent', semantic.warning),
-      DayStatus.dayOff => ('Day off', semantic.neutral),
-      DayStatus.notClockedIn => ('Not clocked in', semantic.neutral),
+      DayStatus.absent => (row.status.label, semantic.warning),
+      DayStatus.expected ||
+      DayStatus.dayOff ||
+      DayStatus.notClockedIn => (row.status.label, semantic.neutral),
     };
     final times = [
       for (final session in row.sessions)
