@@ -1,5 +1,6 @@
 import 'package:attendance_payroll/app/app.dart';
 import 'package:attendance_payroll/app/configuration/app_config.dart';
+import 'package:attendance_payroll/app/configuration/provider_retry.dart';
 import 'package:attendance_payroll/core/database/app_database.dart';
 import 'package:attendance_payroll/core/database/database_providers.dart';
 import 'package:attendance_payroll/core/errors/global_error_handler.dart';
@@ -34,6 +35,7 @@ Future<void> bootstrap() async {
 
   runApp(
     ProviderScope(
+      retry: noAutomaticRetry,
       overrides: [
         appConfigProvider.overrideWithValue(config),
         appLoggerProvider.overrideWithValue(logger),

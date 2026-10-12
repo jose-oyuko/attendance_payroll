@@ -10,6 +10,7 @@ import 'package:attendance_payroll/features/payroll/domain/payroll_period.dart';
 import 'package:attendance_payroll/features/payroll/domain/payroll_result.dart';
 import 'package:attendance_payroll/features/payroll/presentation/payroll_formatting.dart';
 import 'package:attendance_payroll/features/payroll/presentation/payroll_view_providers.dart';
+import 'package:attendance_payroll/features/reports/presentation/report_routes.dart';
 import 'package:attendance_payroll/shared/formatting/date_formatting.dart';
 import 'package:attendance_payroll/shared/formatting/time_formatting.dart';
 import 'package:attendance_payroll/shared/responsive/adaptive_grid.dart';
@@ -184,11 +185,13 @@ class PayrollIssuesSection extends StatelessWidget {
 /// One row per paid employee; tapping shows how their pay was worked out.
 class PayrollLinesSection extends StatelessWidget {
   const PayrollLinesSection({
+    required this.periodId,
     required this.result,
     required this.names,
     super.key,
   });
 
+  final String periodId;
   final PayrollResult result;
   final Map<String, String> names;
 
@@ -211,6 +214,7 @@ class PayrollLinesSection extends StatelessWidget {
             onTap: () => showDialog<void>(
               context: context,
               builder: (_) => _LineBreakdown(
+                periodId: periodId,
                 line: line,
                 name: names[line.employeeId] ?? 'Unknown employee',
               ),
@@ -231,8 +235,13 @@ class PayrollLinesSection extends StatelessWidget {
 }
 
 class _LineBreakdown extends StatelessWidget {
-  const _LineBreakdown({required this.line, required this.name});
+  const _LineBreakdown({
+    required this.periodId,
+    required this.line,
+    required this.name,
+  });
 
+  final String periodId;
   final PayrollLine line;
   final String name;
 
@@ -293,6 +302,22 @@ class _LineBreakdown extends StatelessWidget {
         ),
       ),
       actions: [
+        TextButton.icon(
+          onPressed: () {
+            Navigator.of(context).pop();
+            context.push(
+              ReportRoutes.previewOf(
+                ReportRequest(
+                  kind: ReportKind.payslips,
+                  periodId: periodId,
+                  employeeId: line.employeeId,
+                ),
+              ),
+            );
+          },
+          icon: const Icon(Icons.receipt_long_outlined),
+          label: const Text('Payslip'),
+        ),
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
           child: const Text('Close'),

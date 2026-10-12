@@ -178,6 +178,19 @@ Follow-up to Phase 3:
   employee; filter by employee or to days with problems
 - No schema change (still version 8)
 
+## What Phase 9 adds
+
+- Reports area: payslips (everyone, or one employee), payroll summary,
+  attendance report, timesheet and exception report, as PDF
+- Preview with print and share (the device's print and share options)
+- Shortcuts: Payslips and Summary on a payroll period, a payslip from an
+  employee's pay breakdown, and PDF report / Timesheet on Attendance → Range
+- Payroll that is not finalized is marked "Not final" on its documents
+- Documents work fully offline (fonts are bundled)
+- Failed screens now show their error straight away instead of retrying
+  silently in the background
+- No schema change (still version 8)
+
 ## Project layout
 
 ```

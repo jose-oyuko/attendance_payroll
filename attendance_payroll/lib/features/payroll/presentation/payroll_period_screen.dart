@@ -16,6 +16,7 @@ import 'package:attendance_payroll/features/payroll/presentation/payroll_view_pr
 import 'package:attendance_payroll/features/payroll/presentation/widgets/payroll_dialogs.dart';
 import 'package:attendance_payroll/features/payroll/presentation/widgets/payroll_period_sections.dart';
 import 'package:attendance_payroll/features/payroll/presentation/widgets/payroll_status_chip.dart';
+import 'package:attendance_payroll/features/reports/presentation/report_routes.dart';
 import 'package:attendance_payroll/shared/formatting/date_formatting.dart';
 import 'package:attendance_payroll/shared/responsive/window_size.dart';
 import 'package:attendance_payroll/shared/widgets/confirm_dialog.dart';
@@ -25,6 +26,7 @@ import 'package:attendance_payroll/shared/widgets/page_container.dart';
 import 'package:attendance_payroll/shared/widgets/subpage_header.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 /// One payroll period: its calculation, adjustments, the lifecycle actions
 /// allowed in its status, and its history.
@@ -115,7 +117,11 @@ class _PeriodView extends StatelessWidget {
         PayrollTotalsGrid(result: run.result),
         if (run.result.issues.isNotEmpty)
           PayrollIssuesSection(issues: run.result.issues, names: names),
-        PayrollLinesSection(result: run.result, names: names),
+        PayrollLinesSection(
+          periodId: period.id,
+          result: run.result,
+          names: names,
+        ),
       ],
     ];
     final details = <Widget>[
@@ -337,6 +343,29 @@ class _PeriodActionsState extends ConsumerState<_PeriodActions> {
           icon: const Icon(Icons.lock_open),
           label: const Text('Reopen'),
         ),
+      if (run != null && run.result.lines.isNotEmpty) ...[
+        OutlinedButton.icon(
+          onPressed: () => context.push(
+            ReportRoutes.previewOf(
+              ReportRequest(kind: ReportKind.payslips, periodId: period.id),
+            ),
+          ),
+          icon: const Icon(Icons.receipt_long_outlined),
+          label: const Text('Payslips'),
+        ),
+        OutlinedButton.icon(
+          onPressed: () => context.push(
+            ReportRoutes.previewOf(
+              ReportRequest(
+                kind: ReportKind.payrollSummary,
+                periodId: period.id,
+              ),
+            ),
+          ),
+          icon: const Icon(Icons.summarize_outlined),
+          label: const Text('Summary'),
+        ),
+      ],
     ];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,

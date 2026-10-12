@@ -40,7 +40,6 @@ enum AdminDestination {
     label: 'Reports',
     icon: Icons.assessment_outlined,
     selectedIcon: Icons.assessment,
-    plannedPhase: 9,
   ),
   backup(
     path: '/backup',

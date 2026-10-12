@@ -28,11 +28,19 @@ presentation  ->  domain  ->  repository interfaces  <-  data (Drift / platform)
   `*_providers.dart`, plus the session in
   `authentication/presentation/auth_controller.dart`). They never use another
   feature's Drift classes, widgets or screens. Shared UI and formatting go in
-  `shared/`.
+  `shared/`. A feature's `*_formatting.dart` (labels for its enums, no
+  widgets) and `*_routes.dart` (locations) may also be used elsewhere, so a
+  status reads the same on screen and on paper, and screens can link to
+  each other.
 
-Riverpod providers are the dependency-injection container. Anything
-environment-specific (configuration, logger, later the database and device id)
-is a provider that `bootstrap()` overrides, so tests can substitute fakes.
+Riverpod providers are the dependency-injection container. Failed providers
+are never retried automatically (`app/configuration/provider_retry.dart`):
+local failures do not go away on their own, and Riverpod's default retries
+would show a spinner for about 40 seconds instead of the error. Screens
+offer "Try again".
+
+Anything environment-specific (configuration, logger, the database and device
+id) is a provider that `bootstrap()` overrides, so tests can substitute fakes.
 
 ## Conventions established in Phase 0
 
@@ -299,6 +307,39 @@ destination so each area keeps its navigation state.
   two columns. `payrollRevisionProvider` refreshes every payroll view,
   including the dashboard's current-payroll card.
 
+## Reports and PDF (Phase 9)
+
+- **Flow**: `ReportService` (domain) gathers each document's data through
+  the features' own services, so documents show exactly what the screens
+  and payroll use, under the same permissions. The result is plain data
+  (`report_documents.dart`) with times already on the company's clock.
+  `PayrollDocumentService` (domain interface, spec §38) lays it out;
+  `PdfPayrollDocumentService` (data) does so with the `pdf` package on a
+  background isolate (`Isolate.run`), so long reports never freeze the
+  screen. Screens contain no layout code.
+- **Documents**: payslips (one page each, from the period's current
+  calculation: company, employee, period, hours, rate, earnings,
+  deductions, gross, net, status, generated time), payroll summary (all
+  employees, totals per currency, problems, signature lines), attendance
+  report (one row per employee per day with a total per employee; any
+  range up to 366 days, read in windows of the attendance service's
+  62-day limit), timesheet (one employee, signature lines) and exception
+  report (exceptions still needing a decision). Payroll that is not
+  finalized is marked "Not final" on every page.
+- **Fonts**: Roboto (Apache 2.0) is bundled in `assets/fonts/` and embedded,
+  so documents render identically offline and support accented names.
+  Dates and times on paper use one unambiguous style ("05 Oct 2026",
+  "08:02") independent of device settings.
+- **Preview** (`/document?kind=…`) is a route outside the admin shell, so
+  a document opened from payroll or attendance returns there on back. It
+  uses `printing`'s `PdfPreview` for print and share; the viewer is a
+  provider (`documentViewerProvider`) because the printing plugin does not
+  exist on a test host. Entry points: the Reports area, the payroll period
+  page (Payslips, Summary, one employee's payslip from the pay breakdown)
+  and Attendance → Range (PDF report, or the timesheet when one employee is
+  selected).
+- No schema change; generating a document is not audited (nothing changes).
+
 ## Database
 
 Drift over SQLite with versioned, tested migrations. Conventions (UUIDv7 keys,
@@ -350,8 +391,8 @@ Nothing in V1 talks to a server, but the design leaves room:
 | 5 | Exceptions and corrections |
 | 6 | Work schedules |
 | 7 | Payroll engine |
-| 8 | Payroll UI (current) |
-| 9 | Reports and PDF |
+| 8 | Payroll UI |
+| 9 | Reports and PDF (current) |
 | 10 | Thermal printing |
 | 11 | Backup and restore |
 | 12 | Hardening |
@@ -359,8 +400,9 @@ Nothing in V1 talks to a server, but the design leaves room:
 
 ## Current boundaries
 
-After Phase 8: attendance, schedules, exceptions and the full payroll cycle
-(calculate, adjust, approve, finalize, reopen, with locking and history) are
-complete. Still deferred: reports, payslips and PDF (Phase 9), printing
-(Phase 10), backup (Phase 11), administrator password change and recovery, session
+After Phase 9: attendance, schedules, exceptions, the full payroll cycle
+(calculate, adjust, approve, finalize, reopen, with locking and history)
+and printable documents (payslips, payroll summary, attendance report,
+timesheet, exception report as PDF, with preview, print and share) are
+complete. Still deferred: thermal printing (Phase 10), backup (Phase 11), administrator password change and recovery, session
 timeout, and settings persistence.

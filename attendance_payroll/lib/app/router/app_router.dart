@@ -21,6 +21,9 @@ import 'package:attendance_payroll/features/kiosk/presentation/kiosk_unlock_scre
 import 'package:attendance_payroll/features/payroll/presentation/payroll_period_screen.dart';
 import 'package:attendance_payroll/features/payroll/presentation/payroll_routes.dart';
 import 'package:attendance_payroll/features/payroll/presentation/payroll_screen.dart';
+import 'package:attendance_payroll/features/reports/presentation/report_preview_screen.dart';
+import 'package:attendance_payroll/features/reports/presentation/report_routes.dart';
+import 'package:attendance_payroll/features/reports/presentation/reports_screen.dart';
 import 'package:attendance_payroll/features/schedules/presentation/schedule_form_screen.dart';
 import 'package:attendance_payroll/features/schedules/presentation/schedule_routes.dart';
 import 'package:attendance_payroll/features/schedules/presentation/schedules_screen.dart';
@@ -112,6 +115,13 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           ),
         ],
       ),
+      // Documents open on top of whichever area asked for them.
+      GoRoute(
+        path: ReportRoutes.preview,
+        builder: (context, state) => ReportPreviewScreen(
+          request: ReportRequest.fromQuery(state.uri.queryParameters),
+        ),
+      ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) =>
             AdminShell(navigationShell: navigationShell),
@@ -149,6 +159,7 @@ Widget _screenFor(AdminDestination destination) {
     AdminDestination.attendance => const AttendanceDayScreen(),
     AdminDestination.schedules => const SchedulesScreen(),
     AdminDestination.payroll => const PayrollScreen(),
+    AdminDestination.reports => const ReportsScreen(),
     AdminDestination.settings => const SettingsScreen(),
     _ => PlannedFeatureScreen(destination: destination),
   };

@@ -8,6 +8,7 @@ import 'package:attendance_payroll/features/attendance/presentation/attendance_v
 import 'package:attendance_payroll/features/attendance/presentation/widgets/attendance_area_tabs.dart';
 import 'package:attendance_payroll/features/attendance/presentation/widgets/attendance_range_views.dart';
 import 'package:attendance_payroll/features/company/presentation/current_company_provider.dart';
+import 'package:attendance_payroll/features/reports/presentation/report_routes.dart';
 import 'package:attendance_payroll/shared/formatting/date_formatting.dart';
 import 'package:attendance_payroll/shared/responsive/window_size.dart';
 import 'package:attendance_payroll/shared/widgets/error_state.dart';
@@ -15,6 +16,7 @@ import 'package:attendance_payroll/shared/widgets/loading_state.dart';
 import 'package:attendance_payroll/shared/widgets/page_container.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 /// Everyone's attendance over a chosen range of dates, one row per employee
 /// per day: a table on wide screens, cards grouped by employee on phones.
@@ -150,6 +152,23 @@ class _RangeViewState extends ConsumerState<_RangeView> {
                 label: const Text('Only days with problems'),
                 selected: _problemsOnly,
                 onSelected: (on) => setState(() => _problemsOnly = on),
+              ),
+              // One employee chosen: their timesheet; otherwise everyone.
+              TextButton.icon(
+                onPressed: () => context.push(
+                  ReportRoutes.previewOf(
+                    ReportRequest(
+                      kind: _employeeId == null
+                          ? ReportKind.attendance
+                          : ReportKind.timesheet,
+                      employeeId: _employeeId,
+                      from: _range.from,
+                      to: _range.to,
+                    ),
+                  ),
+                ),
+                icon: const Icon(Icons.picture_as_pdf_outlined),
+                label: Text(_employeeId == null ? 'PDF report' : 'Timesheet'),
               ),
             ],
           ),

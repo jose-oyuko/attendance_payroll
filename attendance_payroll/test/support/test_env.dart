@@ -33,6 +33,7 @@ import 'package:attendance_payroll/features/payroll/data/drift_payroll_repositor
 import 'package:attendance_payroll/features/payroll/data/drift_payroll_run_repository.dart';
 import 'package:attendance_payroll/features/payroll/domain/payroll_period_lock.dart';
 import 'package:attendance_payroll/features/payroll/domain/payroll_service.dart';
+import 'package:attendance_payroll/features/reports/domain/report_service.dart';
 import 'package:attendance_payroll/features/schedules/data/drift_schedule_assignment_repository.dart';
 import 'package:attendance_payroll/features/schedules/data/drift_work_schedule_repository.dart';
 import 'package:attendance_payroll/features/schedules/domain/work_schedule_service.dart';
@@ -194,6 +195,15 @@ class TestEnv {
     audit: audit,
     transactions: transactions,
     payrollLock: payrollLock,
+    clock: clock.call,
+  );
+
+  late final reports = ReportService(
+    companies: companies,
+    employees: management,
+    attendance: attendance,
+    exceptions: exceptions,
+    payroll: payroll,
     clock: clock.call,
   );
 

@@ -18,12 +18,17 @@ dependencies:
   flutter_riverpod: ^3.4.3
   # Declarative routing, including the stateful admin shell.
   go_router: ^18.0.2
+  # PDF documents (payslips, payroll summary, attendance reports).
+  pdf: ^3.13.1
   # PBKDF2-HMAC-SHA256 for hashing PINs and passwords (Bouncy Castle port).
   pointycastle: ^4.0.0
+  # PDF preview, printing and sharing through the platform.
+  printing: ^5.15.1
   # SqliteException and its error codes, to map constraint violations.
   sqlite3: ^3.5.2
-  # UUIDv7 identifiers that devices can generate independently.
+  # IANA timezone database: attendance follows the company's timezone.
   timezone: ^0.11.1
+  # UUIDv7 identifiers that devices can generate independently.
   uuid: ^4.6.0
 
 dev_dependencies:
@@ -37,3 +42,7 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    # Embedded in PDFs so documents render the same on every device, offline.
+    # Roboto, Apache License 2.0 (see LICENSE-Roboto.txt).
+    - assets/fonts/

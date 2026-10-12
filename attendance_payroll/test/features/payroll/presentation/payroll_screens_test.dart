@@ -110,6 +110,9 @@ void main() {
 
     await _tap(tester, find.widgetWithText(FilledButton, 'Calculate'));
     expect(find.text('In review'), findsOneWidget);
+    // Once calculated, payslips and the summary can be opened as documents.
+    expect(find.widgetWithText(OutlinedButton, 'Payslips'), findsOneWidget);
+    expect(find.widgetWithText(OutlinedButton, 'Summary'), findsOneWidget);
     expect(find.text('John Kamau'), findsWidgets);
     expect(find.text('${const Money(400000, 'KES')}'), findsWidgets);
 

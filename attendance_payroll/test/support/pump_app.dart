@@ -1,5 +1,6 @@
 import 'package:attendance_payroll/app/app.dart';
 import 'package:attendance_payroll/app/configuration/app_config.dart';
+import 'package:attendance_payroll/app/configuration/provider_retry.dart';
 import 'package:attendance_payroll/core/database/app_database.dart';
 import 'package:attendance_payroll/core/database/database_providers.dart';
 import 'package:attendance_payroll/features/authentication/data/authentication_providers.dart';
@@ -8,6 +9,7 @@ import 'package:attendance_payroll/features/authentication/presentation/auth_con
 import 'package:drift/native.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
 
 import 'test_database.dart';
@@ -22,6 +24,7 @@ Future<ProviderContainer> pumpApp(
   required Size size,
   bool signedIn = true,
   AppDatabase? database,
+  List<Override> overrides = const [],
 }) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1.0;
@@ -34,6 +37,7 @@ Future<ProviderContainer> pumpApp(
 
   await tester.pumpWidget(
     ProviderScope(
+      retry: noAutomaticRetry,
       overrides: [
         appConfigProvider.overrideWithValue(
           AppConfig.forEnvironment(AppEnvironment.development),
@@ -41,6 +45,7 @@ Future<ProviderContainer> pumpApp(
         appDatabaseProvider.overrideWithValue(db),
         passwordHasherProvider.overrideWithValue(fastHasher()),
         pinHasherProvider.overrideWithValue(fastHasher()),
+        ...overrides,
       ],
       child: const AttendancePayrollApp(),
     ),
