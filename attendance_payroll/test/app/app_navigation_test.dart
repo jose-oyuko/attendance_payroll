@@ -66,6 +66,8 @@ void main() {
 
       await tester.tap(find.text('Settings'));
       await tester.pumpAndSettle();
+      // The settings page scrolls: appearance is below the other cards.
+      await tester.ensureVisible(find.text('Dark'));
       await tester.tap(find.text('Dark'));
       await tester.pumpAndSettle();
 

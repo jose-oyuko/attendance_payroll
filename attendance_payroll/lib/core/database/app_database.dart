@@ -37,6 +37,7 @@ part 'app_database.g.dart';
     PayrollLines,
     PayrollItems,
     PayrollRunIssues,
+    PrinterSettingsTable,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -61,8 +62,9 @@ class AppDatabase extends _$AppDatabase {
   /// 6 — exception reviews.
   /// 7 — work schedules and assignments; review event optional.
   /// 8 — payroll: settings, periods, adjustments, runs, lines, items, issues.
+  /// 9 — printer settings (thermal printing).
   @override
-  int get schemaVersion => 8;
+  int get schemaVersion => 9;
 
   @override
   MigrationStrategy get migration {
@@ -126,6 +128,9 @@ class AppDatabase extends _$AppDatabase {
           ]) {
             await m.createIndex(index);
           }
+        },
+        from8To9: (m, schema) async {
+          await m.createTable(schema.printerSettings);
         },
       ),
       beforeOpen: (details) async {

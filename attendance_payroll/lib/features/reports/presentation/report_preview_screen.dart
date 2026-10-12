@@ -1,4 +1,5 @@
 import 'package:attendance_payroll/core/errors/app_failure.dart';
+import 'package:attendance_payroll/features/printing/presentation/receipt_print_button.dart';
 import 'package:attendance_payroll/features/reports/presentation/report_routes.dart';
 import 'package:attendance_payroll/features/reports/presentation/report_view_providers.dart';
 import 'package:attendance_payroll/shared/widgets/error_state.dart';
@@ -28,6 +29,10 @@ class ReportPreviewScreen extends ConsumerWidget {
               context.canPop() ? context.pop() : context.go(ReportRoutes.list),
         ),
         title: Text(file?.value?.title ?? 'Document'),
+        actions: [
+          if (request != null && hasReceipt(request.kind))
+            ReceiptPrintButton(request: request),
+        ],
       ),
       body: switch (file) {
         null => ErrorState(

@@ -28,7 +28,8 @@ enum AuditAction {
   payrollRecalculated('payroll.recalculated'),
   payrollApproved('payroll.approved'),
   payrollFinalized('payroll.finalized'),
-  payrollReopened('payroll.reopened');
+  payrollReopened('payroll.reopened'),
+  printerSettingsChanged('printer.settings_changed');
 
   const AuditAction(this.code);
 

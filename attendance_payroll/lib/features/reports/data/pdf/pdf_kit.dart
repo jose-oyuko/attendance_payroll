@@ -4,6 +4,7 @@ import 'package:attendance_payroll/core/time/company_time_zone.dart';
 import 'package:attendance_payroll/core/utils/local_date.dart';
 import 'package:attendance_payroll/features/company/domain/company.dart';
 import 'package:attendance_payroll/features/reports/domain/report_documents.dart';
+import 'package:attendance_payroll/shared/formatting/document_formatting.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
@@ -37,21 +38,6 @@ final class PdfKit {
   static const PdfColor rule = PdfColors.grey400;
   static const PdfColor shade = PdfColors.grey200;
 
-  static const List<String> _months = [
-    'Jan',
-    'Feb',
-    'Mar',
-    'Apr',
-    'May',
-    'Jun',
-    'Jul',
-    'Aug',
-    'Sep',
-    'Oct',
-    'Nov',
-    'Dec',
-  ];
-
   static const List<String> _weekdays = [
     'Mon',
     'Tue',
@@ -62,8 +48,7 @@ final class PdfKit {
     'Sun',
   ];
 
-  static String date(LocalDate d) =>
-      '${d.day.toString().padLeft(2, '0')} ${_months[d.month - 1]} ${d.year}';
+  static String date(LocalDate d) => formatDocumentDate(d);
 
   /// "Mon 05 Oct 2026".
   static String dayAndDate(LocalDate d) =>
@@ -74,10 +59,7 @@ final class PdfKit {
       from == to ? date(from) : '${date(from)} – ${date(to)}';
 
   /// "08:02", 24-hour.
-  static String time(Duration timeOfDay) {
-    String two(int n) => n.toString().padLeft(2, '0');
-    return '${two(timeOfDay.inHours)}:${two(timeOfDay.inMinutes % 60)}';
-  }
+  static String time(Duration timeOfDay) => formatDocumentTime(timeOfDay);
 
   static String wallTime(WallTime t) => '${date(t.date)} ${time(t.timeOfDay)}';
 

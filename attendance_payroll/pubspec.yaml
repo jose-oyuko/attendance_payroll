@@ -23,6 +23,7 @@ dependencies:
   # PBKDF2-HMAC-SHA256 for hashing PINs and passwords (Bouncy Castle port).
   pointycastle: ^4.0.0
   # PDF preview, printing and sharing through the platform.
+  print_bluetooth_thermal: ^1.2.5
   printing: ^5.15.1
   # SqliteException and its error codes, to map constraint violations.
   sqlite3: ^3.5.2

@@ -15438,6 +15438,433 @@ class PayrollRunIssuesCompanion extends UpdateCompanion<PayrollRunIssueRow> {
   }
 }
 
+class $PrinterSettingsTableTable extends PrinterSettingsTable
+    with TableInfo<$PrinterSettingsTableTable, PrinterSettingsRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PrinterSettingsTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _connectionMeta = const VerificationMeta(
+    'connection',
+  );
+  @override
+  late final GeneratedColumn<String> connection = GeneratedColumn<String>(
+    'connection',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _deviceIdMeta = const VerificationMeta(
+    'deviceId',
+  );
+  @override
+  late final GeneratedColumn<String> deviceId = GeneratedColumn<String>(
+    'device_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _deviceNameMeta = const VerificationMeta(
+    'deviceName',
+  );
+  @override
+  late final GeneratedColumn<String> deviceName = GeneratedColumn<String>(
+    'device_name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _paperWidthMeta = const VerificationMeta(
+    'paperWidth',
+  );
+  @override
+  late final GeneratedColumn<String> paperWidth = GeneratedColumn<String>(
+    'paper_width',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    connection,
+    deviceId,
+    deviceName,
+    paperWidth,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'printer_settings';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<PrinterSettingsRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('connection')) {
+      context.handle(
+        _connectionMeta,
+        connection.isAcceptableOrUnknown(data['connection']!, _connectionMeta),
+      );
+    }
+    if (data.containsKey('device_id')) {
+      context.handle(
+        _deviceIdMeta,
+        deviceId.isAcceptableOrUnknown(data['device_id']!, _deviceIdMeta),
+      );
+    }
+    if (data.containsKey('device_name')) {
+      context.handle(
+        _deviceNameMeta,
+        deviceName.isAcceptableOrUnknown(data['device_name']!, _deviceNameMeta),
+      );
+    }
+    if (data.containsKey('paper_width')) {
+      context.handle(
+        _paperWidthMeta,
+        paperWidth.isAcceptableOrUnknown(data['paper_width']!, _paperWidthMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_paperWidthMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  PrinterSettingsRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PrinterSettingsRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      connection: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}connection'],
+      ),
+      deviceId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}device_id'],
+      ),
+      deviceName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}device_name'],
+      ),
+      paperWidth: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}paper_width'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $PrinterSettingsTableTable createAlias(String alias) {
+    return $PrinterSettingsTableTable(attachedDatabase, alias);
+  }
+}
+
+class PrinterSettingsRow extends DataClass
+    implements Insertable<PrinterSettingsRow> {
+  final String id;
+
+  /// See `PrinterConnection`; null while no printer is chosen.
+  final String? connection;
+
+  /// Where the printer is reached (Bluetooth address, USB id, host).
+  final String? deviceId;
+  final String? deviceName;
+
+  /// See `PaperWidth`.
+  final String paperWidth;
+  final DateTime updatedAt;
+  const PrinterSettingsRow({
+    required this.id,
+    this.connection,
+    this.deviceId,
+    this.deviceName,
+    required this.paperWidth,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    if (!nullToAbsent || connection != null) {
+      map['connection'] = Variable<String>(connection);
+    }
+    if (!nullToAbsent || deviceId != null) {
+      map['device_id'] = Variable<String>(deviceId);
+    }
+    if (!nullToAbsent || deviceName != null) {
+      map['device_name'] = Variable<String>(deviceName);
+    }
+    map['paper_width'] = Variable<String>(paperWidth);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  PrinterSettingsTableCompanion toCompanion(bool nullToAbsent) {
+    return PrinterSettingsTableCompanion(
+      id: Value(id),
+      connection: connection == null && nullToAbsent
+          ? const Value.absent()
+          : Value(connection),
+      deviceId: deviceId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deviceId),
+      deviceName: deviceName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(deviceName),
+      paperWidth: Value(paperWidth),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory PrinterSettingsRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PrinterSettingsRow(
+      id: serializer.fromJson<String>(json['id']),
+      connection: serializer.fromJson<String?>(json['connection']),
+      deviceId: serializer.fromJson<String?>(json['deviceId']),
+      deviceName: serializer.fromJson<String?>(json['deviceName']),
+      paperWidth: serializer.fromJson<String>(json['paperWidth']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'connection': serializer.toJson<String?>(connection),
+      'deviceId': serializer.toJson<String?>(deviceId),
+      'deviceName': serializer.toJson<String?>(deviceName),
+      'paperWidth': serializer.toJson<String>(paperWidth),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  PrinterSettingsRow copyWith({
+    String? id,
+    Value<String?> connection = const Value.absent(),
+    Value<String?> deviceId = const Value.absent(),
+    Value<String?> deviceName = const Value.absent(),
+    String? paperWidth,
+    DateTime? updatedAt,
+  }) => PrinterSettingsRow(
+    id: id ?? this.id,
+    connection: connection.present ? connection.value : this.connection,
+    deviceId: deviceId.present ? deviceId.value : this.deviceId,
+    deviceName: deviceName.present ? deviceName.value : this.deviceName,
+    paperWidth: paperWidth ?? this.paperWidth,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  PrinterSettingsRow copyWithCompanion(PrinterSettingsTableCompanion data) {
+    return PrinterSettingsRow(
+      id: data.id.present ? data.id.value : this.id,
+      connection: data.connection.present
+          ? data.connection.value
+          : this.connection,
+      deviceId: data.deviceId.present ? data.deviceId.value : this.deviceId,
+      deviceName: data.deviceName.present
+          ? data.deviceName.value
+          : this.deviceName,
+      paperWidth: data.paperWidth.present
+          ? data.paperWidth.value
+          : this.paperWidth,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PrinterSettingsRow(')
+          ..write('id: $id, ')
+          ..write('connection: $connection, ')
+          ..write('deviceId: $deviceId, ')
+          ..write('deviceName: $deviceName, ')
+          ..write('paperWidth: $paperWidth, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, connection, deviceId, deviceName, paperWidth, updatedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PrinterSettingsRow &&
+          other.id == this.id &&
+          other.connection == this.connection &&
+          other.deviceId == this.deviceId &&
+          other.deviceName == this.deviceName &&
+          other.paperWidth == this.paperWidth &&
+          other.updatedAt == this.updatedAt);
+}
+
+class PrinterSettingsTableCompanion
+    extends UpdateCompanion<PrinterSettingsRow> {
+  final Value<String> id;
+  final Value<String?> connection;
+  final Value<String?> deviceId;
+  final Value<String?> deviceName;
+  final Value<String> paperWidth;
+  final Value<DateTime> updatedAt;
+  final Value<int> rowid;
+  const PrinterSettingsTableCompanion({
+    this.id = const Value.absent(),
+    this.connection = const Value.absent(),
+    this.deviceId = const Value.absent(),
+    this.deviceName = const Value.absent(),
+    this.paperWidth = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  PrinterSettingsTableCompanion.insert({
+    required String id,
+    this.connection = const Value.absent(),
+    this.deviceId = const Value.absent(),
+    this.deviceName = const Value.absent(),
+    required String paperWidth,
+    required DateTime updatedAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       paperWidth = Value(paperWidth),
+       updatedAt = Value(updatedAt);
+  static Insertable<PrinterSettingsRow> custom({
+    Expression<String>? id,
+    Expression<String>? connection,
+    Expression<String>? deviceId,
+    Expression<String>? deviceName,
+    Expression<String>? paperWidth,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (connection != null) 'connection': connection,
+      if (deviceId != null) 'device_id': deviceId,
+      if (deviceName != null) 'device_name': deviceName,
+      if (paperWidth != null) 'paper_width': paperWidth,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  PrinterSettingsTableCompanion copyWith({
+    Value<String>? id,
+    Value<String?>? connection,
+    Value<String?>? deviceId,
+    Value<String?>? deviceName,
+    Value<String>? paperWidth,
+    Value<DateTime>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return PrinterSettingsTableCompanion(
+      id: id ?? this.id,
+      connection: connection ?? this.connection,
+      deviceId: deviceId ?? this.deviceId,
+      deviceName: deviceName ?? this.deviceName,
+      paperWidth: paperWidth ?? this.paperWidth,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (connection.present) {
+      map['connection'] = Variable<String>(connection.value);
+    }
+    if (deviceId.present) {
+      map['device_id'] = Variable<String>(deviceId.value);
+    }
+    if (deviceName.present) {
+      map['device_name'] = Variable<String>(deviceName.value);
+    }
+    if (paperWidth.present) {
+      map['paper_width'] = Variable<String>(paperWidth.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PrinterSettingsTableCompanion(')
+          ..write('id: $id, ')
+          ..write('connection: $connection, ')
+          ..write('deviceId: $deviceId, ')
+          ..write('deviceName: $deviceName, ')
+          ..write('paperWidth: $paperWidth, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -15476,6 +15903,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $PayrollRunIssuesTable payrollRunIssues = $PayrollRunIssuesTable(
     this,
   );
+  late final $PrinterSettingsTableTable printerSettingsTable =
+      $PrinterSettingsTableTable(this);
   late final Index auditLogCompanyTime = Index(
     'audit_log_company_time',
     'CREATE INDEX audit_log_company_time ON audit_log (company_id, occurred_at)',
@@ -15563,6 +15992,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     payrollLines,
     payrollItems,
     payrollRunIssues,
+    printerSettingsTable,
     auditLogCompanyTime,
     auditLogEntity,
     attendanceEventsEmployeeTime,
@@ -29828,6 +30258,258 @@ typedef $$PayrollRunIssuesTableProcessedTableManager =
       PayrollRunIssueRow,
       PrefetchHooks Function({bool runId, bool employeeId})
     >;
+typedef $$PrinterSettingsTableTableCreateCompanionBuilder =
+    PrinterSettingsTableCompanion Function({
+      required String id,
+      Value<String?> connection,
+      Value<String?> deviceId,
+      Value<String?> deviceName,
+      required String paperWidth,
+      required DateTime updatedAt,
+      Value<int> rowid,
+    });
+typedef $$PrinterSettingsTableTableUpdateCompanionBuilder =
+    PrinterSettingsTableCompanion Function({
+      Value<String> id,
+      Value<String?> connection,
+      Value<String?> deviceId,
+      Value<String?> deviceName,
+      Value<String> paperWidth,
+      Value<DateTime> updatedAt,
+      Value<int> rowid,
+    });
+
+class $$PrinterSettingsTableTableFilterComposer
+    extends Composer<_$AppDatabase, $PrinterSettingsTableTable> {
+  $$PrinterSettingsTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get connection => $composableBuilder(
+    column: $table.connection,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get deviceId => $composableBuilder(
+    column: $table.deviceId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get deviceName => $composableBuilder(
+    column: $table.deviceName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get paperWidth => $composableBuilder(
+    column: $table.paperWidth,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$PrinterSettingsTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $PrinterSettingsTableTable> {
+  $$PrinterSettingsTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get connection => $composableBuilder(
+    column: $table.connection,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get deviceId => $composableBuilder(
+    column: $table.deviceId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get deviceName => $composableBuilder(
+    column: $table.deviceName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get paperWidth => $composableBuilder(
+    column: $table.paperWidth,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$PrinterSettingsTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $PrinterSettingsTableTable> {
+  $$PrinterSettingsTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get connection => $composableBuilder(
+    column: $table.connection,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get deviceId =>
+      $composableBuilder(column: $table.deviceId, builder: (column) => column);
+
+  GeneratedColumn<String> get deviceName => $composableBuilder(
+    column: $table.deviceName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get paperWidth => $composableBuilder(
+    column: $table.paperWidth,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$PrinterSettingsTableTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $PrinterSettingsTableTable,
+          PrinterSettingsRow,
+          $$PrinterSettingsTableTableFilterComposer,
+          $$PrinterSettingsTableTableOrderingComposer,
+          $$PrinterSettingsTableTableAnnotationComposer,
+          $$PrinterSettingsTableTableCreateCompanionBuilder,
+          $$PrinterSettingsTableTableUpdateCompanionBuilder,
+          (
+            PrinterSettingsRow,
+            BaseReferences<
+              _$AppDatabase,
+              $PrinterSettingsTableTable,
+              PrinterSettingsRow
+            >,
+          ),
+          PrinterSettingsRow,
+          PrefetchHooks Function()
+        > {
+  $$PrinterSettingsTableTableTableManager(
+    _$AppDatabase db,
+    $PrinterSettingsTableTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PrinterSettingsTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PrinterSettingsTableTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$PrinterSettingsTableTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String?> connection = const Value.absent(),
+                Value<String?> deviceId = const Value.absent(),
+                Value<String?> deviceName = const Value.absent(),
+                Value<String> paperWidth = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => PrinterSettingsTableCompanion(
+                id: id,
+                connection: connection,
+                deviceId: deviceId,
+                deviceName: deviceName,
+                paperWidth: paperWidth,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                Value<String?> connection = const Value.absent(),
+                Value<String?> deviceId = const Value.absent(),
+                Value<String?> deviceName = const Value.absent(),
+                required String paperWidth,
+                required DateTime updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => PrinterSettingsTableCompanion.insert(
+                id: id,
+                connection: connection,
+                deviceId: deviceId,
+                deviceName: deviceName,
+                paperWidth: paperWidth,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$PrinterSettingsTableTable, PrinterSettingsRow>(
+                    table,
+                  ),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $PrinterSettingsTableTable,
+                    PrinterSettingsRow
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$PrinterSettingsTableTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $PrinterSettingsTableTable,
+      PrinterSettingsRow,
+      $$PrinterSettingsTableTableFilterComposer,
+      $$PrinterSettingsTableTableOrderingComposer,
+      $$PrinterSettingsTableTableAnnotationComposer,
+      $$PrinterSettingsTableTableCreateCompanionBuilder,
+      $$PrinterSettingsTableTableUpdateCompanionBuilder,
+      (
+        PrinterSettingsRow,
+        BaseReferences<
+          _$AppDatabase,
+          $PrinterSettingsTableTable,
+          PrinterSettingsRow
+        >,
+      ),
+      PrinterSettingsRow,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -29876,4 +30558,6 @@ class $AppDatabaseManager {
       $$PayrollItemsTableTableManager(_db, _db.payrollItems);
   $$PayrollRunIssuesTableTableManager get payrollRunIssues =>
       $$PayrollRunIssuesTableTableManager(_db, _db.payrollRunIssues);
+  $$PrinterSettingsTableTableTableManager get printerSettingsTable =>
+      $$PrinterSettingsTableTableTableManager(_db, _db.printerSettingsTable);
 }

@@ -31,6 +31,7 @@ tables are in `lib/core/database/tables.dart`. Only repositories in feature
 | 6 | Phase 5 | `exception_reviews` |
 | 7 | Phase 6 | `work_schedules`, `work_schedule_days`, `schedule_assignments`; `exception_reviews.event_id` optional |
 | 8 | Phase 7 | `payroll_settings`, `payroll_periods`, `payroll_adjustments`, `payroll_runs`, `payroll_lines`, `payroll_items`, `payroll_run_issues` |
+| 9 | Phase 10 | `printer_settings` |
 
 ### Version 1
 
@@ -156,6 +157,20 @@ A run is an immutable snapshot: recalculating writes a new run and marks the
 previous one superseded. Migration 7 → 8 only creates tables and indexes.
 Phase 8 (approval, finalization, reopening) uses these columns and needs no
 schema change.
+
+### Version 9
+
+- **printer_settings** — the thermal printer chosen on this installation.
+  Exactly one row (CHECK `id = 'this_device'`); no row means no printer
+  and 58 mm paper. `connection` (`bluetooth`, `usb`, `network`), `device_id`
+  (Bluetooth address, USB id or host), `device_name`, `paper_width`
+  (`mm58`, `mm80`), `updated_at`. CHECK: the three printer columns are all
+  set or all null. Device-local like `device_settings`: a printer belongs to
+  the place the device is in, so it carries no sync metadata and is never
+  shared with other devices.
+
+Migration 8 → 9 only creates this table; existing rows are untouched
+(covered by a data-integrity migration test).
 
 Indexes come from the unique keys: `(company_id, employee_number)` serves
 lookups by company and by number; `(company_id, username)` and

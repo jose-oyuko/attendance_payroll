@@ -191,6 +191,22 @@ Follow-up to Phase 3:
   silently in the background
 - No schema change (still version 8)
 
+## What Phase 10 adds
+
+- Settings → Printer: pick a paired Bluetooth receipt printer, choose 58 mm
+  or 80 mm paper, print a test page, or forget the printer. The choice is
+  remembered on the device.
+- "Print receipt" on the payslip and payroll summary previews prints them
+  on the thermal printer (several payslips print as one job, cut between
+  employees). Payroll that is not finalized is marked "NOT FINAL".
+- Printer choices are audited; Bluetooth permissions are declared for
+  Android.
+- Schema version 9 (`printer_settings`)
+
+Receipt printing needs a real Android device and a printer paired in the
+phone's Bluetooth settings first; the emulator has no Bluetooth. The
+printing code is covered by tests with a fake Bluetooth.
+
 ## Project layout
 
 ```

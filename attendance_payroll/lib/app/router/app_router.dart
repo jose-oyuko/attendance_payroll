@@ -21,6 +21,8 @@ import 'package:attendance_payroll/features/kiosk/presentation/kiosk_unlock_scre
 import 'package:attendance_payroll/features/payroll/presentation/payroll_period_screen.dart';
 import 'package:attendance_payroll/features/payroll/presentation/payroll_routes.dart';
 import 'package:attendance_payroll/features/payroll/presentation/payroll_screen.dart';
+import 'package:attendance_payroll/features/printing/presentation/printer_routes.dart';
+import 'package:attendance_payroll/features/printing/presentation/printer_settings_screen.dart';
 import 'package:attendance_payroll/features/reports/presentation/report_preview_screen.dart';
 import 'package:attendance_payroll/features/reports/presentation/report_routes.dart';
 import 'package:attendance_payroll/features/reports/presentation/reports_screen.dart';
@@ -232,6 +234,12 @@ List<RouteBase> _childRoutesFor(AdminDestination destination) {
         builder: (context, state) => PayrollPeriodScreen(
           periodId: state.pathParameters[PayrollRoutes.idParameter]!,
         ),
+      ),
+    ],
+    AdminDestination.settings => [
+      GoRoute(
+        path: PrinterRoutes.segment,
+        builder: (context, state) => const PrinterSettingsScreen(),
       ),
     ],
     _ => const <RouteBase>[],

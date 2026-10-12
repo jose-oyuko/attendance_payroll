@@ -629,3 +629,39 @@ class PayrollRunIssues extends Table {
   @override
   Set<Column<Object>> get primaryKey => {id};
 }
+
+/// The thermal printer chosen on this installation. Never shared with other
+/// devices: a printer belongs to the place the device is in. Exactly one row,
+/// with id [PrinterSettingsTable.singletonId]; no row means no printer.
+@DataClassName('PrinterSettingsRow')
+class PrinterSettingsTable extends Table {
+  static const String singletonId = 'this_device';
+
+  @override
+  String get tableName => 'printer_settings';
+
+  TextColumn get id => text()();
+
+  /// See `PrinterConnection`; null while no printer is chosen.
+  TextColumn get connection => text().nullable()();
+
+  /// Where the printer is reached (Bluetooth address, USB id, host).
+  TextColumn get deviceId => text().nullable()();
+  TextColumn get deviceName => text().nullable()();
+
+  /// See `PaperWidth`.
+  TextColumn get paperWidth => text()();
+  DateTimeColumn get updatedAt => dateTime()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+
+  // A literal, not interpolated: drift_dev reads constraints statically when
+  // exporting schema snapshots. Must match [singletonId].
+  @override
+  List<String> get customConstraints => [
+    "CHECK (id = 'this_device')",
+    'CHECK ((connection IS NULL) = (device_id IS NULL) '
+        'AND (device_id IS NULL) = (device_name IS NULL))',
+  ];
+}

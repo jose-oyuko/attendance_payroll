@@ -340,6 +340,55 @@ destination so each area keeps its navigation state.
   selected).
 - No schema change; generating a document is not audited (nothing changes).
 
+## Thermal printing (Phase 10)
+
+- **Layers** (spec §39): `PrinterService` (domain interface: status,
+  discover, connect, disconnect, print) is all the app knows of a printer.
+  `BluetoothPrinterService` (data) implements it for Bluetooth receipt
+  printers speaking ESC/POS; USB or network printers are further
+  implementations (their `PrinterConnection` values already exist), chosen
+  in `printerServiceProvider`. Payroll code never learns which printer is
+  used.
+- **Receipt model**: `Receipt` (domain) is a list of lines (text, label
+  and value columns, rule, feed, cut) with no printer language and no
+  paper width. `EscPosEncoder` (data) wraps and aligns it for 58 mm (32
+  characters) or 80 mm (48 characters) paper and emits ESC/POS. Text is
+  reduced to ASCII ("José" prints as "Jose") because printers disagree
+  on code pages, and control characters in names are dropped so a name
+  cannot send printer commands.
+- **Documents**: `payslipsReceipt` and `payrollSummaryReceipt`
+  (`payroll_receipts.dart`) are plain functions of the same document data
+  the PDFs use (`ReportService`), so a receipt and the PDF of one payslip
+  always agree. Payroll that is not final says "NOT FINAL" on paper.
+  Several payslips print as one job, cut between employees. Attendance
+  reports are wide tables and have no receipt.
+- **Bluetooth**: `BluetoothGateway` is the seam around the
+  `print_bluetooth_thermal` plugin (classic Bluetooth/SPP), so the service
+  is tested with a fake: a test host has no Bluetooth. Printers are
+  paired in the phone's Bluetooth settings; the app lists the paired
+  devices, connects to the chosen one and remembers it. The plugin's
+  permission check shows the Android 12+ prompt, so status is read only
+  when the administrator acts on a printer (opening the screen, refresh,
+  printing), never polled.
+- **PrintingService** (domain): chooses a printer (connects first; a printer
+  that cannot be reached is never saved), sets the paper width, forgets the
+  printer, prints a test page, and prints receipts, connecting when needed
+  and reopening a dropped link once before giving up. Choosing the printer
+  or paper is permission-checked (`managePrinter`) and audited
+  (`printer.settings_changed`, naming the field, not the values). Printing
+  a document, like generating a PDF, is not audited; it requires
+  `viewPayroll`.
+- **Settings**: `printer_settings` (schema 9) is one device-local row.
+- **Screens**: Settings → Printer (current printer with status, test page,
+  forget, paper width, paired printers with Use), and a "Print receipt"
+  action on the payslip and payroll summary previews.
+- **Android**: the manifest declares the Bluetooth permissions (legacy ones
+  capped at Android 11, `BLUETOOTH_CONNECT` and `BLUETOOTH_SCAN` for 12+).
+  Receipt printing needs a physical Android device with a paired printer;
+  the emulator has no Bluetooth.
+- Deferred: USB and network printers, logos and barcodes on receipts,
+  printing attendance reports on a receipt printer.
+
 ## Database
 
 Drift over SQLite with versioned, tested migrations. Conventions (UUIDv7 keys,
@@ -392,17 +441,18 @@ Nothing in V1 talks to a server, but the design leaves room:
 | 6 | Work schedules |
 | 7 | Payroll engine |
 | 8 | Payroll UI |
-| 9 | Reports and PDF (current) |
-| 10 | Thermal printing |
+| 9 | Reports and PDF |
+| 10 | Thermal printing (current) |
 | 11 | Backup and restore |
 | 12 | Hardening |
 | 13 | Cloud architecture (documentation only) |
 
 ## Current boundaries
 
-After Phase 9: attendance, schedules, exceptions, the full payroll cycle
-(calculate, adjust, approve, finalize, reopen, with locking and history)
-and printable documents (payslips, payroll summary, attendance report,
-timesheet, exception report as PDF, with preview, print and share) are
-complete. Still deferred: thermal printing (Phase 10), backup (Phase 11), administrator password change and recovery, session
-timeout, and settings persistence.
+After Phase 10: attendance, schedules, exceptions, the full payroll cycle
+(calculate, adjust, approve, finalize, reopen, with locking and history),
+printable documents (payslips, payroll summary, attendance report,
+timesheet, exception report as PDF, with preview, print and share) and
+Bluetooth thermal receipts (payslips and payroll summary) are complete.
+Still deferred: backup (Phase 11), administrator password change and
+recovery, session timeout, and persisting the theme choice.

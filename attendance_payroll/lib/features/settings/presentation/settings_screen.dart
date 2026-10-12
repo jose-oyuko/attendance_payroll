@@ -1,11 +1,15 @@
 import 'package:attendance_payroll/core/constants/app_spacing.dart';
 import 'package:attendance_payroll/core/extensions/build_context_extensions.dart';
 import 'package:attendance_payroll/features/authentication/presentation/auth_controller.dart';
+import 'package:attendance_payroll/features/printing/presentation/printer_routes.dart';
+import 'package:attendance_payroll/features/printing/presentation/printer_settings_screen.dart';
+import 'package:attendance_payroll/features/printing/presentation/printer_view_providers.dart';
 import 'package:attendance_payroll/features/settings/presentation/attendance_rules_card.dart';
 import 'package:attendance_payroll/features/settings/presentation/theme_mode_provider.dart';
 import 'package:attendance_payroll/shared/widgets/page_container.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -20,6 +24,7 @@ class SettingsScreen extends ConsumerWidget {
         children: [
           const _AccountCard(),
           const AttendanceRulesCard(),
+          const _PrinterCard(),
           _appearance(context, ref, mode),
         ],
       ),
@@ -64,6 +69,47 @@ class SettingsScreen extends ConsumerWidget {
               style: context.textStyles.bodySmall?.copyWith(
                 color: context.colors.onSurfaceVariant,
               ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// The receipt printer of this device; set up on its own page.
+class _PrinterCard extends ConsumerWidget {
+  const _PrinterCard();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final settings = ref.watch(printerSettingsProvider);
+    final summary = switch (settings) {
+      AsyncData(:final value) =>
+        value.device == null
+            ? 'No printer chosen.'
+            : '${value.device!.name}, ${value.paperWidth.label} paper.',
+      _ => 'Receipt printer for payslips and payroll summaries.',
+    };
+    return Card.outlined(
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.md),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                spacing: AppSpacing.xs,
+                children: [
+                  Text('Printer', style: context.textStyles.titleMedium),
+                  Text(summary),
+                ],
+              ),
+            ),
+            OutlinedButton.icon(
+              onPressed: () => context.go(PrinterRoutes.settings),
+              icon: const Icon(Icons.print_outlined),
+              label: const Text('Set up'),
             ),
           ],
         ),

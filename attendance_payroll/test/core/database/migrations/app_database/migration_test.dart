@@ -13,6 +13,7 @@ import 'generated/schema_v5.dart' as v5;
 import 'generated/schema_v6.dart' as v6;
 import 'generated/schema_v7.dart' as v7;
 import 'generated/schema_v8.dart' as v8;
+import 'generated/schema_v9.dart' as v9;
 
 // Generated first by `dart run drift_dev make-migrations`, then completed by
 // hand. That command does not overwrite this file: when adding version N,
@@ -517,6 +518,51 @@ void main() {
           v8.WorkScheduleDaysData.fromJson(day.toJson()),
         ]);
         expect(await newDb.select(newDb.payrollPeriods).get(), isEmpty);
+      },
+    );
+  });
+
+  test('v8 → v9 keeps payroll unchanged and adds printer settings', () async {
+    const at = '2026-10-12T05:00:00.000Z';
+    const company = v8.CompaniesData(
+      id: 'co-1',
+      createdAt: at,
+      updatedAt: at,
+      version: 1,
+      syncState: 'localOnly',
+      name: 'Acme Ltd',
+      currencyCode: 'KES',
+      timezone: 'Africa/Nairobi',
+    );
+    const period = v8.PayrollPeriodsData(
+      id: 'per-1',
+      createdAt: at,
+      updatedAt: at,
+      version: 1,
+      syncState: 'localOnly',
+      companyId: 'co-1',
+      name: 'October 2026',
+      startDate: '2026-10-01',
+      endDate: '2026-10-31',
+      status: 'draft',
+    );
+
+    await verifier.testWithDataIntegrity(
+      oldVersion: 8,
+      newVersion: 9,
+      createOld: v8.DatabaseAtV8.new,
+      createNew: v9.DatabaseAtV9.new,
+      openTestedDatabase: AppDatabase.new,
+      createItems: (batch, oldDb) {
+        batch
+          ..insert(oldDb.companies, company)
+          ..insert(oldDb.payrollPeriods, period);
+      },
+      validateItems: (newDb) async {
+        expect(await newDb.select(newDb.payrollPeriods).get(), [
+          v9.PayrollPeriodsData.fromJson(period.toJson()),
+        ]);
+        expect(await newDb.select(newDb.printerSettings).get(), isEmpty);
       },
     );
   });
