@@ -46,7 +46,6 @@ enum AdminDestination {
     label: 'Backup',
     icon: Icons.backup_outlined,
     selectedIcon: Icons.backup,
-    plannedPhase: 11,
   ),
   settings(
     path: '/settings',
@@ -60,15 +59,10 @@ enum AdminDestination {
     required this.label,
     required this.icon,
     required this.selectedIcon,
-    this.plannedPhase,
   });
 
   final String path;
   final String label;
   final IconData icon;
   final IconData selectedIcon;
-
-  /// Implementation phase in which this area is built, or `null` when the
-  /// area already exists.
-  final int? plannedPhase;
 }

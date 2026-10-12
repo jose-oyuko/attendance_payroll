@@ -389,6 +389,72 @@ destination so each area keeps its navigation state.
 - Deferred: USB and network printers, logos and barcodes on receipts,
   printing attendance reports on a receipt printer.
 
+## Backup and restore (Phase 11)
+
+- **Layers** (spec §26): `BackupService` (domain) holds the rules. It
+  uses ports: `BackupStorage` (where files live; the local app folder now,
+  Google Drive or another provider later as another implementation, with no
+  change to the rules), `BackupCodec` (the file format), `BackupDatabase`
+  (snapshot and replace the data), `BackupSecretStore` (the password) and
+  `BackupSettingsRepository`. Screens never touch files or SQL.
+- **File format** (`.apbackup`, `backupVersion` 1): `APBK`, a container
+  version byte, the header length, a readable JSON header, then the data.
+  The header says what the file is without the password: backup version, app
+  version, schema version, date, kind, who made it, device, company and a
+  few counts. The data is the SQLite database, gzip-compressed and encrypted
+  with AES-256-GCM under a key derived from the backup password with
+  PBKDF2-HMAC-SHA256 (150,000 iterations; salt and work factor are in the
+  header, so the factor can be raised later). The header is the GCM
+  associated data, so changing any byte of it or of the data makes
+  decryption fail; a SHA-256 of the data in the header is a second check.
+  A wrong password and a damaged file are indistinguishable by design.
+  Derivation, compression and encryption run on a background isolate.
+- **Creating**: `VACUUM INTO` takes a consistent snapshot while the app keeps
+  running. The result is encrypted, then decrypted again and the database
+  checked (`integrity_check`) **before** it is kept, so a backup that cannot
+  be restored is never listed. Files are written under a temporary name and
+  renamed, so a full disk never leaves a half-written backup. An unreadable
+  folder or a bad file in it is reported, not fatal.
+- **Restoring never swaps the database file or restarts the app.** The
+  backup is decrypted and checked (not damaged, not from a newer schema),
+  migrated to the current schema with the same tested migrations as an app
+  update, attached to the live connection, and every company table is
+  replaced in **one transaction** with foreign keys checked at commit. Any
+  failure rolls everything back and the data is exactly as it was. Before
+  that a **safety backup** of the current data is made (the last three are
+  kept), so a restore can be undone. Tables that describe the device (its
+  identity, kiosk mode, printer, backup settings) are never replaced. The
+  audit entry is written inside the same transaction, so it is part of the
+  restored data. Afterwards everyone is signed out: the administrators now
+  come from the backup.
+- **Safeguards**: restoring needs the `manageBackups` permission, is refused
+  on a kiosk device, and a backup of another company needs an explicit
+  confirmation. A newer app version's backup says to update the app. Backup
+  file names are validated so a name can never point outside the folder.
+- **New installation**: first-run setup offers "Restore from a backup
+  instead" (new phone, reinstall). It works only while the device has no
+  company, so nothing can be lost and no administrator is needed.
+- **Password**: set once in the Backup screen (8+ characters, with a warning
+  that it cannot be recovered) and kept in the platform's secure storage
+  (Android Keystore) so automatic backups can encrypt without asking. It is
+  never in the database, a backup, the audit log or a log. Restoring a file
+  from elsewhere asks for the password it was made with.
+- **Automatic backups**: when an administrator signs in and the newest
+  backup is over a day old, one is made in the background (on by default;
+  needs a password). Only automatic backups are pruned (default: keep 10);
+  manual backups are never deleted by the app. A failure is remembered and
+  shown on the Backup screen and is not retried for an hour.
+- **Screens**: Backup (status and reminder, "Back up now", password, the
+  backups with Export / Restore / Delete, restore from a file, settings).
+  Export uses the system share sheet (Drive, email, ...).
+- **Audit**: `backup.created`, `backup.restored`, `backup.deleted`,
+  `backup.exported`, `backup.settings_changed`, `backup.password_changed`.
+  None records the password or any business data.
+- **Limits and deferred**: a backup is held in memory while it is made
+  (fine for tens of megabytes; very large databases would need streaming).
+  Deferred: Google Drive provider and scheduled background uploads (next
+  phase), a dashboard reminder, backup of the company logo file.
+
 ## Database
 
 Drift over SQLite with versioned, tested migrations. Conventions (UUIDv7 keys,
@@ -442,17 +508,18 @@ Nothing in V1 talks to a server, but the design leaves room:
 | 7 | Payroll engine |
 | 8 | Payroll UI |
 | 9 | Reports and PDF |
-| 10 | Thermal printing (current) |
-| 11 | Backup and restore |
+| 10 | Thermal printing |
+| 11 | Backup and restore (current) |
 | 12 | Hardening |
 | 13 | Cloud architecture (documentation only) |
 
 ## Current boundaries
 
-After Phase 10: attendance, schedules, exceptions, the full payroll cycle
+After Phase 11: attendance, schedules, exceptions, the full payroll cycle
 (calculate, adjust, approve, finalize, reopen, with locking and history),
 printable documents (payslips, payroll summary, attendance report,
 timesheet, exception report as PDF, with preview, print and share) and
-Bluetooth thermal receipts (payslips and payroll summary) are complete.
-Still deferred: backup (Phase 11), administrator password change and
-recovery, session timeout, and persisting the theme choice.
+Bluetooth thermal receipts (payslips and payroll summary) and encrypted
+local backup and restore are complete. Still deferred: Google Drive backup,
+administrator password change and recovery, session timeout, and persisting
+the theme choice.

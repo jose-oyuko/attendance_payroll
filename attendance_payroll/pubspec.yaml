@@ -12,20 +12,31 @@ dependencies:
   drift: ^2.35.2
   # Opens the on-device database on a background isolate (bundles SQLite).
   drift_flutter: ^0.3.1
+  # Picks a backup file to import (the system file picker).
+  file_selector: ^1.1.0
   flutter:
     sdk: flutter
   # State management and dependency injection (Notifier API, no code generation).
   flutter_riverpod: ^3.4.3
+  # Keeps the backup password in the platform's secure storage (Android Keystore).
+  flutter_secure_storage: ^11.2.0
   # Declarative routing, including the stateful admin shell.
   go_router: ^18.0.2
+  # The app's private folder, where backups are kept.
+  path_provider: ^2.1.6
   # PDF documents (payslips, payroll summary, attendance reports).
   pdf: ^3.13.1
-  # PBKDF2-HMAC-SHA256 for hashing PINs and passwords (Bouncy Castle port).
+  # PBKDF2-HMAC-SHA256 for hashing PINs and passwords, and AES-GCM for
+  # encrypting backups (Bouncy Castle port).
   pointycastle: ^4.0.0
-  # PDF preview, printing and sharing through the platform.
+  # Bluetooth (classic) connection to thermal receipt printers.
   print_bluetooth_thermal: ^1.2.5
+  # PDF preview, printing and sharing through the platform.
   printing: ^5.15.1
-  # SqliteException and its error codes, to map constraint violations.
+  # Shares a backup file through the system share sheet (Drive, email, ...).
+  share_plus: ^13.3.1
+  # SqliteException and its error codes, to map constraint violations; opens
+  # backup snapshots to check them.
   sqlite3: ^3.5.2
   # IANA timezone database: attendance follows the company's timezone.
   timezone: ^0.11.1

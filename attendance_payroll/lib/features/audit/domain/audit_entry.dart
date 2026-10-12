@@ -29,7 +29,13 @@ enum AuditAction {
   payrollApproved('payroll.approved'),
   payrollFinalized('payroll.finalized'),
   payrollReopened('payroll.reopened'),
-  printerSettingsChanged('printer.settings_changed');
+  printerSettingsChanged('printer.settings_changed'),
+  backupCreated('backup.created'),
+  backupRestored('backup.restored'),
+  backupDeleted('backup.deleted'),
+  backupExported('backup.exported'),
+  backupSettingsChanged('backup.settings_changed'),
+  backupPasswordChanged('backup.password_changed');
 
   const AuditAction(this.code);
 

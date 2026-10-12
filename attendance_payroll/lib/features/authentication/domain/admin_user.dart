@@ -16,6 +16,7 @@ enum Permission {
   managePayroll,
   approvePayroll,
   managePrinter,
+  manageBackups,
 }
 
 /// What an administrator may do. V1 has a single all-powerful role; finer

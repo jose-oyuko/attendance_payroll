@@ -207,6 +207,26 @@ Receipt printing needs a real Android device and a printer paired in the
 phone's Bluetooth settings first; the emulator has no Bluetooth. The
 printing code is covered by tests with a fake Bluetooth.
 
+## What Phase 11 adds
+
+- Backup area: "Back up now", the backups kept on the device (date, kind,
+  who, size, what is inside), Export, Restore and Delete
+- Backups are encrypted with a backup password you set once (8+ characters,
+  kept in the phone's secure storage). **It cannot be recovered**: write it
+  down. Files are checked after they are made and a damaged or tampered file
+  is refused
+- Restore replaces all data in one step or not at all, after saving a
+  "Before a restore" safety backup; everyone is signed out afterwards. A
+  backup of another company, or from a newer app, is refused or needs an
+  explicit confirmation
+- Restore from a file you exported earlier or brought from another phone,
+  and "Restore from a backup instead" when setting up a new device
+- Automatic backup when you sign in and the last one is over a day old
+  (keeps 10 by default; manual backups are never deleted); a reminder when
+  none is recent
+- Export through the share sheet puts a backup on Google Drive, email, etc.
+- Schema version 10 (`backup_settings`)
+
 ## Project layout
 
 ```

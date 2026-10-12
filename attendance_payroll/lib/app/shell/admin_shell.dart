@@ -2,6 +2,7 @@ import 'package:attendance_payroll/app/configuration/app_config.dart';
 import 'package:attendance_payroll/app/router/admin_destination.dart';
 import 'package:attendance_payroll/core/constants/app_spacing.dart';
 import 'package:attendance_payroll/core/extensions/build_context_extensions.dart';
+import 'package:attendance_payroll/features/backup/presentation/backup_view_providers.dart';
 import 'package:attendance_payroll/shared/responsive/window_size.dart';
 import 'package:attendance_payroll/shared/responsive/window_size_builder.dart';
 import 'package:flutter/material.dart';
@@ -31,6 +32,8 @@ class AdminShell extends ConsumerWidget {
       appConfigProvider.select((config) => config.appName),
     );
     final current = AdminDestination.values[navigationShell.currentIndex];
+    // Once per sign-in, makes an automatic backup if one is due.
+    ref.watch(automaticBackupProvider);
 
     return WindowSizeBuilder(
       builder: (context, size) {

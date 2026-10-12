@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'generated/schema.dart';
 import 'generated/schema_v1.dart' as v1;
+import 'generated/schema_v10.dart' as v10;
 import 'generated/schema_v2.dart' as v2;
 import 'generated/schema_v3.dart' as v3;
 import 'generated/schema_v4.dart' as v4;
@@ -563,6 +564,34 @@ void main() {
           v9.PayrollPeriodsData.fromJson(period.toJson()),
         ]);
         expect(await newDb.select(newDb.printerSettings).get(), isEmpty);
+      },
+    );
+  });
+  test('v9 → v10 keeps printer settings and adds backup settings', () async {
+    const at = '2026-10-12T05:00:00.000Z';
+    const printer = v9.PrinterSettingsData(
+      id: 'this_device',
+      connection: 'bluetooth',
+      deviceId: '66:02:BD:06:18:7B',
+      deviceName: 'RPP02N',
+      paperWidth: 'mm80',
+      updatedAt: at,
+    );
+
+    await verifier.testWithDataIntegrity(
+      oldVersion: 9,
+      newVersion: 10,
+      createOld: v9.DatabaseAtV9.new,
+      createNew: v10.DatabaseAtV10.new,
+      openTestedDatabase: AppDatabase.new,
+      createItems: (batch, oldDb) {
+        batch.insert(oldDb.printerSettings, printer);
+      },
+      validateItems: (newDb) async {
+        expect(await newDb.select(newDb.printerSettings).get(), [
+          v10.PrinterSettingsData.fromJson(printer.toJson()),
+        ]);
+        expect(await newDb.select(newDb.backupSettings).get(), isEmpty);
       },
     );
   });

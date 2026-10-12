@@ -5,6 +5,9 @@ import 'package:attendance_payroll/core/utils/validators.dart';
 import 'package:attendance_payroll/features/authentication/domain/admin_user.dart';
 import 'package:attendance_payroll/features/authentication/domain/password_policy.dart';
 import 'package:attendance_payroll/features/authentication/presentation/auth_controller.dart';
+import 'package:attendance_payroll/features/backup/data/backup_providers.dart';
+import 'package:attendance_payroll/features/backup/presentation/backup_view_providers.dart';
+import 'package:attendance_payroll/features/backup/presentation/widgets/restore_backup_dialog.dart';
 import 'package:attendance_payroll/features/company/domain/company.dart';
 import 'package:attendance_payroll/shared/widgets/auth_panel.dart';
 import 'package:attendance_payroll/shared/widgets/busy_button.dart';
@@ -82,6 +85,34 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
       _busy = false;
       _error = failure?.userMessage;
     });
+  }
+
+  /// Restores a backup instead of creating a company: for a new phone, or
+  /// after reinstalling. Nothing exists yet, so nothing can be lost.
+  Future<void> _restoreFromBackup() async {
+    final service = ref.read(backupServiceProvider);
+    final bytes = await ref.read(backupFilePickerProvider)();
+    if (bytes == null || !mounted) {
+      return;
+    }
+    final header = service.inspect(bytes);
+    if (header.failureOrNull case final failure?) {
+      setState(() => _error = failure.userMessage);
+      return;
+    }
+    final restored = await showRestoreBackupDialog(
+      context,
+      header: header.unwrap(),
+      differentCompany: false,
+      passwordRequired: true,
+      newInstallation: true,
+      restore: (password, _) =>
+          service.restoreOnNewInstallation(bytes, password: password ?? ''),
+    );
+    if (restored) {
+      // The company and its administrators now exist: go to sign-in.
+      ref.invalidate(authControllerProvider);
+    }
   }
 
   static String? _required(String? value, String message) {
@@ -185,6 +216,10 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
                 label: 'Create company',
                 busy: _busy,
                 onPressed: _submit,
+              ),
+              TextButton(
+                onPressed: _busy ? null : _restoreFromBackup,
+                child: const Text('Restore from a backup instead'),
               ),
             ],
           ),

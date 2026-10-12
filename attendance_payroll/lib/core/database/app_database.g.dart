@@ -15865,6 +15865,524 @@ class PrinterSettingsTableCompanion
   }
 }
 
+class $BackupSettingsTableTable extends BackupSettingsTable
+    with TableInfo<$BackupSettingsTableTable, BackupSettingsRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $BackupSettingsTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _retentionCountMeta = const VerificationMeta(
+    'retentionCount',
+  );
+  @override
+  late final GeneratedColumn<int> retentionCount = GeneratedColumn<int>(
+    'retention_count',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _automaticEnabledMeta = const VerificationMeta(
+    'automaticEnabled',
+  );
+  @override
+  late final GeneratedColumn<bool> automaticEnabled = GeneratedColumn<bool>(
+    'automatic_enabled',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("automatic_enabled" IN (0, 1))',
+    ),
+  );
+  static const VerificationMeta _reminderDaysMeta = const VerificationMeta(
+    'reminderDays',
+  );
+  @override
+  late final GeneratedColumn<int> reminderDays = GeneratedColumn<int>(
+    'reminder_days',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _lastAutomaticAttemptAtMeta =
+      const VerificationMeta('lastAutomaticAttemptAt');
+  @override
+  late final GeneratedColumn<DateTime> lastAutomaticAttemptAt =
+      GeneratedColumn<DateTime>(
+        'last_automatic_attempt_at',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _lastAutomaticErrorMeta =
+      const VerificationMeta('lastAutomaticError');
+  @override
+  late final GeneratedColumn<String> lastAutomaticError =
+      GeneratedColumn<String>(
+        'last_automatic_error',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    retentionCount,
+    automaticEnabled,
+    reminderDays,
+    lastAutomaticAttemptAt,
+    lastAutomaticError,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'backup_settings';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<BackupSettingsRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('retention_count')) {
+      context.handle(
+        _retentionCountMeta,
+        retentionCount.isAcceptableOrUnknown(
+          data['retention_count']!,
+          _retentionCountMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_retentionCountMeta);
+    }
+    if (data.containsKey('automatic_enabled')) {
+      context.handle(
+        _automaticEnabledMeta,
+        automaticEnabled.isAcceptableOrUnknown(
+          data['automatic_enabled']!,
+          _automaticEnabledMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_automaticEnabledMeta);
+    }
+    if (data.containsKey('reminder_days')) {
+      context.handle(
+        _reminderDaysMeta,
+        reminderDays.isAcceptableOrUnknown(
+          data['reminder_days']!,
+          _reminderDaysMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_reminderDaysMeta);
+    }
+    if (data.containsKey('last_automatic_attempt_at')) {
+      context.handle(
+        _lastAutomaticAttemptAtMeta,
+        lastAutomaticAttemptAt.isAcceptableOrUnknown(
+          data['last_automatic_attempt_at']!,
+          _lastAutomaticAttemptAtMeta,
+        ),
+      );
+    }
+    if (data.containsKey('last_automatic_error')) {
+      context.handle(
+        _lastAutomaticErrorMeta,
+        lastAutomaticError.isAcceptableOrUnknown(
+          data['last_automatic_error']!,
+          _lastAutomaticErrorMeta,
+        ),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  BackupSettingsRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return BackupSettingsRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      retentionCount: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}retention_count'],
+      )!,
+      automaticEnabled: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}automatic_enabled'],
+      )!,
+      reminderDays: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}reminder_days'],
+      )!,
+      lastAutomaticAttemptAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}last_automatic_attempt_at'],
+      ),
+      lastAutomaticError: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}last_automatic_error'],
+      ),
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $BackupSettingsTableTable createAlias(String alias) {
+    return $BackupSettingsTableTable(attachedDatabase, alias);
+  }
+}
+
+class BackupSettingsRow extends DataClass
+    implements Insertable<BackupSettingsRow> {
+  final String id;
+
+  /// How many automatic backups are kept; older ones are deleted.
+  final int retentionCount;
+  final bool automaticEnabled;
+
+  /// Days without a backup before the administrator is reminded.
+  final int reminderDays;
+  final DateTime? lastAutomaticAttemptAt;
+
+  /// What went wrong the last time an automatic backup failed, or null.
+  final String? lastAutomaticError;
+  final DateTime updatedAt;
+  const BackupSettingsRow({
+    required this.id,
+    required this.retentionCount,
+    required this.automaticEnabled,
+    required this.reminderDays,
+    this.lastAutomaticAttemptAt,
+    this.lastAutomaticError,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['retention_count'] = Variable<int>(retentionCount);
+    map['automatic_enabled'] = Variable<bool>(automaticEnabled);
+    map['reminder_days'] = Variable<int>(reminderDays);
+    if (!nullToAbsent || lastAutomaticAttemptAt != null) {
+      map['last_automatic_attempt_at'] = Variable<DateTime>(
+        lastAutomaticAttemptAt,
+      );
+    }
+    if (!nullToAbsent || lastAutomaticError != null) {
+      map['last_automatic_error'] = Variable<String>(lastAutomaticError);
+    }
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  BackupSettingsTableCompanion toCompanion(bool nullToAbsent) {
+    return BackupSettingsTableCompanion(
+      id: Value(id),
+      retentionCount: Value(retentionCount),
+      automaticEnabled: Value(automaticEnabled),
+      reminderDays: Value(reminderDays),
+      lastAutomaticAttemptAt: lastAutomaticAttemptAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastAutomaticAttemptAt),
+      lastAutomaticError: lastAutomaticError == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastAutomaticError),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory BackupSettingsRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return BackupSettingsRow(
+      id: serializer.fromJson<String>(json['id']),
+      retentionCount: serializer.fromJson<int>(json['retentionCount']),
+      automaticEnabled: serializer.fromJson<bool>(json['automaticEnabled']),
+      reminderDays: serializer.fromJson<int>(json['reminderDays']),
+      lastAutomaticAttemptAt: serializer.fromJson<DateTime?>(
+        json['lastAutomaticAttemptAt'],
+      ),
+      lastAutomaticError: serializer.fromJson<String?>(
+        json['lastAutomaticError'],
+      ),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'retentionCount': serializer.toJson<int>(retentionCount),
+      'automaticEnabled': serializer.toJson<bool>(automaticEnabled),
+      'reminderDays': serializer.toJson<int>(reminderDays),
+      'lastAutomaticAttemptAt': serializer.toJson<DateTime?>(
+        lastAutomaticAttemptAt,
+      ),
+      'lastAutomaticError': serializer.toJson<String?>(lastAutomaticError),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  BackupSettingsRow copyWith({
+    String? id,
+    int? retentionCount,
+    bool? automaticEnabled,
+    int? reminderDays,
+    Value<DateTime?> lastAutomaticAttemptAt = const Value.absent(),
+    Value<String?> lastAutomaticError = const Value.absent(),
+    DateTime? updatedAt,
+  }) => BackupSettingsRow(
+    id: id ?? this.id,
+    retentionCount: retentionCount ?? this.retentionCount,
+    automaticEnabled: automaticEnabled ?? this.automaticEnabled,
+    reminderDays: reminderDays ?? this.reminderDays,
+    lastAutomaticAttemptAt: lastAutomaticAttemptAt.present
+        ? lastAutomaticAttemptAt.value
+        : this.lastAutomaticAttemptAt,
+    lastAutomaticError: lastAutomaticError.present
+        ? lastAutomaticError.value
+        : this.lastAutomaticError,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  BackupSettingsRow copyWithCompanion(BackupSettingsTableCompanion data) {
+    return BackupSettingsRow(
+      id: data.id.present ? data.id.value : this.id,
+      retentionCount: data.retentionCount.present
+          ? data.retentionCount.value
+          : this.retentionCount,
+      automaticEnabled: data.automaticEnabled.present
+          ? data.automaticEnabled.value
+          : this.automaticEnabled,
+      reminderDays: data.reminderDays.present
+          ? data.reminderDays.value
+          : this.reminderDays,
+      lastAutomaticAttemptAt: data.lastAutomaticAttemptAt.present
+          ? data.lastAutomaticAttemptAt.value
+          : this.lastAutomaticAttemptAt,
+      lastAutomaticError: data.lastAutomaticError.present
+          ? data.lastAutomaticError.value
+          : this.lastAutomaticError,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BackupSettingsRow(')
+          ..write('id: $id, ')
+          ..write('retentionCount: $retentionCount, ')
+          ..write('automaticEnabled: $automaticEnabled, ')
+          ..write('reminderDays: $reminderDays, ')
+          ..write('lastAutomaticAttemptAt: $lastAutomaticAttemptAt, ')
+          ..write('lastAutomaticError: $lastAutomaticError, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    retentionCount,
+    automaticEnabled,
+    reminderDays,
+    lastAutomaticAttemptAt,
+    lastAutomaticError,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is BackupSettingsRow &&
+          other.id == this.id &&
+          other.retentionCount == this.retentionCount &&
+          other.automaticEnabled == this.automaticEnabled &&
+          other.reminderDays == this.reminderDays &&
+          other.lastAutomaticAttemptAt == this.lastAutomaticAttemptAt &&
+          other.lastAutomaticError == this.lastAutomaticError &&
+          other.updatedAt == this.updatedAt);
+}
+
+class BackupSettingsTableCompanion extends UpdateCompanion<BackupSettingsRow> {
+  final Value<String> id;
+  final Value<int> retentionCount;
+  final Value<bool> automaticEnabled;
+  final Value<int> reminderDays;
+  final Value<DateTime?> lastAutomaticAttemptAt;
+  final Value<String?> lastAutomaticError;
+  final Value<DateTime> updatedAt;
+  final Value<int> rowid;
+  const BackupSettingsTableCompanion({
+    this.id = const Value.absent(),
+    this.retentionCount = const Value.absent(),
+    this.automaticEnabled = const Value.absent(),
+    this.reminderDays = const Value.absent(),
+    this.lastAutomaticAttemptAt = const Value.absent(),
+    this.lastAutomaticError = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  BackupSettingsTableCompanion.insert({
+    required String id,
+    required int retentionCount,
+    required bool automaticEnabled,
+    required int reminderDays,
+    this.lastAutomaticAttemptAt = const Value.absent(),
+    this.lastAutomaticError = const Value.absent(),
+    required DateTime updatedAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       retentionCount = Value(retentionCount),
+       automaticEnabled = Value(automaticEnabled),
+       reminderDays = Value(reminderDays),
+       updatedAt = Value(updatedAt);
+  static Insertable<BackupSettingsRow> custom({
+    Expression<String>? id,
+    Expression<int>? retentionCount,
+    Expression<bool>? automaticEnabled,
+    Expression<int>? reminderDays,
+    Expression<DateTime>? lastAutomaticAttemptAt,
+    Expression<String>? lastAutomaticError,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (retentionCount != null) 'retention_count': retentionCount,
+      if (automaticEnabled != null) 'automatic_enabled': automaticEnabled,
+      if (reminderDays != null) 'reminder_days': reminderDays,
+      if (lastAutomaticAttemptAt != null)
+        'last_automatic_attempt_at': lastAutomaticAttemptAt,
+      if (lastAutomaticError != null)
+        'last_automatic_error': lastAutomaticError,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  BackupSettingsTableCompanion copyWith({
+    Value<String>? id,
+    Value<int>? retentionCount,
+    Value<bool>? automaticEnabled,
+    Value<int>? reminderDays,
+    Value<DateTime?>? lastAutomaticAttemptAt,
+    Value<String?>? lastAutomaticError,
+    Value<DateTime>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return BackupSettingsTableCompanion(
+      id: id ?? this.id,
+      retentionCount: retentionCount ?? this.retentionCount,
+      automaticEnabled: automaticEnabled ?? this.automaticEnabled,
+      reminderDays: reminderDays ?? this.reminderDays,
+      lastAutomaticAttemptAt:
+          lastAutomaticAttemptAt ?? this.lastAutomaticAttemptAt,
+      lastAutomaticError: lastAutomaticError ?? this.lastAutomaticError,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (retentionCount.present) {
+      map['retention_count'] = Variable<int>(retentionCount.value);
+    }
+    if (automaticEnabled.present) {
+      map['automatic_enabled'] = Variable<bool>(automaticEnabled.value);
+    }
+    if (reminderDays.present) {
+      map['reminder_days'] = Variable<int>(reminderDays.value);
+    }
+    if (lastAutomaticAttemptAt.present) {
+      map['last_automatic_attempt_at'] = Variable<DateTime>(
+        lastAutomaticAttemptAt.value,
+      );
+    }
+    if (lastAutomaticError.present) {
+      map['last_automatic_error'] = Variable<String>(lastAutomaticError.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BackupSettingsTableCompanion(')
+          ..write('id: $id, ')
+          ..write('retentionCount: $retentionCount, ')
+          ..write('automaticEnabled: $automaticEnabled, ')
+          ..write('reminderDays: $reminderDays, ')
+          ..write('lastAutomaticAttemptAt: $lastAutomaticAttemptAt, ')
+          ..write('lastAutomaticError: $lastAutomaticError, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -15905,6 +16423,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   );
   late final $PrinterSettingsTableTable printerSettingsTable =
       $PrinterSettingsTableTable(this);
+  late final $BackupSettingsTableTable backupSettingsTable =
+      $BackupSettingsTableTable(this);
   late final Index auditLogCompanyTime = Index(
     'audit_log_company_time',
     'CREATE INDEX audit_log_company_time ON audit_log (company_id, occurred_at)',
@@ -15993,6 +16513,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     payrollItems,
     payrollRunIssues,
     printerSettingsTable,
+    backupSettingsTable,
     auditLogCompanyTime,
     auditLogEntity,
     attendanceEventsEmployeeTime,
@@ -30510,6 +31031,281 @@ typedef $$PrinterSettingsTableTableProcessedTableManager =
       PrinterSettingsRow,
       PrefetchHooks Function()
     >;
+typedef $$BackupSettingsTableTableCreateCompanionBuilder =
+    BackupSettingsTableCompanion Function({
+      required String id,
+      required int retentionCount,
+      required bool automaticEnabled,
+      required int reminderDays,
+      Value<DateTime?> lastAutomaticAttemptAt,
+      Value<String?> lastAutomaticError,
+      required DateTime updatedAt,
+      Value<int> rowid,
+    });
+typedef $$BackupSettingsTableTableUpdateCompanionBuilder =
+    BackupSettingsTableCompanion Function({
+      Value<String> id,
+      Value<int> retentionCount,
+      Value<bool> automaticEnabled,
+      Value<int> reminderDays,
+      Value<DateTime?> lastAutomaticAttemptAt,
+      Value<String?> lastAutomaticError,
+      Value<DateTime> updatedAt,
+      Value<int> rowid,
+    });
+
+class $$BackupSettingsTableTableFilterComposer
+    extends Composer<_$AppDatabase, $BackupSettingsTableTable> {
+  $$BackupSettingsTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get retentionCount => $composableBuilder(
+    column: $table.retentionCount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get automaticEnabled => $composableBuilder(
+    column: $table.automaticEnabled,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get reminderDays => $composableBuilder(
+    column: $table.reminderDays,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get lastAutomaticAttemptAt => $composableBuilder(
+    column: $table.lastAutomaticAttemptAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get lastAutomaticError => $composableBuilder(
+    column: $table.lastAutomaticError,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$BackupSettingsTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $BackupSettingsTableTable> {
+  $$BackupSettingsTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get retentionCount => $composableBuilder(
+    column: $table.retentionCount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get automaticEnabled => $composableBuilder(
+    column: $table.automaticEnabled,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get reminderDays => $composableBuilder(
+    column: $table.reminderDays,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get lastAutomaticAttemptAt => $composableBuilder(
+    column: $table.lastAutomaticAttemptAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get lastAutomaticError => $composableBuilder(
+    column: $table.lastAutomaticError,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$BackupSettingsTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $BackupSettingsTableTable> {
+  $$BackupSettingsTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get retentionCount => $composableBuilder(
+    column: $table.retentionCount,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get automaticEnabled => $composableBuilder(
+    column: $table.automaticEnabled,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get reminderDays => $composableBuilder(
+    column: $table.reminderDays,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get lastAutomaticAttemptAt => $composableBuilder(
+    column: $table.lastAutomaticAttemptAt,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get lastAutomaticError => $composableBuilder(
+    column: $table.lastAutomaticError,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$BackupSettingsTableTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $BackupSettingsTableTable,
+          BackupSettingsRow,
+          $$BackupSettingsTableTableFilterComposer,
+          $$BackupSettingsTableTableOrderingComposer,
+          $$BackupSettingsTableTableAnnotationComposer,
+          $$BackupSettingsTableTableCreateCompanionBuilder,
+          $$BackupSettingsTableTableUpdateCompanionBuilder,
+          (
+            BackupSettingsRow,
+            BaseReferences<
+              _$AppDatabase,
+              $BackupSettingsTableTable,
+              BackupSettingsRow
+            >,
+          ),
+          BackupSettingsRow,
+          PrefetchHooks Function()
+        > {
+  $$BackupSettingsTableTableTableManager(
+    _$AppDatabase db,
+    $BackupSettingsTableTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$BackupSettingsTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$BackupSettingsTableTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$BackupSettingsTableTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<int> retentionCount = const Value.absent(),
+                Value<bool> automaticEnabled = const Value.absent(),
+                Value<int> reminderDays = const Value.absent(),
+                Value<DateTime?> lastAutomaticAttemptAt = const Value.absent(),
+                Value<String?> lastAutomaticError = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => BackupSettingsTableCompanion(
+                id: id,
+                retentionCount: retentionCount,
+                automaticEnabled: automaticEnabled,
+                reminderDays: reminderDays,
+                lastAutomaticAttemptAt: lastAutomaticAttemptAt,
+                lastAutomaticError: lastAutomaticError,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required int retentionCount,
+                required bool automaticEnabled,
+                required int reminderDays,
+                Value<DateTime?> lastAutomaticAttemptAt = const Value.absent(),
+                Value<String?> lastAutomaticError = const Value.absent(),
+                required DateTime updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => BackupSettingsTableCompanion.insert(
+                id: id,
+                retentionCount: retentionCount,
+                automaticEnabled: automaticEnabled,
+                reminderDays: reminderDays,
+                lastAutomaticAttemptAt: lastAutomaticAttemptAt,
+                lastAutomaticError: lastAutomaticError,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$BackupSettingsTableTable, BackupSettingsRow>(
+                    table,
+                  ),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $BackupSettingsTableTable,
+                    BackupSettingsRow
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$BackupSettingsTableTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $BackupSettingsTableTable,
+      BackupSettingsRow,
+      $$BackupSettingsTableTableFilterComposer,
+      $$BackupSettingsTableTableOrderingComposer,
+      $$BackupSettingsTableTableAnnotationComposer,
+      $$BackupSettingsTableTableCreateCompanionBuilder,
+      $$BackupSettingsTableTableUpdateCompanionBuilder,
+      (
+        BackupSettingsRow,
+        BaseReferences<
+          _$AppDatabase,
+          $BackupSettingsTableTable,
+          BackupSettingsRow
+        >,
+      ),
+      BackupSettingsRow,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -30560,4 +31356,6 @@ class $AppDatabaseManager {
       $$PayrollRunIssuesTableTableManager(_db, _db.payrollRunIssues);
   $$PrinterSettingsTableTableTableManager get printerSettingsTable =>
       $$PrinterSettingsTableTableTableManager(_db, _db.printerSettingsTable);
+  $$BackupSettingsTableTableTableManager get backupSettingsTable =>
+      $$BackupSettingsTableTableTableManager(_db, _db.backupSettingsTable);
 }

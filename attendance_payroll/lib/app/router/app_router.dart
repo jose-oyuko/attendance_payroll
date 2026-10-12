@@ -1,6 +1,5 @@
 import 'package:attendance_payroll/app/router/admin_destination.dart';
 import 'package:attendance_payroll/app/shell/admin_shell.dart';
-import 'package:attendance_payroll/app/shell/planned_feature_screen.dart';
 import 'package:attendance_payroll/core/errors/app_failure.dart';
 import 'package:attendance_payroll/features/attendance/presentation/attendance_day_screen.dart';
 import 'package:attendance_payroll/features/attendance/presentation/attendance_range_screen.dart';
@@ -11,6 +10,7 @@ import 'package:attendance_payroll/features/authentication/presentation/auth_con
 import 'package:attendance_payroll/features/authentication/presentation/setup_screen.dart';
 import 'package:attendance_payroll/features/authentication/presentation/sign_in_screen.dart';
 import 'package:attendance_payroll/features/authentication/presentation/startup_screen.dart';
+import 'package:attendance_payroll/features/backup/presentation/backup_screen.dart';
 import 'package:attendance_payroll/features/dashboard/presentation/dashboard_screen.dart';
 import 'package:attendance_payroll/features/employees/presentation/employee_detail_screen.dart';
 import 'package:attendance_payroll/features/employees/presentation/employee_form_screen.dart';
@@ -162,8 +162,8 @@ Widget _screenFor(AdminDestination destination) {
     AdminDestination.schedules => const SchedulesScreen(),
     AdminDestination.payroll => const PayrollScreen(),
     AdminDestination.reports => const ReportsScreen(),
+    AdminDestination.backup => const BackupScreen(),
     AdminDestination.settings => const SettingsScreen(),
-    _ => PlannedFeatureScreen(destination: destination),
   };
 }
 

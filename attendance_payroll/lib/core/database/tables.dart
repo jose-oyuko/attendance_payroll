@@ -665,3 +665,42 @@ class PrinterSettingsTable extends Table {
         'AND (device_id IS NULL) = (device_name IS NULL))',
   ];
 }
+
+/// How backups behave on this installation. Never shared with other devices
+/// and never replaced by a restore: it describes this device's backup
+/// routine. Exactly one row, with id [BackupSettingsTable.singletonId]; no
+/// row means the defaults (automatic backups on, keep 10, remind after 7
+/// days).
+@DataClassName('BackupSettingsRow')
+class BackupSettingsTable extends Table {
+  static const String singletonId = 'this_device';
+
+  @override
+  String get tableName => 'backup_settings';
+
+  TextColumn get id => text()();
+
+  /// How many automatic backups are kept; older ones are deleted.
+  IntColumn get retentionCount => integer()();
+  BoolColumn get automaticEnabled => boolean()();
+
+  /// Days without a backup before the administrator is reminded.
+  IntColumn get reminderDays => integer()();
+  DateTimeColumn get lastAutomaticAttemptAt => dateTime().nullable()();
+
+  /// What went wrong the last time an automatic backup failed, or null.
+  TextColumn get lastAutomaticError => text().nullable()();
+  DateTimeColumn get updatedAt => dateTime()();
+
+  @override
+  Set<Column<Object>> get primaryKey => {id};
+
+  // Literals, not interpolated: drift_dev reads constraints statically when
+  // exporting schema snapshots. The id must match [singletonId].
+  @override
+  List<String> get customConstraints => [
+    "CHECK (id = 'this_device')",
+    'CHECK (retention_count BETWEEN 1 AND 100)',
+    'CHECK (reminder_days BETWEEN 1 AND 365)',
+  ];
+}

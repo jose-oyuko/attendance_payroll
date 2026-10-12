@@ -32,6 +32,7 @@ tables are in `lib/core/database/tables.dart`. Only repositories in feature
 | 7 | Phase 6 | `work_schedules`, `work_schedule_days`, `schedule_assignments`; `exception_reviews.event_id` optional |
 | 8 | Phase 7 | `payroll_settings`, `payroll_periods`, `payroll_adjustments`, `payroll_runs`, `payroll_lines`, `payroll_items`, `payroll_run_issues` |
 | 9 | Phase 10 | `printer_settings` |
+| 10 | Phase 11 | `backup_settings` |
 
 ### Version 1
 
@@ -171,6 +172,22 @@ schema change.
 
 Migration 8 → 9 only creates this table; existing rows are untouched
 (covered by a data-integrity migration test).
+
+### Version 10
+
+- **backup_settings** — how backups behave on this installation. Exactly one
+  row (CHECK `id = 'this_device'`); no row means the defaults. `automatic_enabled`,
+  `retention_count` (CHECK 1–100: automatic backups kept), `reminder_days`
+  (CHECK 1–365), `last_automatic_attempt_at`, `last_automatic_error` (a
+  user-facing message, never a secret), `updated_at`. Device-local like
+  `printer_settings`: no sync metadata, and a restore never replaces it.
+
+Backup files themselves are not in the database: they are encrypted files in
+the app's private folder, each with a readable header. The backup password is
+in the platform's secure storage, not in the database or in backups.
+
+Migration 9 → 10 only creates this table (covered by a data-integrity
+migration test).
 
 Indexes come from the unique keys: `(company_id, employee_number)` serves
 lookups by company and by number; `(company_id, username)` and
