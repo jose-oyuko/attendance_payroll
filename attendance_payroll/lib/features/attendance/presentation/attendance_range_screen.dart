@@ -138,15 +138,23 @@ class _RangeViewState extends ConsumerState<_RangeView> {
                   '${formatLocalDate(context, _range.to)}',
                 ),
               ),
-              DropdownButton<String?>(
-                value: names.containsKey(_employeeId) ? _employeeId : null,
-                hint: const Text('All employees'),
-                items: [
-                  const DropdownMenuItem(child: Text('All employees')),
-                  for (final MapEntry(:key, :value) in names.entries)
-                    DropdownMenuItem(value: key, child: Text(value)),
-                ],
-                onChanged: (id) => setState(() => _employeeId = id),
+              // Wide enough for a name, but never wider than the screen.
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 280),
+                child: DropdownButton<String?>(
+                  isExpanded: true,
+                  value: names.containsKey(_employeeId) ? _employeeId : null,
+                  hint: const Text('All employees'),
+                  items: [
+                    const DropdownMenuItem(child: Text('All employees')),
+                    for (final MapEntry(:key, :value) in names.entries)
+                      DropdownMenuItem(
+                        value: key,
+                        child: Text(value, overflow: TextOverflow.ellipsis),
+                      ),
+                  ],
+                  onChanged: (id) => setState(() => _employeeId = id),
+                ),
               ),
               FilterChip(
                 label: const Text('Only days with problems'),

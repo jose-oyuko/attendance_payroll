@@ -227,6 +227,32 @@ printing code is covered by tests with a fake Bluetooth.
 - Export through the share sheet puts a backup on Google Drive, email, etc.
 - Schema version 10 (`backup_settings`)
 
+## What Phase 12 adds
+
+This is the first release candidate (version 1.0.0). Nothing new to learn; the
+app is safer, faster and checked harder.
+
+- Sign-out after 15 minutes without activity (and after being away that long),
+  with a message saying why; **Settings → Account → Change password**
+- Release builds are hidden from screenshots and the recent-apps list, never
+  use the network, and are not copied to a Google account by Android backup
+- Backups are about 30 times faster to make and restore (a 300-employee company
+  with a year of clock events: about 5 seconds to back up, about 12 to restore)
+- The database is crash-safe (write-ahead logging, full synchronous writes)
+- Every screen was checked on phone and tablet sizes, at the largest text size,
+  and for control size, labels and contrast; the overflows found were fixed
+- New tests: the whole workflow end to end, payroll on thousands of random
+  months against an independent calculation, large-company speed, query plans,
+  accessibility, and security checks on the source and the Android manifest
+- Release guide ([docs/RELEASE.md](docs/RELEASE.md)), security review
+  ([docs/SECURITY.md](docs/SECURITY.md)), CI that builds the release APK
+- No schema change (still version 10)
+
+**Before you give the app to anyone**, read [docs/RELEASE.md](docs/RELEASE.md):
+choose the application id (`com.example...` is a placeholder and cannot be
+changed later without making it a different app), create the signing key, and
+run the device checklist on a real phone.
+
 ## Project layout
 
 ```

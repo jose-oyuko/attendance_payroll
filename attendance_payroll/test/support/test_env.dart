@@ -51,7 +51,8 @@ SecretHasher fastHasher() => SecretHasher(iterations: 2);
 /// Real repositories and services over a fresh in-memory database, with a
 /// controllable clock.
 class TestEnv {
-  TestEnv({AuditLogRepository? audit}) : db = openTestDatabase() {
+  TestEnv({AuditLogRepository? audit, AppDatabase? database})
+    : db = database ?? openTestDatabase() {
     this.audit =
         audit ??
         DriftAuditLogRepository(

@@ -47,13 +47,16 @@ class PayrollSection extends StatelessWidget {
               AppSpacing.sm,
               AppSpacing.sm,
             ),
-            child: Row(
+            // The action sits beside the title when there is room, and
+            // under it when there is not (large text).
+            child: Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              runSpacing: AppSpacing.xs,
               children: [
-                Expanded(
-                  child: Semantics(
-                    header: true,
-                    child: Text(title, style: context.textStyles.titleMedium),
-                  ),
+                Semantics(
+                  header: true,
+                  child: Text(title, style: context.textStyles.titleMedium),
                 ),
                 ?trailing,
               ],
@@ -220,13 +223,20 @@ class PayrollLinesSection extends StatelessWidget {
               ),
             ),
             title: Text(names[line.employeeId] ?? 'Unknown employee'),
+            // The net pay sits at the end of the row, or under the hours
+            // when large text leaves no room beside the name.
             subtitle: Text(
-              line.overtimeHours == Duration.zero
-                  ? formatHours(line.regularHours)
-                  : '${formatHours(line.regularHours)} + '
-                        '${formatHours(line.overtimeHours)} overtime',
+              [
+                line.overtimeHours == Duration.zero
+                    ? formatHours(line.regularHours)
+                    : '${formatHours(line.regularHours)} + '
+                          '${formatHours(line.overtimeHours)} overtime',
+                if (context.largeText) '${line.net}',
+              ].join('\n'),
             ),
-            trailing: Text('${line.net}', style: context.textStyles.titleSmall),
+            trailing: context.largeText
+                ? null
+                : Text('${line.net}', style: context.textStyles.titleSmall),
           ),
         ],
       ],

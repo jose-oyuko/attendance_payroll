@@ -24,7 +24,7 @@ class EmptyState extends StatelessWidget {
   Widget build(BuildContext context) {
     final message = this.message;
     final action = this.action;
-    return Center(
+    final content = Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(
           maxWidth: AppConstants.messageMaxWidth,
@@ -65,6 +65,18 @@ class EmptyState extends StatelessWidget {
           ),
         ),
       ),
+    );
+    // Centred when there is room; scrolls when large text needs more height
+    // than the screen has.
+    return LayoutBuilder(
+      builder: (context, constraints) => constraints.hasBoundedHeight
+          ? SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: content,
+              ),
+            )
+          : content,
     );
   }
 }

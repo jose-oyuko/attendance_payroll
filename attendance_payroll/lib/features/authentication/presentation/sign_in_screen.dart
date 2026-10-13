@@ -4,6 +4,7 @@ import 'package:attendance_payroll/features/authentication/presentation/auth_con
 import 'package:attendance_payroll/shared/widgets/auth_panel.dart';
 import 'package:attendance_payroll/shared/widgets/busy_button.dart';
 import 'package:attendance_payroll/shared/widgets/failure_banner.dart';
+import 'package:attendance_payroll/shared/widgets/notice_banner.dart';
 import 'package:attendance_payroll/shared/widgets/password_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -53,6 +54,10 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
   @override
   Widget build(BuildContext context) {
     final error = _error;
+    final reason = switch (ref.watch(authControllerProvider)) {
+      AsyncData(value: SignedOut(:final reason)) => reason,
+      _ => null,
+    };
     return AuthPanel(
       title: 'Sign in',
       subtitle: 'Administrator access to attendance and payroll.',
@@ -63,6 +68,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             spacing: AppSpacing.md,
             children: [
+              if (reason != null) NoticeBanner(message: reason),
               if (error != null) FailureBanner(message: error),
               TextFormField(
                 controller: _username,

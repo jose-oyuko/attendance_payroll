@@ -194,6 +194,34 @@ lookups by company and by number; `(company_id, username)` and
 `(employee_id, effective_from)` likewise. Further indexes are added with the
 queries that need them (attendance, payroll).
 
+## Connection settings and review (Phase 12)
+
+- **Journal mode and durability.** On a device the database is opened with
+  write-ahead logging and `synchronous = FULL` (`AppDatabase.configureConnection`):
+  a power cut mid-write cannot corrupt the file, a committed clock-in or
+  payroll approval is on disk before the app says it is saved, and a backup can
+  read while the app writes. Foreign keys are enforced on every connection
+  (`beforeOpen`). `connection_settings_test.dart` checks all three, and that a
+  fresh file passes `integrity_check` and `foreign_key_check`.
+- **Indexes.** `query_plans_test.dart` records every `SELECT` the app runs on a
+  realistic workload (day and range attendance, exceptions, payroll
+  calculation, history, payslips, reports) and asks SQLite for its plan: no
+  query may scan a table that grows with time (events, corrections, audit log,
+  exception reviews, payroll rows). It replaces a list of "indexes that exist"
+  with proof that the real queries use them. Add the new query to the
+  scenario when a screen gets one.
+- **Migrations.** Every upgrade path from every version to the latest is
+  generated and verified against the exported schema (`migration_test.dart`),
+  and each version has a data-integrity test proving existing rows survive.
+  Restoring an older backup runs the same migrations on the backup first, so
+  a restored backup is always at the current schema.
+- **Scale.** `test/performance/large_company_test.dart` seeds 300 employees with
+  a year of clock events (about 156,000 events) and times the heavy work.
+  On a laptop: a month of payroll about 2 s, a month's attendance report about
+  1 s, a full year's report about 11 s, a backup about 5 s (5 MB) and a restore
+  about 12 s. The limits in the test are several times that, so it fails on an
+  algorithmic regression, not on a slow machine.
+
 ## Changing the schema
 
 Never delete a user's database to get past a schema change.

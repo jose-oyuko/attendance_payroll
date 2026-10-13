@@ -33,15 +33,17 @@ class DashboardScreen extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         spacing: AppSpacing.md,
         children: [
-          Row(
+          // The link goes beside the heading when there is room, and under it
+          // when there is not (large text).
+          Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              Expanded(
-                child: Text(
-                  company == null
-                      ? "Today's attendance"
-                      : "Today's attendance · ${company.details.name}",
-                  style: context.textStyles.titleMedium,
-                ),
+              Text(
+                company == null
+                    ? "Today's attendance"
+                    : "Today's attendance · ${company.details.name}",
+                style: context.textStyles.titleMedium,
               ),
               TextButton(
                 onPressed: () => context.go(AdminDestination.attendance.path),

@@ -136,6 +136,9 @@ class _RailLayout extends StatelessWidget {
                     icon: Icon(destination.icon),
                     selectedIcon: Icon(destination.selectedIcon),
                     label: Text(destination.label),
+                    // The rail's own items are 44 high; 48 is the least that
+                    // is comfortable to press.
+                    padding: const EdgeInsets.symmetric(vertical: 2),
                   ),
               ],
             ),

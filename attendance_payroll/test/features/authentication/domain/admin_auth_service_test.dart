@@ -1,5 +1,6 @@
 import 'package:attendance_payroll/core/errors/app_failure.dart';
 import 'package:attendance_payroll/features/authentication/domain/admin_auth_service.dart';
+import 'package:attendance_payroll/features/authentication/domain/admin_session.dart';
 import 'package:attendance_payroll/features/authentication/domain/admin_user.dart';
 import 'package:attendance_payroll/features/company/domain/company.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -143,6 +144,139 @@ void main() {
         (result.failureOrNull! as BusinessRuleFailure).rule,
         AdminAuthService.notSetUpRule,
       );
+    });
+  });
+  group('changePassword', () {
+    const newPassword = 'a different long password';
+
+    test(
+      'replaces the password: the new one works, the old one does not',
+      () async {
+        final session = await env.setUpOwner();
+
+        final result = await env.auth.changePassword(
+          session,
+          currentPassword: ownerPassword,
+          newPassword: newPassword,
+        );
+
+        expect(result.isOk, isTrue);
+        expect(
+          (await env.auth.signIn(ownerUsername, newPassword)).isOk,
+          isTrue,
+        );
+        expect(
+          await signInFailure(ownerPassword),
+          isA<AuthenticationFailure>(),
+        );
+      },
+    );
+
+    test('needs the current password', () async {
+      final session = await env.setUpOwner();
+
+      final result = await env.auth.changePassword(
+        session,
+        currentPassword: 'not my password',
+        newPassword: newPassword,
+      );
+
+      expect(result.failureOrNull, isA<AuthenticationFailure>());
+      expect(result.failureOrNull!.userMessage, contains('current password'));
+      expect(
+        (await env.auth.signIn(ownerUsername, ownerPassword)).isOk,
+        isTrue,
+      );
+    });
+
+    test('wrong attempts lock it like sign-in', () async {
+      final session = await env.setUpOwner();
+
+      for (var i = 0; i < AdminAuthService.lockoutPolicy.maxAttempts; i++) {
+        await env.auth.changePassword(
+          session,
+          currentPassword: 'not my password',
+          newPassword: newPassword,
+        );
+      }
+      final locked = await env.auth.changePassword(
+        session,
+        currentPassword: ownerPassword,
+        newPassword: newPassword,
+      );
+
+      expect(locked.failureOrNull, isA<AuthenticationFailure>());
+      expect(locked.failureOrNull!.userMessage, contains('Try again'));
+      expect(await env.auditActions(), contains('admin.locked_out'));
+    });
+
+    test('the new password follows the policy and must be new', () async {
+      final session = await env.setUpOwner();
+
+      final tooShort = await env.auth.changePassword(
+        session,
+        currentPassword: ownerPassword,
+        newPassword: 'short',
+      );
+      final same = await env.auth.changePassword(
+        session,
+        currentPassword: ownerPassword,
+        newPassword: ownerPassword,
+      );
+
+      expect(tooShort.failureOrNull, isA<ValidationFailure>());
+      expect(same.failureOrNull, isA<ValidationFailure>());
+      expect(
+        (await env.auth.signIn(ownerUsername, ownerPassword)).isOk,
+        isTrue,
+      );
+    });
+
+    test('is audited without either password', () async {
+      final session = await env.setUpOwner();
+
+      await env.auth.changePassword(
+        session,
+        currentPassword: ownerPassword,
+        newPassword: newPassword,
+      );
+
+      final row = (await env.auditRows()).singleWhere(
+        (r) => r.action == 'admin.password_changed',
+      );
+      expect(row.actorId, session.admin.id);
+      final stored = row.metadata ?? '';
+      expect(stored, isNot(contains(ownerPassword)));
+      expect(stored, isNot(contains(newPassword)));
+      final credential = await env.db.select(env.db.credentials).getSingle();
+      expect(credential.secretHash, isNot(contains(newPassword)));
+    });
+
+    test('an administrator who is no longer active cannot', () async {
+      final session = await env.setUpOwner();
+      final inactive = AdminSession(
+        admin: AdminUser(
+          id: session.admin.id,
+          companyId: session.companyId,
+          username: session.admin.username,
+          displayName: session.admin.displayName,
+          role: session.admin.role,
+          active: false,
+          lastLoginAt: null,
+          createdAt: session.admin.createdAt,
+          updatedAt: session.admin.updatedAt,
+          version: session.admin.version,
+        ),
+        signedInAt: session.signedInAt,
+      );
+
+      final result = await env.auth.changePassword(
+        inactive,
+        currentPassword: ownerPassword,
+        newPassword: newPassword,
+      );
+
+      expect(result.failureOrNull, isA<PermissionFailure>());
     });
   });
 }

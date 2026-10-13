@@ -25,13 +25,17 @@ class SectionCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           spacing: AppSpacing.md,
           children: [
-            Row(
+            // The action goes beside the title when there is room, and under it
+            // when there is not (a phone, or large text).
+            Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: AppSpacing.sm,
+              runSpacing: AppSpacing.xs,
               children: [
-                Expanded(
-                  child: Semantics(
-                    header: true,
-                    child: Text(title, style: context.textStyles.titleMedium),
-                  ),
+                Semantics(
+                  header: true,
+                  child: Text(title, style: context.textStyles.titleMedium),
                 ),
                 ?action,
               ],

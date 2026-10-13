@@ -18,14 +18,22 @@ import 'package:pointycastle/export.dart';
 /// container version 1 byte    layout of everything after it
 /// header length     4 bytes   big-endian
 /// header            JSON, readable without the password
-/// encrypted data    AES-256-GCM of the gzip-compressed database
+/// encrypted data    AES-256-CTR of the gzip-compressed database
+/// tag               32 bytes  HMAC-SHA256 over the header and the data
 /// ```
 ///
-/// The key comes from the backup password with PBKDF2-HMAC-SHA256 (salt and
-/// work factor are in the header). The header is the GCM associated data, so
-/// changing any byte of the header or the data makes decryption fail: a
-/// damaged or tampered file is never half-read. The header also holds the
-/// SHA-256 of the compressed database as an independent integrity check.
+/// Encrypt-then-MAC: a master key comes from the backup password with
+/// PBKDF2-HMAC-SHA256 (salt and work factor are in the header), and an
+/// encryption key and a separate MAC key are derived from it. The tag covers
+/// the header length, the header and the encrypted data and is checked, in
+/// constant time, **before** anything is decrypted, so a damaged or tampered
+/// file (or a wrong password) is rejected without being half-read. The header
+/// also holds the SHA-256 of the compressed database as an independent
+/// integrity check.
+///
+/// This replaced AES-GCM, whose authentication step is about thirty times
+/// slower in pure Dart (minutes for a large company on a phone). Files made
+/// with the GCM cipher are still read.
 ///
 /// Key derivation, compression and encryption run on a background isolate so
 /// a backup never freezes the screen.
@@ -42,11 +50,19 @@ final class ApbackupCodec implements BackupCodec {
 
   static const List<int> magic = [0x41, 0x50, 0x42, 0x4B];
   static const int containerVersion = 1;
+
+  /// The cipher of new backups.
+  static const String ctrHmacCipher = 'aes-256-ctr-hmac-sha256';
+
+  /// The cipher of the first backups of the app, still readable.
+  static const String gcmCipher = 'aes-256-gcm';
+
   static const int _fixedBytes = 9;
   static const int _keyLength = 32;
   static const int _saltLength = 16;
-  static const int _nonceLength = 12;
-  static const int _tagBits = 128;
+  static const int _ivLength = 16;
+  static const int _macLength = 32;
+  static const int _gcmTagBits = 128;
 
   final int iterations;
   final bool inBackground;
@@ -73,7 +89,7 @@ final class ApbackupCodec implements BackupCodec {
       password: password,
       iterations: iterations,
       salt: _randomBytes(_saltLength),
-      nonce: _randomBytes(_nonceLength),
+      iv: _randomBytes(_ivLength),
     );
     return _run(_encode, job);
   }
@@ -134,7 +150,7 @@ String _sha256Hex(Uint8List bytes) => SHA256Digest()
     .map((b) => b.toRadixString(16).padLeft(2, '0'))
     .join();
 
-Uint8List _deriveKey(String password, Uint8List salt, int iterations) =>
+Uint8List _masterKey(String password, Uint8List salt, int iterations) =>
     derivePbkdf2(
       Pbkdf2Job(
         secret: password,
@@ -144,21 +160,46 @@ Uint8List _deriveKey(String password, Uint8List salt, int iterations) =>
       ),
     );
 
-GCMBlockCipher _cipher({
-  required bool encrypt,
-  required Uint8List key,
-  required Uint8List nonce,
-  required Uint8List headerBytes,
-}) => GCMBlockCipher(AESEngine())
-  ..init(
-    encrypt,
-    AEADParameters(
-      KeyParameter(key),
-      ApbackupCodec._tagBits,
-      nonce,
-      headerBytes,
-    ),
-  );
+/// HMAC-SHA256 of the concatenation of [parts].
+Uint8List _hmac(Uint8List key, List<Uint8List> parts) {
+  final mac = HMac(SHA256Digest(), 64)..init(KeyParameter(key));
+  for (final part in parts) {
+    mac.update(part, 0, part.length);
+  }
+  final out = Uint8List(mac.macSize);
+  mac.doFinal(out, 0);
+  return out;
+}
+
+/// The encryption key and the MAC key, from the master key. Separate keys
+/// for separate purposes, so neither can be confused for the other.
+({Uint8List encryption, Uint8List mac}) _subKeys(Uint8List master) => (
+  encryption: _hmac(master, [Uint8List.fromList(utf8.encode('apbackup enc'))]),
+  mac: _hmac(master, [Uint8List.fromList(utf8.encode('apbackup mac'))]),
+);
+
+Uint8List _ctr(Uint8List key, Uint8List iv, Uint8List data) => (CTRStreamCipher(
+  AESEngine(),
+)..init(true, ParametersWithIV(KeyParameter(key), iv))).process(data);
+
+/// The tag over the length of the header, the header and the data.
+Uint8List _tag(Uint8List macKey, Uint8List header, Uint8List data) =>
+    _hmac(macKey, [
+      (ByteData(4)..setUint32(0, header.length)).buffer.asUint8List(),
+      header,
+      data,
+    ]);
+
+bool _sameBytes(Uint8List a, Uint8List b) {
+  if (a.length != b.length) {
+    return false;
+  }
+  var difference = 0;
+  for (var i = 0; i < a.length; i++) {
+    difference |= a[i] ^ b[i];
+  }
+  return difference == 0;
+}
 
 final class _EncodeJob {
   const _EncodeJob({
@@ -167,7 +208,7 @@ final class _EncodeJob {
     required this.password,
     required this.iterations,
     required this.salt,
-    required this.nonce,
+    required this.iv,
   });
 
   final Map<String, Object?> header;
@@ -175,7 +216,7 @@ final class _EncodeJob {
   final String password;
   final int iterations;
   final Uint8List salt;
-  final Uint8List nonce;
+  final Uint8List iv;
 }
 
 final class _DecodeJob {
@@ -197,26 +238,25 @@ Uint8List _encode(_EncodeJob job) {
           'iterations': job.iterations,
           'salt': base64.encode(job.salt),
         },
-        'cipher': {'name': 'aes-256-gcm', 'nonce': base64.encode(job.nonce)},
+        'cipher': {
+          'name': ApbackupCodec.ctrHmacCipher,
+          'iv': base64.encode(job.iv),
+        },
         'compression': 'gzip',
         'sha256': _sha256Hex(compressed),
       }),
     ),
   );
-  final key = _deriveKey(job.password, job.salt, job.iterations);
-  final encrypted = _cipher(
-    encrypt: true,
-    key: key,
-    nonce: job.nonce,
-    headerBytes: headerBytes,
-  ).process(compressed);
+  final keys = _subKeys(_masterKey(job.password, job.salt, job.iterations));
+  final encrypted = _ctr(keys.encryption, job.iv, compressed);
 
   final out = BytesBuilder(copy: false)
     ..add(ApbackupCodec.magic)
     ..addByte(ApbackupCodec.containerVersion)
     ..add((ByteData(4)..setUint32(0, headerBytes.length)).buffer.asUint8List())
     ..add(headerBytes)
-    ..add(encrypted);
+    ..add(encrypted)
+    ..add(_tag(keys.mac, headerBytes, encrypted));
   return out.takeBytes();
 }
 
@@ -234,41 +274,29 @@ Uint8List _decode(_DecodeJob job) {
       cipher is! Map<String, Object?> ||
       expected is! String ||
       kdf['name'] != 'pbkdf2-hmac-sha256' ||
-      cipher['name'] != 'aes-256-gcm' ||
       json['compression'] != 'gzip') {
     throw BackupFailures.invalidFile;
   }
   final iterations = kdf['iterations'];
   final salt = kdf['salt'];
-  final nonce = cipher['nonce'];
-  if (iterations is! int ||
-      iterations < 1 ||
-      salt is! String ||
-      nonce is! String) {
+  if (iterations is! int || iterations < 1 || salt is! String) {
     throw BackupFailures.invalidFile;
   }
-  final Uint8List saltBytes;
-  final Uint8List nonceBytes;
-  try {
-    saltBytes = base64.decode(salt);
-    nonceBytes = base64.decode(nonce);
-  } on FormatException {
-    throw BackupFailures.invalidFile;
-  }
-  final key = _deriveKey(job.password, saltBytes, iterations);
+  final body = Uint8List.sublistView(job.file, headerEnd);
   final Uint8List compressed;
   try {
-    compressed = _cipher(
-      encrypt: false,
-      key: key,
-      nonce: nonceBytes,
-      headerBytes: headerBytes,
-    ).process(Uint8List.sublistView(job.file, headerEnd));
-  } on InvalidCipherTextException {
-    // Wrong password, or a changed byte anywhere in the file: GCM cannot
-    // tell them apart, and neither should the message.
-    throw BackupFailures.wrongPassword;
-  } on ArgumentError {
+    final master = _masterKey(job.password, base64.decode(salt), iterations);
+    compressed = switch (cipher['name']) {
+      ApbackupCodec.ctrHmacCipher => _openCtr(
+        master,
+        cipher,
+        headerBytes,
+        body,
+      ),
+      ApbackupCodec.gcmCipher => _openGcm(master, cipher, headerBytes, body),
+      _ => throw BackupFailures.invalidFile,
+    };
+  } on FormatException {
     throw BackupFailures.invalidFile;
   }
   if (_sha256Hex(compressed) != expected) {
@@ -277,6 +305,62 @@ Uint8List _decode(_DecodeJob job) {
   try {
     return Uint8List.fromList(gzip.decode(compressed));
   } on FormatException {
+    throw BackupFailures.invalidFile;
+  }
+}
+
+/// The current cipher: the tag is checked first, then the data is decrypted.
+Uint8List _openCtr(
+  Uint8List master,
+  Map<String, Object?> cipher,
+  Uint8List headerBytes,
+  Uint8List body,
+) {
+  final iv = cipher['iv'];
+  if (iv is! String || body.length < ApbackupCodec._macLength) {
+    throw BackupFailures.invalidFile;
+  }
+  final ivBytes = base64.decode(iv);
+  if (ivBytes.length != ApbackupCodec._ivLength) {
+    throw BackupFailures.invalidFile;
+  }
+  final keys = _subKeys(master);
+  final split = body.length - ApbackupCodec._macLength;
+  final data = Uint8List.sublistView(body, 0, split);
+  final tag = Uint8List.sublistView(body, split);
+  // A wrong password and a changed byte anywhere give a different tag; the
+  // two cannot be told apart, and neither should the message.
+  if (!_sameBytes(_tag(keys.mac, headerBytes, data), tag)) {
+    throw BackupFailures.wrongPassword;
+  }
+  return _ctr(keys.encryption, ivBytes, data);
+}
+
+/// The cipher of the first backups (AES-256-GCM), kept readable.
+Uint8List _openGcm(
+  Uint8List master,
+  Map<String, Object?> cipher,
+  Uint8List headerBytes,
+  Uint8List body,
+) {
+  final nonce = cipher['nonce'];
+  if (nonce is! String) {
+    throw BackupFailures.invalidFile;
+  }
+  try {
+    return (GCMBlockCipher(AESEngine())..init(
+          false,
+          AEADParameters(
+            KeyParameter(master),
+            ApbackupCodec._gcmTagBits,
+            base64.decode(nonce),
+            headerBytes,
+          ),
+        ))
+        .process(body);
+  } on InvalidCipherTextException {
+    throw BackupFailures.wrongPassword;
+  } on ArgumentError {
     throw BackupFailures.invalidFile;
   }
 }

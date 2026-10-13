@@ -455,6 +455,42 @@ destination so each area keeps its navigation state.
   Deferred: Google Drive provider and scheduled background uploads (next
   phase), a dashboard reminder, backup of the company logo file.
 
+## Hardening (Phase 12)
+
+The review is written up where it belongs: security in
+[SECURITY.md](SECURITY.md), database in [DATABASE.md](DATABASE.md), building
+and shipping in [RELEASE.md](RELEASE.md). What changed in the code:
+
+- **Security**: administrator password change (current password required,
+  shares the sign-in lockout, audited); automatic sign-out after 15 minutes
+  without a touch or in the background (`SessionTimeoutGuard`, with the
+  reason shown at sign-in); release builds hide the app from screenshots and
+  the recent-apps list; Android Auto Backup is off; the network permission is
+  removed; release signing is read from an uncommitted `key.properties`.
+- **Backup speed**: backups moved from AES-GCM to AES-256-CTR with an
+  HMAC-SHA256 tag (encrypt-then-MAC, checked before decrypting). GCM's
+  authentication runs at about 0.5 MB/s in pure Dart; the new construction is
+  about 30 times faster, so a large company's backup takes seconds, not
+  minutes. Files made with GCM still open.
+- **Database**: write-ahead logging and full synchronous writes; query-plan
+  and scale tests (see DATABASE.md).
+- **Accessibility and layout**: a sweep opens every screen with realistic data
+  at phone, small-tablet and tablet sizes and at the largest text size, and
+  fails on any overflow, any control smaller than 48 dp or without a label,
+  and any text with too little contrast in light or dark. It found and fixed
+  overflows in the employee list, employee detail, attendance range,
+  schedules, schedule form, payroll period and dashboard, and a rail whose
+  items were 44 dp high. `BuildContext.largeText` is the shared way for a
+  layout to stack what it would otherwise put side by side.
+- **Tests that guard promises**: `test/security/source_hygiene_test.dart` (no
+  network code, nothing printed, secure randomness, no SQL from text, manifest
+  settings), `test/integration/payroll_cycle_test.dart` (the whole workflow
+  from the spec, finalized payroll surviving a later rate change and a backup
+  restore), `payroll_properties_test.dart` (random months against an
+  independent exact calculation) and the scale tests.
+- **Release**: version 1.0.0; CI also builds the release APK and fails if it
+  asks for the network or allows Android backup.
+
 ## Database
 
 Drift over SQLite with versioned, tested migrations. Conventions (UUIDv7 keys,
@@ -509,17 +545,21 @@ Nothing in V1 talks to a server, but the design leaves room:
 | 8 | Payroll UI |
 | 9 | Reports and PDF |
 | 10 | Thermal printing |
-| 11 | Backup and restore (current) |
-| 12 | Hardening |
+| 11 | Backup and restore |
+| 12 | Hardening (current) |
 | 13 | Cloud architecture (documentation only) |
 
 ## Current boundaries
 
-After Phase 11: attendance, schedules, exceptions, the full payroll cycle
-(calculate, adjust, approve, finalize, reopen, with locking and history),
-printable documents (payslips, payroll summary, attendance report,
-timesheet, exception report as PDF, with preview, print and share) and
-Bluetooth thermal receipts (payslips and payroll summary) and encrypted
-local backup and restore are complete. Still deferred: Google Drive backup,
-administrator password change and recovery, session timeout, and persisting
-the theme choice.
+After Phase 12 the V1 feature set is complete and reviewed (version 1.0.0):
+attendance, schedules, exceptions, the full payroll cycle (calculate, adjust,
+approve, finalize, reopen, with locking and history), printable documents
+(PDF with preview, print and share), Bluetooth thermal receipts, and encrypted
+local backup and restore, with sessions that expire and a changeable
+administrator password.
+
+Deliberately not in V1 (see SECURITY.md and the spec's section 55): cloud
+backup and synchronization (Phase 13 describes the design), administrator
+password recovery (there is no server; restore a backup), encryption of the
+database file itself, finer administrator roles, and remembering the theme
+choice between launches.

@@ -116,6 +116,71 @@ final class AdminAuthService {
     });
   }
 
+  /// Changes the password of the signed-in administrator. The current
+  /// password must be given again, so someone at an unlocked, unattended
+  /// device cannot take the account over; wrong attempts count towards the
+  /// same lockout as sign-in. The new password is never stored, logged or
+  /// written to the audit log.
+  Future<Result<void>> changePassword(
+    AdminSession session, {
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    if (!session.admin.active) {
+      return const Err(PermissionFailure());
+    }
+    final invalid = PasswordPolicy.validate(newPassword);
+    if (invalid != null) {
+      return Err(invalid);
+    }
+    if (newPassword == currentPassword) {
+      return const Err(
+        ValidationFailure(
+          field: 'password',
+          userMessage: 'Choose a password different from the current one.',
+        ),
+      );
+    }
+    final owner = CredentialOwner.admin(session.admin.id);
+    final verified = await _verifier.verify(
+      owner,
+      currentPassword,
+      wrongSecretMessage: 'The current password is incorrect.',
+      onLockedOut: () => _audit.record(
+        AuditEntry(
+          companyId: session.companyId,
+          actorType: AuditActorType.system,
+          actorId: null,
+          action: AuditAction.adminLockedOut,
+          entityType: 'admin_user',
+          entityId: session.admin.id,
+        ),
+      ),
+    );
+    if (verified case Err(:final failure)) {
+      return Err(failure);
+    }
+    // Hash before the transaction: it is slow and needs no database lock.
+    final hash = await _hasher.hash(newPassword);
+    return _transactions.run(() async {
+      (await _credentials.replaceSecret(
+        owner,
+        hash,
+        isTemporary: false,
+      )).unwrap();
+      (await _audit.record(
+        AuditEntry(
+          companyId: session.companyId,
+          actorType: AuditActorType.admin,
+          actorId: session.admin.id,
+          action: AuditAction.adminPasswordChanged,
+          entityType: 'admin_user',
+          entityId: session.admin.id,
+        ),
+      )).unwrap();
+    });
+  }
+
   /// Signs an administrator in. Every failure gives the same message so the
   /// response does not reveal whether a username exists.
   Future<Result<AdminSession>> signIn(String username, String password) async {

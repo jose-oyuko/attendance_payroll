@@ -1,5 +1,6 @@
 import 'package:attendance_payroll/core/constants/app_spacing.dart';
 import 'package:attendance_payroll/core/errors/app_failure.dart';
+import 'package:attendance_payroll/core/extensions/build_context_extensions.dart';
 import 'package:attendance_payroll/features/employees/domain/employee.dart';
 import 'package:attendance_payroll/features/employees/presentation/employee_routes.dart';
 import 'package:attendance_payroll/features/employees/presentation/employee_view_providers.dart';
@@ -125,13 +126,21 @@ class _Toolbar extends StatelessWidget {
       label: const Text('Add employee'),
     );
 
-    if (context.windowSize == WindowSize.compact) {
+    // Beside each other only when there is room: narrow screens and big text
+    // stack them.
+    if (context.windowSize == WindowSize.compact || context.largeText) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         spacing: AppSpacing.sm,
         children: [
           searchField,
-          Row(children: [archivedFilter, const Spacer(), addButton]),
+          Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: AppSpacing.sm,
+            runSpacing: AppSpacing.sm,
+            children: [archivedFilter, addButton],
+          ),
         ],
       );
     }

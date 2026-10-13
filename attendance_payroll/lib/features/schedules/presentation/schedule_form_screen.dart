@@ -255,14 +255,12 @@ class _ScheduleFormState extends ConsumerState<_ScheduleForm> {
               validator: (v) =>
                   (v ?? '').trim().isEmpty ? 'Enter a name.' : null,
             ),
-            Row(
+            Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: AppSpacing.sm,
               children: [
-                Expanded(
-                  child: Text(
-                    'Working days',
-                    style: context.textStyles.titleSmall,
-                  ),
-                ),
+                Text('Working days', style: context.textStyles.titleSmall),
                 TextButton(
                   onPressed: _copyFirstToAll,
                   child: const Text('Same hours every day'),

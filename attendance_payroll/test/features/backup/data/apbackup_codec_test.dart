@@ -254,4 +254,75 @@ void main() {
 
     expect(headerFromJson(json, supported: 1).companyName, 'Acme Ltd');
   });
+  test(
+    'the new cipher is authenticated before anything is decrypted',
+    () async {
+      final file = await encoded();
+      final headerEnd = 9 + ByteData.sublistView(file, 5, 9).getUint32(0);
+
+      for (final index in [
+        headerEnd, // first byte of the data
+        (headerEnd + file.length) ~/ 2, // the middle of the data
+        file.length - 33, // last byte of the data
+        file.length - 32, // first byte of the tag
+        file.length - 1, // last byte of the tag
+      ]) {
+        expect(
+          await failureRule(() => codec.decode(flipped(file, index), password)),
+          BackupFailures.wrongPasswordRule,
+          reason: 'byte $index',
+        );
+      }
+    },
+  );
+
+  test('a file cut short inside the tag is refused', () async {
+    final file = await encoded();
+    final headerEnd = 9 + ByteData.sublistView(file, 5, 9).getUint32(0);
+
+    expect(
+      await failureRule(
+        () => codec.decode(file.sublist(0, headerEnd + 10), password),
+      ),
+      BackupFailures.invalidFileRule,
+    );
+  });
+
+  test(
+    'backups made with the first cipher (AES-GCM) can still be read',
+    () async {
+      // Made by the first version of the app: 'legacy snapshot contents'.
+      final legacy = base64.decode(
+        'QVBCSwEAAAI3eyJmb3JtYXQiOiJhcGJhY2t1cCIsImJhY2t1cFZlcnNpb24iOjEsImFwcFZlcnNpb24iOiIwLjEuMCIsInNjaGVtYVZlcnNpb24iOjEwLCJjcmVhdGVkQXQiOiIyMDI2LTEwLTEyVDE1OjMwOjAwLjAwMFoiLCJraW5kIjoibWFudWFsIiwiY3JlYXRlZEJ5IjoiSmFuZSBPd25lciIsImRldmljZUlkIjoiZGV2aWNlLTEiLCJjb21wYW55SWQiOiJjb21wYW55LTEiLCJjb21wYW55TmFtZSI6IkFjbWUgTHRkIiwic3VtbWFyeSI6eyJlbXBsb3llZXMiOjMsImF0dGVuZGFuY2VFdmVudHMiOjEwLCJwYXlyb2xsUGVyaW9kcyI6MSwibGF0ZXN0QXR0ZW5kYW5jZUF0IjpudWxsfSwia2RmIjp7Im5hbWUiOiJwYmtkZjItaG1hYy1zaGEyNTYiLCJpdGVyYXRpb25zIjoxMDAwLCJzYWx0IjoiSjFYbFBDVzd5NWpPcUc4UGx2enlPQT09In0sImNpcGhlciI6eyJuYW1lIjoiYWVzLTI1Ni1nY20iLCJub25jZSI6Ik54eHdMZUk0UzhxR1ZkZGIifSwiY29tcHJlc3Npb24iOiJnemlwIiwic2hhMjU2IjoiZDhjYWI5ZDJkYzFmOWJmMjY3MGYwNGNkM2M0ZmU3NjVlMGQ0MjU5OTJiMzhmZTVlOWEyY2Q5MTIxN2Q0YmU5ZSJ9RAlpz9AAsmn4WbmvK1BfcXs+JAOoW5X9k3aZ0xWHTrDKLnf/pVntkjpl2mIVn070lF36H2FhHkcAUUsg',
+      );
+
+      expect(codec.readHeader(legacy).companyName, 'Acme Ltd');
+      expect(
+        utf8.decode(await codec.decode(legacy, 'legacy-pass-123')),
+        'legacy snapshot contents',
+      );
+      expect(
+        await failureRule(() => codec.decode(legacy, 'wrong-wrong')),
+        BackupFailures.wrongPasswordRule,
+      );
+    },
+  );
+
+  test('encryption is fast enough for a large company', () async {
+    // 16 MB of data: the first cipher needed about half a minute for this.
+    final big = Uint8List.fromList(
+      List.generate(16 * 1024 * 1024, (i) => (i * 31 + i ~/ 7) % 253),
+    );
+    final watch = Stopwatch()..start();
+
+    final file = await codec.encode(
+      header: header(),
+      snapshot: big,
+      password: password,
+    );
+    final back = await codec.decode(file, password);
+
+    expect(back.length, big.length);
+    expect(watch.elapsed, lessThan(const Duration(seconds: 20)));
+  }, timeout: const Timeout(Duration(minutes: 2)));
 }

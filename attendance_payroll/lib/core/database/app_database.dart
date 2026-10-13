@@ -6,6 +6,7 @@ import 'package:attendance_payroll/core/errors/app_failure.dart';
 import 'package:attendance_payroll/core/utils/local_date.dart';
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
+import 'package:sqlite3/common.dart' show CommonDatabase;
 
 part 'app_database.g.dart';
 
@@ -47,7 +48,27 @@ class AppDatabase extends _$AppDatabase {
   /// Opens the database file in the app's documents directory, running SQLite
   /// on a background isolate so queries never block the UI.
   factory AppDatabase.onDevice() {
-    return AppDatabase(driftDatabase(name: fileName));
+    return AppDatabase(
+      driftDatabase(
+        name: fileName,
+        native: const DriftNativeOptions(setup: configureConnection),
+      ),
+    );
+  }
+
+  /// Settings of every connection to the database file, applied when it is
+  /// opened (on the database isolate, so this must stay a plain function).
+  ///
+  /// - Write-ahead logging: a crash or power cut mid-write cannot corrupt the
+  ///   file, and a backup can read while the app writes.
+  /// - Full synchronous writes: a committed clock-in or payroll approval is on
+  ///   disk before the app says it is saved.
+  /// - Foreign keys are switched on in `beforeOpen`, so tests that open the
+  ///   database without this function get them too.
+  static void configureConnection(CommonDatabase database) {
+    database
+      ..execute('PRAGMA journal_mode = WAL')
+      ..execute('PRAGMA synchronous = FULL');
   }
 
   static const String fileName = 'attendance_payroll';

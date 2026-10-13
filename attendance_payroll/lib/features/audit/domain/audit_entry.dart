@@ -5,6 +5,7 @@ enum AuditAction {
   adminCreated('admin.created'),
   adminSignedIn('admin.signed_in'),
   adminLockedOut('admin.locked_out'),
+  adminPasswordChanged('admin.password_changed'),
   employeeCreated('employee.created'),
   employeeUpdated('employee.updated'),
   employeeStatusChanged('employee.status_changed'),

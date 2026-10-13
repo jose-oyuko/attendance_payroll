@@ -1,6 +1,7 @@
 import 'package:attendance_payroll/core/constants/app_spacing.dart';
 import 'package:attendance_payroll/core/extensions/build_context_extensions.dart';
 import 'package:attendance_payroll/features/authentication/presentation/auth_controller.dart';
+import 'package:attendance_payroll/features/authentication/presentation/change_password_dialog.dart';
 import 'package:attendance_payroll/features/printing/presentation/printer_routes.dart';
 import 'package:attendance_payroll/features/printing/presentation/printer_settings_screen.dart';
 import 'package:attendance_payroll/features/printing/presentation/printer_view_providers.dart';
@@ -121,6 +122,15 @@ class _PrinterCard extends ConsumerWidget {
 class _AccountCard extends ConsumerWidget {
   const _AccountCard();
 
+  Future<void> _changePassword(BuildContext context) async {
+    final changed = await showChangePasswordDialog(context);
+    if (changed && context.mounted) {
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(const SnackBar(content: Text('Password changed.')));
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final admin = ref.watch(adminSessionProvider)?.admin;
@@ -130,23 +140,28 @@ class _AccountCard extends ConsumerWidget {
     return Card.outlined(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.md),
-        child: Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          spacing: AppSpacing.md,
           children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                spacing: AppSpacing.xs,
-                children: [
-                  Text('Account', style: context.textStyles.titleMedium),
-                  Text('Signed in as ${admin.displayName} (${admin.username})'),
-                ],
-              ),
-            ),
-            OutlinedButton.icon(
-              onPressed: () =>
-                  ref.read(authControllerProvider.notifier).signOut(),
-              icon: const Icon(Icons.logout),
-              label: const Text('Sign out'),
+            Text('Account', style: context.textStyles.titleMedium),
+            Text('Signed in as ${admin.displayName} (${admin.username})'),
+            Wrap(
+              spacing: AppSpacing.sm,
+              runSpacing: AppSpacing.sm,
+              children: [
+                OutlinedButton.icon(
+                  onPressed: () => _changePassword(context),
+                  icon: const Icon(Icons.password),
+                  label: const Text('Change password'),
+                ),
+                OutlinedButton.icon(
+                  onPressed: () =>
+                      ref.read(authControllerProvider.notifier).signOut(),
+                  icon: const Icon(Icons.logout),
+                  label: const Text('Sign out'),
+                ),
+              ],
             ),
           ],
         ),

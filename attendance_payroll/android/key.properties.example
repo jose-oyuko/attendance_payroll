@@ -1,0 +1,8 @@
+# Copy to android/key.properties (which is git-ignored) and fill in.
+# See docs/RELEASE.md for how to create the keystore. Never commit the real
+# file or the keystore, and keep a safe copy of both: an app signed with a
+# lost key can never be updated.
+storePassword=<password of the keystore>
+keyPassword=<password of the key>
+keyAlias=upload
+storeFile=<path to the keystore, for example ../../keystore/attendance-payroll.jks>

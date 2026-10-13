@@ -20,7 +20,11 @@ final class NeedsSetup extends AuthState {
 }
 
 final class SignedOut extends AuthState {
-  const SignedOut();
+  const SignedOut({this.reason});
+
+  /// Why the administrator was signed out, when they did not choose to (for
+  /// example after a period without activity). Shown on the sign-in screen.
+  final String? reason;
 }
 
 final class SignedIn extends AuthState {
@@ -70,7 +74,8 @@ class AuthController extends AsyncNotifier<AuthState> {
     return _apply(result);
   }
 
-  void signOut() => state = const AsyncData(SignedOut());
+  void signOut({String? reason}) =>
+      state = AsyncData(SignedOut(reason: reason));
 
   /// Turns this device into the attendance kiosk and signs the administrator
   /// out. Returns the failure to show, or `null` on success.

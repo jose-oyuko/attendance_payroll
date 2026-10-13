@@ -1,4 +1,13 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <!-- The app works entirely offline and never uses the network.
+         Plugins declare INTERNET for features this app does not use;
+         it is removed so the release build cannot reach the Internet.
+         (Debug builds add it back for hot reload.) -->
+    <uses-permission
+        android:name="android.permission.INTERNET"
+        tools:node="remove" />
+
     <!-- Bluetooth receipt printers. Classic Bluetooth (SPP) printing: the
          legacy permissions cover Android 11 and older, the others Android 12+.-->
     <uses-permission
@@ -10,10 +19,16 @@
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
     <uses-permission android:name="android.permission.BLUETOOTH_SCAN" />
 
+    <!-- allowBackup is off on purpose: Android Auto Backup would copy the
+         unencrypted payroll database to the user's Google account. The
+         app has its own encrypted backups (Backup area). -->
     <application
-        android:label="attendance_payroll"
+        android:label="Attendance &amp; Payroll"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:allowBackup="false"
+        android:fullBackupContent="false"
+        android:usesCleartextTraffic="false">
         <activity
             android:name=".MainActivity"
             android:exported="true"

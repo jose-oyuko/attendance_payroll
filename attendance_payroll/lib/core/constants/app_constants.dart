@@ -2,7 +2,7 @@
 abstract final class AppConstants {
   /// The app version, written into backups. Must equal the version in
   /// pubspec.yaml (a test checks).
-  static const String appVersion = '0.1.0';
+  static const String appVersion = '1.0.0';
 
   /// Minimum interactive target size (Material guideline).
   static const double minTouchTarget = 48;
