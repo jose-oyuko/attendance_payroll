@@ -1,4 +1,4 @@
-package com.example.attendance_payroll
+package ke.co.oyukojoseph.attendancepayroll
 
 import android.content.pm.ApplicationInfo
 import android.os.Bundle

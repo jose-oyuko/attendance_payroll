@@ -143,4 +143,39 @@ void main() {
     expect(ignore, contains('*.jks'));
     expect(ignore, contains('*.keystore'));
   });
+  group('the application id', () {
+    late String gradle;
+
+    setUpAll(() {
+      gradle = File('android/app/build.gradle.kts').readAsStringSync();
+    });
+
+    String valueOf(String key) =>
+        RegExp('$key\\s*=\\s*"([^"]+)"').firstMatch(gradle)!.group(1)!;
+
+    test('is the same in the namespace and the application id', () {
+      expect(valueOf('applicationId'), valueOf('namespace'));
+    });
+
+    test('is a real id, not the template placeholder Play refuses', () {
+      final id = valueOf('applicationId');
+
+      expect(id, isNot(startsWith('com.example')));
+      expect(id, matches(RegExp(r'^[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)+$')));
+    });
+
+    test('is the package of MainActivity, in the matching folder', () {
+      final id = valueOf('applicationId');
+      final folder = 'android/app/src/main/kotlin/${id.replaceAll('.', '/')}';
+
+      final activity = File('$folder/MainActivity.kt');
+
+      expect(
+        activity.existsSync(),
+        isTrue,
+        reason: 'MainActivity.kt in $folder',
+      );
+      expect(activity.readAsStringSync(), contains('package $id'));
+    });
+  });
 }

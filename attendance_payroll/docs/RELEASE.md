@@ -7,14 +7,20 @@ do. Nothing here needs a server: the app is offline.
 
 These cannot be changed later without consequences, so decide them once.
 
-1. **The application id** is `com.example.attendance_payroll` in
-   `android/app/build.gradle.kts` (`namespace` and `applicationId`) and in
-   `android/app/src/main/kotlin/.../MainActivity.kt`'s package. It is the
-   identity of the app on a phone and in the Play Store. **Changing it later
-   makes Android treat the new build as a different app: an update would
-   install beside the old one, not replace it, and the old data would not
-   carry over** (a backup/restore would). Choose your own (for example
-   `ke.co.yourcompany.attendancepayroll`) before anyone installs the app.
+1. **The application id** is `ke.co.oyukojoseph.attendancepayroll`. It is the
+   identity of the app on a phone and in the Play Store, and it is set in
+   three places that must agree: `namespace` and `applicationId` in
+   `android/app/build.gradle.kts`, and the folder and `package` line of
+   `MainActivity.kt` under `android/app/src/main/kotlin/`. A test checks
+   that they agree and that it is not the `com.example` placeholder.
+   **Do not change it once the app is installed anywhere.** Android would
+   treat the new build as a different app: an update would install beside the
+   old one, not replace it, and the old data would not carry over (a
+   backup/restore would). Before publishing on the Play Store, check it is
+   free (`https://play.google.com/store/apps/details?id=` followed by the id)
+   and reserve it by creating the app in Play Console; an id is permanent
+   there. It is built from the reversed name `oyukojoseph.co.ke`; if that
+   domain is not yours, the id is still valid, as it only needs to be unique.
 2. **The signing key** (below). If it is lost, the app can never be updated
    under the same identity. Keep two copies, offline, away from the repository.
 3. **The version** (below).

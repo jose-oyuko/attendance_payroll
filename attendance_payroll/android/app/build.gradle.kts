@@ -17,7 +17,7 @@ if (hasReleaseKey) {
 }
 
 android {
-    namespace = "com.example.attendance_payroll"
+    namespace = "ke.co.oyukojoseph.attendancepayroll"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -38,8 +38,11 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.attendance_payroll"
+        // The app's permanent identity on a phone and in the Play Store. Never
+        // change it once the app is installed anywhere: Android would treat the
+        // new build as a different app (see docs/RELEASE.md). It must equal the
+        // namespace above and the package of MainActivity (a test checks).
+        applicationId = "ke.co.oyukojoseph.attendancepayroll"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
