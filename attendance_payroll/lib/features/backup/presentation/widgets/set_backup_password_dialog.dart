@@ -76,7 +76,7 @@ class _SetBackupPasswordDialogState
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Text(
-        widget.changing ? 'Change backup password' : 'Set a backup password',
+        widget.changing ? 'Change backup password' : 'Add a backup password',
       ),
       content: SingleChildScrollView(
         child: Form(
@@ -87,8 +87,10 @@ class _SetBackupPasswordDialogState
             spacing: AppSpacing.md,
             children: [
               Text(
-                'Backups are encrypted with this password, so anyone who '
-                'gets a backup file cannot read your payroll data.',
+                'Backups are encrypted either way. With a password, only '
+                'someone who knows it can open a backup file, even with this '
+                'app, so it is the safer choice for files you share or store '
+                'elsewhere.',
                 style: context.textStyles.bodyMedium,
               ),
               Text(

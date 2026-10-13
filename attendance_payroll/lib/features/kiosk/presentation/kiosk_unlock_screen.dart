@@ -4,6 +4,7 @@ import 'package:attendance_payroll/features/authentication/presentation/auth_con
 import 'package:attendance_payroll/shared/widgets/auth_panel.dart';
 import 'package:attendance_payroll/shared/widgets/busy_button.dart';
 import 'package:attendance_payroll/shared/widgets/failure_banner.dart';
+import 'package:attendance_payroll/shared/widgets/notice_banner.dart';
 import 'package:attendance_payroll/shared/widgets/password_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -57,17 +58,22 @@ class _KioskUnlockScreenState extends ConsumerState<KioskUnlockScreen> {
   @override
   Widget build(BuildContext context) {
     final error = _error;
+    final notice = switch (ref.watch(authControllerProvider)) {
+      AsyncData(value: KioskMode(:final notice)) => notice,
+      _ => null,
+    };
     return AuthPanel(
-      title: 'Leave kiosk mode',
+      title: 'Unlock the app',
       subtitle:
-          'An administrator must sign in to stop using this device as the '
-          'attendance kiosk.',
+          'An administrator signs in to use the rest of the app. Employees '
+          'can keep clocking in and out at the kiosk.',
       child: Form(
         key: _formKey,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           spacing: AppSpacing.md,
           children: [
+            if (notice != null) NoticeBanner(message: notice),
             if (error != null) FailureBanner(message: error),
             TextFormField(
               controller: _username,
@@ -85,11 +91,7 @@ class _KioskUnlockScreenState extends ConsumerState<KioskUnlockScreen> {
               validator: (value) =>
                   (value ?? '').isEmpty ? 'Enter your password.' : null,
             ),
-            BusyButton(
-              label: 'Sign in and leave kiosk',
-              busy: _busy,
-              onPressed: _submit,
-            ),
+            BusyButton(label: 'Sign in', busy: _busy, onPressed: _submit),
             TextButton(
               onPressed: () => context.go(widget.kioskLocation),
               child: const Text('Back to the kiosk'),

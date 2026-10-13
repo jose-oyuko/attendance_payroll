@@ -73,23 +73,21 @@ class _DayViewState extends ConsumerState<_DayView> {
     }
   }
 
-  Future<void> _startKiosk() async {
+  Future<void> _lock() async {
     final confirmed = await showConfirmDialog(
       context,
-      title: 'Start kiosk mode?',
+      title: 'Lock the app?',
       message:
-          'You will be signed out and this device will show only the '
-          'attendance kiosk, where employees tap their name, enter their PIN '
-          'and clock in or out. It stays a kiosk after restarting. To leave '
-          'kiosk mode, an administrator must sign in.',
-      confirmLabel: 'Start kiosk',
+          'The app will lock and show only the attendance kiosk, where '
+          'employees tap their name, enter their PIN and clock in or out. An '
+          'administrator signs in to unlock it. It also locks by itself when '
+          'it is left alone, and when it starts.',
+      confirmLabel: 'Lock app',
     );
     if (!confirmed || !mounted) {
       return;
     }
-    final failure = await ref
-        .read(authControllerProvider.notifier)
-        .startKiosk();
+    final failure = await ref.read(authControllerProvider.notifier).lock();
     if (failure != null && mounted) {
       ScaffoldMessenger.of(
         context,
@@ -136,9 +134,9 @@ class _DayViewState extends ConsumerState<_DayView> {
               ),
               if (canStartKiosk)
                 FilledButton.icon(
-                  onPressed: _startKiosk,
-                  icon: const Icon(Icons.tablet_outlined),
-                  label: const Text('Start kiosk'),
+                  onPressed: _lock,
+                  icon: const Icon(Icons.lock_outline),
+                  label: const Text('Lock app'),
                 ),
             ],
           ),
@@ -307,32 +305,42 @@ class _EmployeeRow extends StatelessWidget {
             '${session.end == null ? '…' : formatCompanyTime(context, zone, session.end!)}',
     ].join(', ');
     final details = row.employee.details;
+    final status = DecoratedBox(
+      decoration: BoxDecoration(
+        color: colors.container,
+        borderRadius: BorderRadius.circular(AppSpacing.xs),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.sm,
+          vertical: AppSpacing.xs / 2,
+        ),
+        child: Text(
+          label,
+          style: context.textStyles.labelMedium?.copyWith(
+            color: colors.onContainer,
+          ),
+        ),
+      ),
+    );
+    final info = Text(
+      times.isEmpty
+          ? details.employeeNumber
+          : '${details.employeeNumber} · $times',
+    );
+    // The status sits at the end of the row, or under the details when large
+    // text leaves no room beside the name.
     return ListTile(
       onTap: () => context.go(AttendanceRoutes.employee(row.employee.id)),
       title: Text(details.shownName),
-      subtitle: Text(
-        times.isEmpty
-            ? details.employeeNumber
-            : '${details.employeeNumber} · $times',
-      ),
-      trailing: DecoratedBox(
-        decoration: BoxDecoration(
-          color: colors.container,
-          borderRadius: BorderRadius.circular(AppSpacing.xs),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.sm,
-            vertical: AppSpacing.xs / 2,
-          ),
-          child: Text(
-            label,
-            style: context.textStyles.labelMedium?.copyWith(
-              color: colors.onContainer,
-            ),
-          ),
-        ),
-      ),
+      subtitle: context.largeText
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: AppSpacing.xs,
+              children: [info, status],
+            )
+          : info,
+      trailing: context.largeText ? null : status,
     );
   }
 }

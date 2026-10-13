@@ -164,12 +164,12 @@ destination so each area keeps its navigation state.
 
 ## Kiosk mode and attendance screens (Phase 4)
 
-- **Kiosk mode** is a device setting (`device_settings`), started by an
-  administrator from Attendance → Start kiosk. Starting it signs the
-  administrator out; it survives restarts. While on, the router allows only
-  `/kiosk` and `/kiosk/unlock` (`redirectForAuth`), outside the admin shell,
-  so no administrator screen is reachable. Leaving it requires an
-  administrator to sign in at `/kiosk/unlock`.
+- **Kiosk mode** is a device setting (`device_settings`). It is the app's
+  **locked state, and the state it starts in** (see "Locked by default"
+  under Hardening): the router allows only `/kiosk` and `/kiosk/unlock`
+  (`redirectForAuth`), outside the admin shell, so no administrator screen
+  is reachable. Getting out requires an administrator to sign in at
+  `/kiosk/unlock`.
 - **The kiosk has no session.** `KioskService` is its only door to employee
   data: it lists active employees (names only) and checks PINs, and refuses
   everything unless kiosk mode is on for that company. Clock actions then
@@ -401,14 +401,24 @@ destination so each area keeps its navigation state.
   version byte, the header length, a readable JSON header, then the data.
   The header says what the file is without the password: backup version, app
   version, schema version, date, kind, who made it, device, company and a
-  few counts. The data is the SQLite database, gzip-compressed and encrypted
-  with AES-256-GCM under a key derived from the backup password with
+  few counts, and how it is protected. The data is the SQLite database,
+  gzip-compressed and encrypted with AES-256-CTR under a key derived with
   PBKDF2-HMAC-SHA256 (150,000 iterations; salt and work factor are in the
-  header, so the factor can be raised later). The header is the GCM
-  associated data, so changing any byte of it or of the data makes
-  decryption fail; a SHA-256 of the data in the header is a second check.
-  A wrong password and a damaged file are indistinguishable by design.
-  Derivation, compression and encryption run on a background isolate.
+  header, so the factor can be raised later). An HMAC-SHA256 tag over the
+  header and the data is checked before anything is decrypted, so changing
+  any byte makes decryption fail; a SHA-256 of the data in the header is a
+  second check. (The first backups used AES-GCM, which was about 30 times
+  slower; they still open. See Hardening.) A wrong password and a damaged
+  file are indistinguishable by design. Derivation, compression and
+  encryption run on a background isolate.
+- **Protection**: every backup is encrypted. The key comes either from a
+  **backup password** the administrator chose, or, when there is none
+  (**standard protection**, the default), from a secret built into the app.
+  Standard protection keeps a backup unreadable as a file, tamper-evident and
+  restorable on any phone with the app, without a password to lose; anyone
+  who has both the app and the file can open it, so a password is the choice
+  for backups that leave the device. The header's `protection` field says
+  which applies, so restoring asks for a password only when one is needed.
 - **Creating**: `VACUUM INTO` takes a consistent snapshot while the app keeps
   running. The result is encrypted, then decrypted again and the database
   checked (`integrity_check`) **before** it is kept, so a backup that cannot
@@ -425,8 +435,8 @@ destination so each area keeps its navigation state.
   kept), so a restore can be undone. Tables that describe the device (its
   identity, kiosk mode, printer, backup settings) are never replaced. The
   audit entry is written inside the same transaction, so it is part of the
-  restored data. Afterwards everyone is signed out: the administrators now
-  come from the backup.
+  restored data. Afterwards the app locks (the kiosk shows): the
+  administrators now come from the backup.
 - **Safeguards**: restoring needs the `manageBackups` permission, is refused
   on a kiosk device, and a backup of another company needs an explicit
   confirmation. A newer app version's backup says to update the app. Backup
@@ -434,14 +444,16 @@ destination so each area keeps its navigation state.
 - **New installation**: first-run setup offers "Restore from a backup
   instead" (new phone, reinstall). It works only while the device has no
   company, so nothing can be lost and no administrator is needed.
-- **Password**: set once in the Backup screen (8+ characters, with a warning
-  that it cannot be recovered) and kept in the platform's secure storage
-  (Android Keystore) so automatic backups can encrypt without asking. It is
-  never in the database, a backup, the audit log or a log. Restoring a file
-  from elsewhere asks for the password it was made with.
+- **Password** (optional): added in the Backup screen (8+ characters, with
+  a warning that it cannot be recovered) and kept in the platform's secure
+  storage (Android Keystore) so automatic backups can use it without asking.
+  It can be removed again (back to standard protection, audited); backups
+  already made keep the protection they had. It is never in the database, a
+  backup, the audit log or a log. Restoring a password-protected file from
+  elsewhere asks for its password.
 - **Automatic backups**: when an administrator signs in and the newest
   backup is over a day old, one is made in the background (on by default;
-  needs a password). Only automatic backups are pruned (default: keep 10);
+  no password needed). Only automatic backups are pruned (default: keep 10);
   manual backups are never deleted by the app. A failure is remembered and
   shown on the Backup screen and is not retried for an hour.
 - **Screens**: Backup (status and reminder, "Back up now", password, the
@@ -462,9 +474,10 @@ The review is written up where it belongs: security in
 and shipping in [RELEASE.md](RELEASE.md). What changed in the code:
 
 - **Security**: administrator password change (current password required,
-  shares the sign-in lockout, audited); automatic sign-out after 15 minutes
-  without a touch or in the background (`SessionTimeoutGuard`, with the
-  reason shown at sign-in); release builds hide the app from screenshots and
+  shares the sign-in lockout, audited); the app locks itself after a time
+  an administrator chooses (15 minutes by default) without a touch or in the
+  background (`SessionTimeoutGuard`, with the reason shown where they sign
+  in); release builds hide the app from screenshots and
   the recent-apps list; Android Auto Backup is off; the network permission is
   removed; release signing is read from an uncommitted `key.properties`.
 - **Backup speed**: backups moved from AES-GCM to AES-256-CTR with an
@@ -488,6 +501,23 @@ and shipping in [RELEASE.md](RELEASE.md). What changed in the code:
   from the spec, finalized payroll surviving a later rate change and a backup
   restore), `payroll_properties_test.dart` (random months against an
   independent exact calculation) and the scale tests.
+- **Locked by default** (changes made before the first release): the
+  attendance kiosk is the app's resting state. The app **starts locked**
+  (`AuthController.build` asks `KioskService.lockIfNeeded`, which turns the
+  device's kiosk flag on, recorded as the app's own action), **locks itself**
+  after the chosen idle time, and locks when an administrator presses Lock
+  app. There is no separate sign-in screen any more: an administrator
+  unlocks from the kiosk's "Administrator" button, which signs in and turns
+  the flag off. Locking after a restore is the app's own action, because the
+  restoring administrator may no longer exist in the restored data. The idle
+  time is a device setting (`device_settings.lock_after_minutes`, schema 11;
+  null means 15 minutes, 0 means never) read through `AppLockService`,
+  changed by an administrator in Settings → App lock and audited.
+  `inactivityLimitProvider` turns it into the timer; a new value applies to
+  the session in progress. The kiosk is never timed out.
+- **Backups encrypted by default**: a backup no longer needs a password
+  (see Backup and restore → Protection), so "Back up now" and automatic
+  backups work from the first minute.
 - **Release**: version 1.0.0; CI also builds the release APK and fails if it
   asks for the network or allows Android backup.
 

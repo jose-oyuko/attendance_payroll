@@ -1,10 +1,12 @@
 import 'package:attendance_payroll/features/authentication/presentation/setup_screen.dart';
-import 'package:attendance_payroll/features/authentication/presentation/sign_in_screen.dart';
 import 'package:attendance_payroll/features/dashboard/presentation/dashboard_screen.dart';
+import 'package:attendance_payroll/features/kiosk/presentation/kiosk_screen.dart';
+import 'package:attendance_payroll/features/kiosk/presentation/kiosk_unlock_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../../support/pump_app.dart';
+import '../../../support/test_database.dart';
 import '../../../support/test_env.dart';
 
 Finder _field(String label) => find.widgetWithText(TextFormField, label);
@@ -47,23 +49,55 @@ void main() {
     expect(find.byType(SetupScreen), findsOneWidget);
   });
 
-  testWidgets('sign out, then sign back in', (tester) async {
+  testWidgets('lock the app, then unlock it as an administrator', (
+    tester,
+  ) async {
     await pumpApp(tester, size: tabletSize);
 
     await tester.tap(find.text('Settings'));
     await tester.pumpAndSettle();
     expect(find.textContaining('Signed in as Jane Owner'), findsOneWidget);
-    await tester.tap(find.text('Sign out'));
+    await tester.tap(find.text('Lock app'));
     await tester.pumpAndSettle();
-    expect(find.byType(SignInScreen), findsOneWidget);
+    // Locked means the kiosk: employees can clock in and out.
+    expect(find.byType(KioskScreen), findsOneWidget);
+    expect(find.byType(DashboardScreen), findsNothing);
+
+    await tester.tap(find.text('Administrator'));
+    await tester.pumpAndSettle();
+    expect(find.byType(KioskUnlockScreen), findsOneWidget);
 
     await tester.enterText(_field('Username'), ownerUsername);
     await tester.enterText(_field('Password'), 'wrong password');
     await _tapButton(tester, 'Sign in');
     expect(find.text('Incorrect username or password.'), findsOneWidget);
+    expect(find.byType(KioskUnlockScreen), findsOneWidget);
 
     await tester.enterText(_field('Password'), ownerPassword);
     await _tapButton(tester, 'Sign in');
     expect(find.byType(DashboardScreen), findsOneWidget);
+  });
+
+  testWidgets('the app always starts locked, showing the kiosk', (
+    tester,
+  ) async {
+    // A company that already exists, as after the app was closed.
+    final db = openTestDatabase();
+    await tester.runAsync(() => TestEnv(database: db).setUpOwner());
+
+    await pumpApp(tester, size: tabletSize, signedIn: false, database: db);
+
+    expect(find.byType(KioskScreen), findsOneWidget);
+    expect(find.byType(DashboardScreen), findsNothing);
+    expect(find.text('Administrator'), findsOneWidget);
+  });
+
+  testWidgets('a brand new install asks for setup, not the kiosk', (
+    tester,
+  ) async {
+    await pumpApp(tester, size: tabletSize, signedIn: false);
+
+    expect(find.byType(SetupScreen), findsOneWidget);
+    expect(find.byType(KioskScreen), findsNothing);
   });
 }

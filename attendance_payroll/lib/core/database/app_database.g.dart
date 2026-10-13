@@ -7455,6 +7455,17 @@ class $DeviceSettingsTable extends DeviceSettings
       'REFERENCES companies (id)',
     ),
   );
+  static const VerificationMeta _lockAfterMinutesMeta = const VerificationMeta(
+    'lockAfterMinutes',
+  );
+  @override
+  late final GeneratedColumn<int> lockAfterMinutes = GeneratedColumn<int>(
+    'lock_after_minutes',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _updatedAtMeta = const VerificationMeta(
     'updatedAt',
   );
@@ -7467,7 +7478,12 @@ class $DeviceSettingsTable extends DeviceSettings
     requiredDuringInsert: true,
   );
   @override
-  List<GeneratedColumn> get $columns => [id, kioskCompanyId, updatedAt];
+  List<GeneratedColumn> get $columns => [
+    id,
+    kioskCompanyId,
+    lockAfterMinutes,
+    updatedAt,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -7491,6 +7507,15 @@ class $DeviceSettingsTable extends DeviceSettings
         kioskCompanyId.isAcceptableOrUnknown(
           data['kiosk_company_id']!,
           _kioskCompanyIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('lock_after_minutes')) {
+      context.handle(
+        _lockAfterMinutesMeta,
+        lockAfterMinutes.isAcceptableOrUnknown(
+          data['lock_after_minutes']!,
+          _lockAfterMinutesMeta,
         ),
       );
     }
@@ -7519,6 +7544,10 @@ class $DeviceSettingsTable extends DeviceSettings
         DriftSqlType.string,
         data['${effectivePrefix}kiosk_company_id'],
       ),
+      lockAfterMinutes: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}lock_after_minutes'],
+      ),
       updatedAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}updated_at'],
@@ -7539,10 +7568,15 @@ class DeviceSettingsRow extends DataClass
   /// The company whose employees use this device as an attendance kiosk, or
   /// null when kiosk mode is off.
   final String? kioskCompanyId;
+
+  /// Minutes without a touch before the app locks (shows the kiosk), or 0
+  /// for never. Null means the default.
+  final int? lockAfterMinutes;
   final DateTime updatedAt;
   const DeviceSettingsRow({
     required this.id,
     this.kioskCompanyId,
+    this.lockAfterMinutes,
     required this.updatedAt,
   });
   @override
@@ -7551,6 +7585,9 @@ class DeviceSettingsRow extends DataClass
     map['id'] = Variable<String>(id);
     if (!nullToAbsent || kioskCompanyId != null) {
       map['kiosk_company_id'] = Variable<String>(kioskCompanyId);
+    }
+    if (!nullToAbsent || lockAfterMinutes != null) {
+      map['lock_after_minutes'] = Variable<int>(lockAfterMinutes);
     }
     map['updated_at'] = Variable<DateTime>(updatedAt);
     return map;
@@ -7562,6 +7599,9 @@ class DeviceSettingsRow extends DataClass
       kioskCompanyId: kioskCompanyId == null && nullToAbsent
           ? const Value.absent()
           : Value(kioskCompanyId),
+      lockAfterMinutes: lockAfterMinutes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lockAfterMinutes),
       updatedAt: Value(updatedAt),
     );
   }
@@ -7574,6 +7614,7 @@ class DeviceSettingsRow extends DataClass
     return DeviceSettingsRow(
       id: serializer.fromJson<String>(json['id']),
       kioskCompanyId: serializer.fromJson<String?>(json['kioskCompanyId']),
+      lockAfterMinutes: serializer.fromJson<int?>(json['lockAfterMinutes']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
     );
   }
@@ -7583,6 +7624,7 @@ class DeviceSettingsRow extends DataClass
     return <String, dynamic>{
       'id': serializer.toJson<String>(id),
       'kioskCompanyId': serializer.toJson<String?>(kioskCompanyId),
+      'lockAfterMinutes': serializer.toJson<int?>(lockAfterMinutes),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
     };
   }
@@ -7590,12 +7632,16 @@ class DeviceSettingsRow extends DataClass
   DeviceSettingsRow copyWith({
     String? id,
     Value<String?> kioskCompanyId = const Value.absent(),
+    Value<int?> lockAfterMinutes = const Value.absent(),
     DateTime? updatedAt,
   }) => DeviceSettingsRow(
     id: id ?? this.id,
     kioskCompanyId: kioskCompanyId.present
         ? kioskCompanyId.value
         : this.kioskCompanyId,
+    lockAfterMinutes: lockAfterMinutes.present
+        ? lockAfterMinutes.value
+        : this.lockAfterMinutes,
     updatedAt: updatedAt ?? this.updatedAt,
   );
   DeviceSettingsRow copyWithCompanion(DeviceSettingsCompanion data) {
@@ -7604,6 +7650,9 @@ class DeviceSettingsRow extends DataClass
       kioskCompanyId: data.kioskCompanyId.present
           ? data.kioskCompanyId.value
           : this.kioskCompanyId,
+      lockAfterMinutes: data.lockAfterMinutes.present
+          ? data.lockAfterMinutes.value
+          : this.lockAfterMinutes,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
   }
@@ -7613,36 +7662,42 @@ class DeviceSettingsRow extends DataClass
     return (StringBuffer('DeviceSettingsRow(')
           ..write('id: $id, ')
           ..write('kioskCompanyId: $kioskCompanyId, ')
+          ..write('lockAfterMinutes: $lockAfterMinutes, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, kioskCompanyId, updatedAt);
+  int get hashCode =>
+      Object.hash(id, kioskCompanyId, lockAfterMinutes, updatedAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is DeviceSettingsRow &&
           other.id == this.id &&
           other.kioskCompanyId == this.kioskCompanyId &&
+          other.lockAfterMinutes == this.lockAfterMinutes &&
           other.updatedAt == this.updatedAt);
 }
 
 class DeviceSettingsCompanion extends UpdateCompanion<DeviceSettingsRow> {
   final Value<String> id;
   final Value<String?> kioskCompanyId;
+  final Value<int?> lockAfterMinutes;
   final Value<DateTime> updatedAt;
   final Value<int> rowid;
   const DeviceSettingsCompanion({
     this.id = const Value.absent(),
     this.kioskCompanyId = const Value.absent(),
+    this.lockAfterMinutes = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   DeviceSettingsCompanion.insert({
     required String id,
     this.kioskCompanyId = const Value.absent(),
+    this.lockAfterMinutes = const Value.absent(),
     required DateTime updatedAt,
     this.rowid = const Value.absent(),
   }) : id = Value(id),
@@ -7650,12 +7705,14 @@ class DeviceSettingsCompanion extends UpdateCompanion<DeviceSettingsRow> {
   static Insertable<DeviceSettingsRow> custom({
     Expression<String>? id,
     Expression<String>? kioskCompanyId,
+    Expression<int>? lockAfterMinutes,
     Expression<DateTime>? updatedAt,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (kioskCompanyId != null) 'kiosk_company_id': kioskCompanyId,
+      if (lockAfterMinutes != null) 'lock_after_minutes': lockAfterMinutes,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (rowid != null) 'rowid': rowid,
     });
@@ -7664,12 +7721,14 @@ class DeviceSettingsCompanion extends UpdateCompanion<DeviceSettingsRow> {
   DeviceSettingsCompanion copyWith({
     Value<String>? id,
     Value<String?>? kioskCompanyId,
+    Value<int?>? lockAfterMinutes,
     Value<DateTime>? updatedAt,
     Value<int>? rowid,
   }) {
     return DeviceSettingsCompanion(
       id: id ?? this.id,
       kioskCompanyId: kioskCompanyId ?? this.kioskCompanyId,
+      lockAfterMinutes: lockAfterMinutes ?? this.lockAfterMinutes,
       updatedAt: updatedAt ?? this.updatedAt,
       rowid: rowid ?? this.rowid,
     );
@@ -7683,6 +7742,9 @@ class DeviceSettingsCompanion extends UpdateCompanion<DeviceSettingsRow> {
     }
     if (kioskCompanyId.present) {
       map['kiosk_company_id'] = Variable<String>(kioskCompanyId.value);
+    }
+    if (lockAfterMinutes.present) {
+      map['lock_after_minutes'] = Variable<int>(lockAfterMinutes.value);
     }
     if (updatedAt.present) {
       map['updated_at'] = Variable<DateTime>(updatedAt.value);
@@ -7698,6 +7760,7 @@ class DeviceSettingsCompanion extends UpdateCompanion<DeviceSettingsRow> {
     return (StringBuffer('DeviceSettingsCompanion(')
           ..write('id: $id, ')
           ..write('kioskCompanyId: $kioskCompanyId, ')
+          ..write('lockAfterMinutes: $lockAfterMinutes, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('rowid: $rowid')
           ..write(')'))
@@ -23691,6 +23754,7 @@ typedef $$DeviceSettingsTableCreateCompanionBuilder =
     DeviceSettingsCompanion Function({
       required String id,
       Value<String?> kioskCompanyId,
+      Value<int?> lockAfterMinutes,
       required DateTime updatedAt,
       Value<int> rowid,
     });
@@ -23698,6 +23762,7 @@ typedef $$DeviceSettingsTableUpdateCompanionBuilder =
     DeviceSettingsCompanion Function({
       Value<String> id,
       Value<String?> kioskCompanyId,
+      Value<int?> lockAfterMinutes,
       Value<DateTime> updatedAt,
       Value<int> rowid,
     });
@@ -23740,6 +23805,11 @@ class $$DeviceSettingsTableFilterComposer
   });
   ColumnFilters<String> get id => $composableBuilder(
     column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get lockAfterMinutes => $composableBuilder(
+    column: $table.lockAfterMinutes,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -23786,6 +23856,11 @@ class $$DeviceSettingsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get lockAfterMinutes => $composableBuilder(
+    column: $table.lockAfterMinutes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
     column: $table.updatedAt,
     builder: (column) => ColumnOrderings(column),
@@ -23826,6 +23901,11 @@ class $$DeviceSettingsTableAnnotationComposer
   });
   GeneratedColumn<String> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get lockAfterMinutes => $composableBuilder(
+    column: $table.lockAfterMinutes,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<DateTime> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
@@ -23886,11 +23966,13 @@ class $$DeviceSettingsTableTableManager
               ({
                 Value<String> id = const Value.absent(),
                 Value<String?> kioskCompanyId = const Value.absent(),
+                Value<int?> lockAfterMinutes = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => DeviceSettingsCompanion(
                 id: id,
                 kioskCompanyId: kioskCompanyId,
+                lockAfterMinutes: lockAfterMinutes,
                 updatedAt: updatedAt,
                 rowid: rowid,
               ),
@@ -23898,11 +23980,13 @@ class $$DeviceSettingsTableTableManager
               ({
                 required String id,
                 Value<String?> kioskCompanyId = const Value.absent(),
+                Value<int?> lockAfterMinutes = const Value.absent(),
                 required DateTime updatedAt,
                 Value<int> rowid = const Value.absent(),
               }) => DeviceSettingsCompanion.insert(
                 id: id,
                 kioskCompanyId: kioskCompanyId,
+                lockAfterMinutes: lockAfterMinutes,
                 updatedAt: updatedAt,
                 rowid: rowid,
               ),

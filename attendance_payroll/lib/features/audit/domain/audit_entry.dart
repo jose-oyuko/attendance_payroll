@@ -36,7 +36,9 @@ enum AuditAction {
   backupDeleted('backup.deleted'),
   backupExported('backup.exported'),
   backupSettingsChanged('backup.settings_changed'),
-  backupPasswordChanged('backup.password_changed');
+  backupPasswordChanged('backup.password_changed'),
+  backupPasswordRemoved('backup.password_removed'),
+  appLockChanged('app.lock_changed');
 
   const AuditAction(this.code);
 

@@ -33,6 +33,7 @@ tables are in `lib/core/database/tables.dart`. Only repositories in feature
 | 8 | Phase 7 | `payroll_settings`, `payroll_periods`, `payroll_adjustments`, `payroll_runs`, `payroll_lines`, `payroll_items`, `payroll_run_issues` |
 | 9 | Phase 10 | `printer_settings` |
 | 10 | Phase 11 | `backup_settings` |
+| 11 | Phase 12 | `device_settings.lock_after_minutes` |
 
 ### Version 1
 
@@ -193,6 +194,18 @@ Indexes come from the unique keys: `(company_id, employee_number)` serves
 lookups by company and by number; `(company_id, username)` and
 `(employee_id, effective_from)` likewise. Further indexes are added with the
 queries that need them (attendance, payroll).
+
+### Version 11
+
+- **device_settings.lock_after_minutes** — nullable integer: minutes without
+  a touch before the app locks (shows the kiosk). Null means nobody has chosen
+  yet (the app's default, 15), 0 means never. It sits in the device's own
+  settings row beside the kiosk flag, so it is never replaced by a restore.
+  The kiosk repository and the lock-time repository each write only their own
+  column.
+
+Migration 10 → 11 adds the column (existing rows get null; covered by a
+data-integrity migration test).
 
 ## Connection settings and review (Phase 12)
 

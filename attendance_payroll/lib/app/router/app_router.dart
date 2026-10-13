@@ -8,7 +8,6 @@ import 'package:attendance_payroll/features/attendance/presentation/employee_att
 import 'package:attendance_payroll/features/attendance/presentation/exceptions_screen.dart';
 import 'package:attendance_payroll/features/authentication/presentation/auth_controller.dart';
 import 'package:attendance_payroll/features/authentication/presentation/setup_screen.dart';
-import 'package:attendance_payroll/features/authentication/presentation/sign_in_screen.dart';
 import 'package:attendance_payroll/features/authentication/presentation/startup_screen.dart';
 import 'package:attendance_payroll/features/backup/presentation/backup_screen.dart';
 import 'package:attendance_payroll/features/dashboard/presentation/dashboard_screen.dart';
@@ -39,11 +38,11 @@ import 'package:go_router/go_router.dart';
 abstract final class AppRoutes {
   static const String starting = '/starting';
   static const String setup = '/setup';
-  static const String signIn = '/sign-in';
   static const String kiosk = '/kiosk';
   static const String kioskUnlock = '/kiosk/unlock';
 
-  static const Set<String> signedOut = {starting, setup, signIn};
+  /// Where the app is before an administrator can be signed in.
+  static const Set<String> signedOut = {starting, setup};
 
   static bool isKiosk(String location) =>
       location == kiosk || location.startsWith('$kiosk/');
@@ -58,7 +57,6 @@ String? redirectForAuth(AsyncValue<AuthState> auth, String location) {
   }
   final required = switch (auth) {
     AsyncData(value: NeedsSetup()) => AppRoutes.setup,
-    AsyncData(value: SignedOut()) => AppRoutes.signIn,
     AsyncData(value: SignedIn()) => null,
     _ => AppRoutes.starting,
   };
@@ -100,10 +98,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.setup,
         builder: (context, state) => const SetupScreen(),
-      ),
-      GoRoute(
-        path: AppRoutes.signIn,
-        builder: (context, state) => const SignInScreen(),
       ),
       GoRoute(
         path: AppRoutes.kiosk,

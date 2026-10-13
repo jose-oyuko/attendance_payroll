@@ -34,16 +34,21 @@ abstract interface class BackupCodec {
   /// Reads the header of [file], or of its first [headerPrefixBytes].
   BackupHeader readHeader(Uint8List file);
 
+  /// Encrypts [snapshot] under [header]. With `header.passwordProtected` the
+  /// key comes from [password]; otherwise [password] is ignored and the
+  /// app's built-in key is used.
   Future<Uint8List> encode({
     required BackupHeader header,
     required Uint8List snapshot,
-    required String password,
+    String? password,
   });
 
-  /// The database snapshot inside [file]. Fails with
-  /// `BackupFailures.wrongPassword` if the password is wrong or any byte of
-  /// the file was changed.
-  Future<Uint8List> decode(Uint8List file, String password);
+  /// The database snapshot inside [file]. A file that is not
+  /// password-protected opens without [password]. Fails with
+  /// `BackupFailures.noPassword` when a password is needed and none is
+  /// given, and with `BackupFailures.wrongPassword` if the password is wrong
+  /// or any byte of the file was changed.
+  Future<Uint8List> decode(Uint8List file, String? password);
 }
 
 /// The live database, as far as backups are concerned.
@@ -71,12 +76,16 @@ abstract interface class BackupDatabase {
   });
 }
 
-/// The backup password, kept in the platform's secure storage so automatic
-/// backups can encrypt without asking. It is never shown or logged.
+/// The optional backup password, kept in the platform's secure storage so
+/// automatic backups can use it without asking. It is never shown or logged.
 abstract interface class BackupSecretStore {
+  /// The backup password, or `null` when none is set (standard protection).
   Future<String?> read();
 
   Future<void> write(String password);
+
+  /// Forgets the password: new backups use standard protection.
+  Future<void> clear();
 }
 
 /// The backup routine of this device.

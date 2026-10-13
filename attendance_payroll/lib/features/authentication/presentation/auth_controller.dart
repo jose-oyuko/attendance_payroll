@@ -19,26 +19,24 @@ final class NeedsSetup extends AuthState {
   const NeedsSetup();
 }
 
-final class SignedOut extends AuthState {
-  const SignedOut({this.reason});
-
-  /// Why the administrator was signed out, when they did not choose to (for
-  /// example after a period without activity). Shown on the sign-in screen.
-  final String? reason;
-}
-
 final class SignedIn extends AuthState {
   const SignedIn(this.session);
 
   final AdminSession session;
 }
 
-/// This device is an attendance kiosk: only the kiosk is reachable, and
-/// leaving it needs an administrator's password.
+/// The app is locked, which means the attendance kiosk is showing: employees
+/// can clock in and out, and nothing else is reachable until an
+/// administrator signs in. This is where the app starts, and where it goes
+/// when it locks itself or is locked.
 final class KioskMode extends AuthState {
-  const KioskMode(this.kiosk);
+  const KioskMode(this.kiosk, {this.notice});
 
   final KioskContext kiosk;
+
+  /// Why the app locked, when the administrator did not ask for it (for
+  /// example after a period without activity). Shown where they sign in.
+  final String? notice;
 }
 
 class AuthController extends AsyncNotifier<AuthState> {
@@ -49,8 +47,11 @@ class AuthController extends AsyncNotifier<AuthState> {
     if (!setUp) {
       return const NeedsSetup();
     }
-    final kiosk = (await ref.watch(kioskServiceProvider).current()).unwrap();
-    return kiosk == null ? const SignedOut() : KioskMode(kiosk);
+    // Locked until an administrator signs in, whatever state the app was
+    // left in.
+    return KioskMode(
+      (await ref.watch(kioskServiceProvider).lockIfNeeded()).unwrap(),
+    );
   }
 
   /// Completes first-run setup and signs the owner in. Returns the failure to
@@ -66,44 +67,37 @@ class AuthController extends AsyncNotifier<AuthState> {
     return _apply(result);
   }
 
-  /// Returns the failure to show, or `null` on success.
-  Future<AppFailure?> signIn(String username, String password) async {
-    final result = await ref
-        .read(adminAuthServiceProvider)
-        .signIn(username, password);
-    return _apply(result);
-  }
-
-  void signOut({String? reason}) =>
-      state = AsyncData(SignedOut(reason: reason));
-
-  /// Turns this device into the attendance kiosk and signs the administrator
-  /// out. Returns the failure to show, or `null` on success.
-  Future<AppFailure?> startKiosk() async {
+  /// Locks the app: the kiosk is shown and the administrator's session ends.
+  /// [reason] is shown where they sign in again. A lock the administrator did
+  /// not ask for ([system], such as after a restore, when their session may
+  /// no longer be valid) is recorded as the app's own. Returns the failure to
+  /// show, or `null` on success.
+  Future<AppFailure?> lock({String? reason, bool system = false}) async {
     final session = switch (state) {
-      AsyncData(value: SignedIn(:final session)) => session,
+      AsyncData(value: SignedIn(:final session)) when !system => session,
       _ => null,
     };
-    if (session == null) {
-      return const AuthenticationFailure(
-        userMessage: 'Sign in as an administrator first.',
-      );
+    final locked = await ref.read(kioskServiceProvider).lock(by: session);
+    switch (locked) {
+      case Ok(:final value):
+        state = AsyncData(KioskMode(value, notice: reason));
+        return null;
+      case Err(:final failure):
+        ref
+            .read(appLoggerProvider)
+            .warning(
+              'auth',
+              'Locking the app failed',
+              fields: {'code': failure.code},
+              error: failure.cause,
+              stackTrace: failure.stackTrace,
+            );
+        return failure;
     }
-    final kiosk = ref.read(kioskServiceProvider);
-    final started = await kiosk.start(session);
-    if (started case Err(:final failure)) {
-      return failure;
-    }
-    final context = (await kiosk.current()).valueOrNull;
-    if (context == null) {
-      return const UnexpectedFailure();
-    }
-    state = AsyncData(KioskMode(context));
-    return null;
   }
 
-  /// Leaves kiosk mode after an administrator signs in. Returns the failure
-  /// to show, or `null` on success; on failure the kiosk stays locked.
+  /// Unlocks the app after an administrator signs in. Returns the failure to
+  /// show, or `null` on success; on failure the app stays locked.
   Future<AppFailure?> unlockKiosk(String username, String password) async {
     final signedIn = await ref
         .read(adminAuthServiceProvider)
@@ -158,10 +152,10 @@ final adminSessionProvider = Provider<AdminSession?>((ref) {
 });
 
 /// For providers that need a session: fails cleanly if it has gone away
-/// (for example right after signing out).
+/// (for example right after the app locked).
 AdminSession requireSession(Ref ref) {
   return ref.watch(adminSessionProvider) ??
       (throw const AuthenticationFailure(
-        userMessage: 'Your session has ended. Please sign in again.',
+        userMessage: 'The app is locked. Sign in again to continue.',
       ));
 }

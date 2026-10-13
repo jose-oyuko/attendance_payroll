@@ -1,14 +1,21 @@
 import 'dart:async';
 
 import 'package:attendance_payroll/features/authentication/presentation/auth_controller.dart';
+import 'package:attendance_payroll/features/kiosk/domain/app_lock_service.dart';
+import 'package:attendance_payroll/features/kiosk/presentation/app_lock_providers.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// How long an administrator can leave the app untouched before it signs
-/// them out. Payroll data is sensitive and the device may be left on a desk.
-final inactivityLimitProvider = Provider<Duration>(
-  (ref) => const Duration(minutes: 15),
-);
+/// How long an administrator can leave the app untouched before it locks,
+/// or `null` for never. Chosen by an administrator (Settings → App lock);
+/// until it has loaded, the default applies.
+final inactivityLimitProvider = Provider<Duration?>((ref) {
+  final minutes =
+      ref.watch(appLockMinutesProvider).value ?? AppLockService.defaultMinutes;
+  return minutes == AppLockService.neverMinutes
+      ? null
+      : Duration(minutes: minutes);
+});
 
 /// The time source for the "left the app for a while" check. Timers do not
 /// run while the app is in the background, so the time away is measured with
@@ -17,9 +24,10 @@ final sessionClockProvider = Provider<DateTime Function()>(
   (ref) => DateTime.now,
 );
 
-/// Signs the administrator out after [inactivityLimitProvider] without a
-/// touch, and when they come back to the app after being away that long.
-/// Kiosk mode is never timed out: it is meant to stay open.
+/// Locks the app (shows the kiosk) after [inactivityLimitProvider] without
+/// a touch, and when an administrator comes back to the app after being away
+/// that long. The kiosk itself is never timed out: it is meant to stay open
+/// for employees.
 class SessionTimeoutGuard extends ConsumerStatefulWidget {
   const SessionTimeoutGuard({required this.child, super.key});
 
@@ -41,11 +49,18 @@ class _SessionTimeoutGuardState extends ConsumerState<SessionTimeoutGuard>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    ref.listenManual<bool>(
-      adminSessionProvider.select((session) => session != null),
-      (_, signedIn) => signedIn ? _restart() : _stop(),
-      fireImmediately: true,
-    );
+    ref
+      ..listenManual<bool>(
+        adminSessionProvider.select((session) => session != null),
+        (_, signedIn) => signedIn ? _restart() : _stop(),
+        fireImmediately: true,
+      )
+      // A different time chosen while signed in applies straight away.
+      ..listenManual<Duration?>(inactivityLimitProvider, (_, _) {
+        if (_signedIn) {
+          _restart();
+        }
+      });
   }
 
   @override
@@ -57,7 +72,8 @@ class _SessionTimeoutGuardState extends ConsumerState<SessionTimeoutGuard>
 
   void _restart() {
     _timer?.cancel();
-    _timer = Timer(ref.read(inactivityLimitProvider), _expire);
+    final limit = ref.read(inactivityLimitProvider);
+    _timer = limit == null ? null : Timer(limit, _expire);
   }
 
   void _stop() {
@@ -70,14 +86,14 @@ class _SessionTimeoutGuardState extends ConsumerState<SessionTimeoutGuard>
     if (!_signedIn) {
       return;
     }
-    final minutes = ref.read(inactivityLimitProvider).inMinutes;
+    final minutes = ref.read(inactivityLimitProvider)?.inMinutes ?? 0;
     _stop();
     ref
         .read(authControllerProvider.notifier)
-        .signOut(
+        .lock(
           reason:
-              'You were signed out after $minutes minutes without activity. '
-              'Sign in again to continue.',
+              'The app locked after $minutes minutes without activity. Sign '
+              'in to continue.',
         );
   }
 
@@ -99,10 +115,11 @@ class _SessionTimeoutGuardState extends ConsumerState<SessionTimeoutGuard>
       case AppLifecycleState.resumed:
         final left = _leftAt;
         _leftAt = null;
+        final limit = ref.read(inactivityLimitProvider);
         final away = left == null
             ? Duration.zero
             : ref.read(sessionClockProvider)().difference(left);
-        if (away >= ref.read(inactivityLimitProvider)) {
+        if (limit != null && away >= limit) {
           _expire();
         } else {
           _restart();

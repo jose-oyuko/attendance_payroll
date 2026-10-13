@@ -248,6 +248,27 @@ app is safer, faster and checked harder.
   ([docs/SECURITY.md](docs/SECURITY.md)), CI that builds the release APK
 - No schema change (still version 10)
 
+### Changes made before the first release
+
+- **The kiosk is the default.** The app starts locked, showing the attendance
+  kiosk, so employees can always clock in and out. An administrator taps
+  **Administrator** and signs in to use the rest of the app. The app goes
+  back to the kiosk when it is locked (Settings → **Lock app**, or
+  Attendance → **Lock app**), when it is left alone for too long, and after
+  a restore. There is no separate sign-in screen any more.
+- **You choose how long "too long" is.** Settings → **App lock**: 1, 2, 5, 10,
+  15 (the default), 30 minutes, 1 or 2 hours, or never. It takes effect at
+  once and is recorded in the audit log.
+- **Backups are always encrypted, and a password is optional.** With no
+  password (the default) "Back up now" and the automatic backups just work and
+  can be restored on any phone with the app, without a password to lose;
+  they cannot be read as a plain file, but anyone who has the app and the
+  file can open them. **Add a backup password** (Backup screen) for backups
+  you share or store elsewhere; remove it again with **Use standard
+  protection**. A password cannot be recovered. Restoring asks for a password
+  only when that backup has one.
+- Schema version 11 (`device_settings.lock_after_minutes`)
+
 **Before you give the app to anyone**, read [docs/RELEASE.md](docs/RELEASE.md):
 choose the application id (`com.example...` is a placeholder and cannot be
 changed later without making it a different app), create the signing key, and

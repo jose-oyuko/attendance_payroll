@@ -86,8 +86,9 @@ class AppDatabase extends _$AppDatabase {
   /// 8 — payroll: settings, periods, adjustments, runs, lines, items, issues.
   /// 9 — printer settings (thermal printing).
   /// 10 — backup settings.
+  /// 11 — the app lock time (device settings).
   @override
-  int get schemaVersion => 10;
+  int get schemaVersion => 11;
 
   @override
   MigrationStrategy get migration {
@@ -157,6 +158,12 @@ class AppDatabase extends _$AppDatabase {
         },
         from9To10: (m, schema) async {
           await m.createTable(schema.backupSettings);
+        },
+        from10To11: (m, schema) async {
+          await m.addColumn(
+            schema.deviceSettings,
+            schema.deviceSettings.lockAfterMinutes,
+          );
         },
       ),
       beforeOpen: (details) async {

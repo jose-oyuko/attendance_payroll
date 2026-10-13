@@ -5,6 +5,7 @@ import 'package:attendance_payroll/features/authentication/presentation/change_p
 import 'package:attendance_payroll/features/printing/presentation/printer_routes.dart';
 import 'package:attendance_payroll/features/printing/presentation/printer_settings_screen.dart';
 import 'package:attendance_payroll/features/printing/presentation/printer_view_providers.dart';
+import 'package:attendance_payroll/features/settings/presentation/app_lock_card.dart';
 import 'package:attendance_payroll/features/settings/presentation/attendance_rules_card.dart';
 import 'package:attendance_payroll/features/settings/presentation/theme_mode_provider.dart';
 import 'package:attendance_payroll/shared/widgets/page_container.dart';
@@ -24,6 +25,7 @@ class SettingsScreen extends ConsumerWidget {
         spacing: AppSpacing.md,
         children: [
           const _AccountCard(),
+          const AppLockCard(),
           const AttendanceRulesCard(),
           const _PrinterCard(),
           _appearance(context, ref, mode),
@@ -157,9 +159,9 @@ class _AccountCard extends ConsumerWidget {
                 ),
                 OutlinedButton.icon(
                   onPressed: () =>
-                      ref.read(authControllerProvider.notifier).signOut(),
-                  icon: const Icon(Icons.logout),
-                  label: const Text('Sign out'),
+                      ref.read(authControllerProvider.notifier).lock(),
+                  icon: const Icon(Icons.lock_outline),
+                  label: const Text('Lock app'),
                 ),
               ],
             ),

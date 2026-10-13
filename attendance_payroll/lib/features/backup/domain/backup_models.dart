@@ -45,6 +45,7 @@ final class BackupHeader {
     required this.companyId,
     required this.companyName,
     required this.summary,
+    this.passwordProtected = true,
   });
 
   /// The format of the backup file, so later versions of the app can still
@@ -63,6 +64,12 @@ final class BackupHeader {
   final String companyId;
   final String companyName;
   final BackupSummary summary;
+
+  /// Whether opening the backup needs a password the administrator chose.
+  /// Otherwise it is encrypted with the app's built-in key ("standard
+  /// protection"): not readable as a file, but anyone with this app can open
+  /// it. Backups from before this choice existed are password-protected.
+  final bool passwordProtected;
 }
 
 /// A backup kept by this device.

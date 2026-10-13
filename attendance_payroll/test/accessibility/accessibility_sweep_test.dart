@@ -149,10 +149,11 @@ void main() {
         ),
       ],
     );
+    // The app starts locked: an administrator unlocks it.
     final failure = await tester.runAsync(
       () => c
           .read(authControllerProvider.notifier)
-          .signIn(ownerUsername, ownerPassword),
+          .unlockKiosk(ownerUsername, ownerPassword),
     );
     expect(failure, isNull);
     await settle(tester);

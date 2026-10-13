@@ -104,10 +104,11 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
       context,
       header: header.unwrap(),
       differentCompany: false,
-      passwordRequired: true,
+      askPassword: header.unwrap().passwordProtected,
+      passwordRequired: header.unwrap().passwordProtected,
       newInstallation: true,
       restore: (password, _) =>
-          service.restoreOnNewInstallation(bytes, password: password ?? ''),
+          service.restoreOnNewInstallation(bytes, password: password),
     );
     if (restored) {
       // The company and its administrators now exist: go to sign-in.

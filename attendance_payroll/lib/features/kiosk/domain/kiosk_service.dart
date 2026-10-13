@@ -7,6 +7,7 @@ import 'package:attendance_payroll/features/audit/domain/audit_log_repository.da
 import 'package:attendance_payroll/features/authentication/domain/admin_session.dart';
 import 'package:attendance_payroll/features/authentication/domain/admin_user.dart';
 import 'package:attendance_payroll/features/authentication/domain/employee_pin_service.dart';
+import 'package:attendance_payroll/features/company/domain/company.dart';
 import 'package:attendance_payroll/features/company/domain/company_repository.dart';
 import 'package:attendance_payroll/features/employees/domain/employee.dart';
 import 'package:attendance_payroll/features/employees/domain/employee_repository.dart';
@@ -58,6 +59,7 @@ final class KioskService {
   });
 
   static const String kioskOffRule = 'kiosk_off';
+  static const String notSetUpRule = 'kiosk_not_set_up';
 
   final KioskModeRepository _kioskMode;
   final CompanyRepository _companies;
@@ -77,13 +79,63 @@ final class KioskService {
       return const Ok(null);
     }
     final company = await _companies.getById(id);
-    return company.map(
-      (c) => KioskContext(
-        companyId: c.id,
-        companyName: c.details.name,
-        timeZone: CompanyTimeZone(c.details.timezone),
-      ),
-    );
+    return company.map(_contextOf);
+  }
+
+  static KioskContext _contextOf(Company c) => KioskContext(
+    companyId: c.id,
+    companyName: c.details.name,
+    timeZone: CompanyTimeZone(c.details.timezone),
+  );
+
+  /// Locks the app for the company: the kiosk is on. [by] is the
+  /// administrator who asked; without one (the app locking itself, or after
+  /// a restore) the app is recorded as the one that did it.
+  Future<Result<KioskContext>> lock({AdminSession? by}) async {
+    if (by?.check(Permission.manageKiosk) case final denied?) {
+      return Err(denied);
+    }
+    final companies = await _companies.list();
+    if (companies case Err(:final failure)) {
+      return Err(failure);
+    }
+    final company = companies.valueOrNull!.firstOrNull;
+    if (company == null) {
+      return const Err(
+        BusinessRuleFailure(
+          rule: notSetUpRule,
+          userMessage: 'Set up the company first.',
+        ),
+      );
+    }
+    final written = await _transactions.run(() async {
+      (await _kioskMode.setKioskCompany(company.id)).unwrap();
+      (await _audit.record(
+        AuditEntry(
+          companyId: company.id,
+          actorType: by == null ? AuditActorType.system : AuditActorType.admin,
+          actorId: by?.admin.id,
+          action: AuditAction.kioskStarted,
+          entityType: 'device',
+          entityId: null,
+        ),
+      )).unwrap();
+    });
+    if (written case Err(:final failure)) {
+      return Err(failure);
+    }
+    return Ok(_contextOf(company));
+  }
+
+  /// The kiosk context, locking first if the app is not locked yet. How the
+  /// app starts: locked, whatever it was doing when it last closed.
+  Future<Result<KioskContext>> lockIfNeeded() async {
+    final now = await current();
+    if (now case Err(:final failure)) {
+      return Err(failure);
+    }
+    final already = now.valueOrNull;
+    return already != null ? Ok(already) : lock();
   }
 
   /// Turns this device into the session company's kiosk. The administrator

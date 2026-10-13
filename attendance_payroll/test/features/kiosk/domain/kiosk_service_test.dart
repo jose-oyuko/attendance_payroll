@@ -131,4 +131,61 @@ void main() {
     final verified = (await env.kiosk.verifyPin(john.id, '4826')).unwrap();
     expect(verified.mustChangePin, isFalse);
   });
+  group('locking the app', () {
+    test('an administrator locks it, and it is recorded as theirs', () async {
+      final context = (await env.kiosk.lock(by: admin)).unwrap();
+
+      expect(context.companyId, admin.companyId);
+      expect((await env.kiosk.current()).unwrap(), isNotNull);
+      final row = (await env.auditRows()).singleWhere(
+        (r) => r.action == 'kiosk.started',
+      );
+      expect(row.actorType, 'admin');
+      expect(row.actorId, admin.admin.id);
+    });
+
+    test(
+      'the app can lock itself, and is then recorded as the actor',
+      () async {
+        (await env.kiosk.lock()).unwrap();
+
+        final row = (await env.auditRows()).singleWhere(
+          (r) => r.action == 'kiosk.started',
+        );
+        expect(row.actorType, 'system');
+        expect(row.actorId, isNull);
+        expect((await env.kiosk.employees()).isOk, isTrue);
+      },
+    );
+
+    test('starting the app locks it, once', () async {
+      final first = (await env.kiosk.lockIfNeeded()).unwrap();
+      final second = (await env.kiosk.lockIfNeeded()).unwrap();
+
+      expect(first.companyId, admin.companyId);
+      expect(second.companyId, admin.companyId);
+      final starts = (await env.auditActions()).where(
+        (a) => a == 'kiosk.started',
+      );
+      expect(starts, hasLength(1));
+    });
+
+    test('unlocking turns it off, and the next start locks it again', () async {
+      (await env.kiosk.lockIfNeeded()).unwrap();
+      (await env.kiosk.stop(admin)).unwrap();
+      expect((await env.kiosk.current()).unwrap(), isNull);
+
+      (await env.kiosk.lockIfNeeded()).unwrap();
+
+      expect((await env.kiosk.current()).unwrap(), isNotNull);
+    });
+
+    test('there is nothing to lock before the company is set up', () async {
+      final fresh = TestEnv();
+
+      final result = await fresh.kiosk.lockIfNeeded();
+
+      expect(ruleOf(result.failureOrNull), KioskService.notSetUpRule);
+    });
+  });
 }

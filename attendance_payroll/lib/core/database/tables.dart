@@ -330,6 +330,10 @@ class DeviceSettings extends Table {
   /// null when kiosk mode is off.
   TextColumn get kioskCompanyId =>
       text().nullable().references(Companies, #id)();
+
+  /// Minutes without a touch before the app locks (shows the kiosk), or 0
+  /// for never. Null means the default.
+  IntColumn get lockAfterMinutes => integer().nullable()();
   DateTimeColumn get updatedAt => dateTime()();
 
   @override

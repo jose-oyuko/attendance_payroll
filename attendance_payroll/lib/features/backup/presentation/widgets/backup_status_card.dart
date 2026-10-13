@@ -9,6 +9,7 @@ import 'package:attendance_payroll/features/backup/presentation/backup_formattin
 import 'package:attendance_payroll/features/backup/presentation/backup_view_providers.dart';
 import 'package:attendance_payroll/features/backup/presentation/widgets/set_backup_password_dialog.dart';
 import 'package:attendance_payroll/shared/widgets/busy_button.dart';
+import 'package:attendance_payroll/shared/widgets/confirm_dialog.dart';
 import 'package:attendance_payroll/shared/widgets/failure_banner.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -26,17 +27,10 @@ class _BackupStatusCardState extends ConsumerState<BackupStatusCard> {
   bool _busy = false;
   String? _error;
 
-  Future<void> _backUp(BackupStatus status) async {
+  Future<void> _backUp() async {
     final session = ref.read(adminSessionProvider);
     if (session == null) {
       return;
-    }
-    if (!status.hasPassword) {
-      final saved = await showSetBackupPasswordDialog(context, changing: false);
-      if (!saved || !mounted) {
-        refreshBackups(ref);
-        return;
-      }
     }
     setState(() {
       _busy = true;
@@ -62,11 +56,40 @@ class _BackupStatusCardState extends ConsumerState<BackupStatusCard> {
     }
   }
 
-  Future<void> _setPassword() async {
-    await showSetBackupPasswordDialog(context, changing: true);
+  Future<void> _setPassword({required bool changing}) async {
+    await showSetBackupPasswordDialog(context, changing: changing);
     if (mounted) {
       refreshBackups(ref);
     }
+  }
+
+  /// Back to standard protection for new backups. Asks first: a password is
+  /// the stronger choice, and the old backups keep needing it.
+  Future<void> _removePassword() async {
+    final session = ref.read(adminSessionProvider);
+    if (session == null) {
+      return;
+    }
+    final confirmed = await showConfirmDialog(
+      context,
+      title: 'Stop using a backup password?',
+      message:
+          'New backups will use standard protection: they are encrypted, but '
+          'anyone who has this app and the backup file can open them. Backups '
+          'you already made keep their password and still need it.',
+      confirmLabel: 'Use standard protection',
+    );
+    if (!confirmed || !mounted) {
+      return;
+    }
+    final result = await ref
+        .read(backupServiceProvider)
+        .removePassword(session);
+    if (!mounted) {
+      return;
+    }
+    refreshBackups(ref);
+    setState(() => _error = result.failureOrNull?.userMessage);
   }
 
   @override
@@ -135,27 +158,33 @@ class _BackupStatusCardState extends ConsumerState<BackupStatusCard> {
           runSpacing: AppSpacing.sm,
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [
-            BusyButton(
-              label: 'Back up now',
-              busy: _busy,
-              onPressed: () => _backUp(status),
-            ),
+            BusyButton(label: 'Back up now', busy: _busy, onPressed: _backUp),
             OutlinedButton.icon(
-              onPressed: _busy ? null : _setPassword,
+              onPressed: _busy
+                  ? null
+                  : () => _setPassword(changing: status.hasPassword),
               icon: const Icon(Icons.key_outlined),
               label: Text(
                 status.hasPassword
                     ? 'Change backup password'
-                    : 'Set backup password',
+                    : 'Add a backup password',
               ),
             ),
+            if (status.hasPassword)
+              TextButton(
+                onPressed: _busy ? null : _removePassword,
+                child: const Text('Use standard protection'),
+              ),
           ],
         ),
         Text(
           status.hasPassword
-              ? 'Backups are encrypted with your backup password.'
-              : 'Set a backup password to start backing up. Backups are '
-                    'encrypted with it.',
+              ? 'Backups are encrypted and protected with your backup '
+                    'password.'
+              : 'Backups are always encrypted. With standard protection '
+                    '(no password) they cannot be read as a plain file, but '
+                    'anyone who has this app and the backup file can open '
+                    'them. Add a password if backups leave this device.',
           style: context.textStyles.bodySmall?.copyWith(
             color: context.colors.onSurfaceVariant,
           ),

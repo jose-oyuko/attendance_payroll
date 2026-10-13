@@ -87,18 +87,25 @@ Run, in this order, and do not release if any step fails:
 
 On a physical device, with a Bluetooth receipt printer paired:
 
-- [ ] First start: set up a company; sign out; sign in.
+- [ ] First start: set up a company; press Settings → Lock app; the kiosk
+      shows; unlock it with the administrator password. Close and reopen the
+      app: it starts locked, on the kiosk.
 - [ ] Add an employee with a rate; give them a PIN; start the kiosk; clock in
       and out as the employee; leave the kiosk with the administrator password.
 - [ ] Open Payroll: create a period, calculate, approve, finalize.
 - [ ] Reports: preview a payslip PDF; share it.
 - [ ] Settings → Printer: pick the printer; print the test page (does the ruler
       fit the paper?); print a payslip and the payroll summary.
-- [ ] Backup: set a password; back up; export the file through the share
-      sheet; change something; restore the backup; sign in again.
+- [ ] Backup: back up with no password (the default); export the file
+      through the share sheet; add a backup password and back up again;
+      change something; restore a backup; unlock the app again.
 - [ ] On a second phone (or after a reinstall): "Restore from a backup instead"
-      on the setup screen, with the exported file.
-- [ ] Leave the app alone for 15 minutes: it signs you out.
+      on the setup screen, with the exported file (it asks for a password only
+      if that backup has one).
+- [ ] Settings → App lock: choose 1 minute; leave the app alone for a
+      minute: it locks and shows the kiosk, and an employee can still clock
+      in; the administrator unlocks it and sees why it locked. Put it back
+      to a sensible time.
 - [ ] The recent-apps screen shows a blank card and screenshots are blocked.
 - [ ] Rotate the phone; try the largest text size in the phone's settings.
 - [ ] Turn Wi-Fi and mobile data off for the whole checklist: nothing may need

@@ -67,13 +67,13 @@ Future<String> _addJohn(
 Future<void> _startKioskFromAttendance(WidgetTester tester) async {
   await tester.tap(find.text('Attendance'));
   await _settle(tester);
-  await _tap(tester, find.widgetWithText(FilledButton, 'Start kiosk'));
-  expect(find.textContaining('You will be signed out'), findsOneWidget);
+  await _tap(tester, find.widgetWithText(FilledButton, 'Lock app'));
+  expect(find.textContaining('The app will lock'), findsOneWidget);
   await _tap(
     tester,
     find.descendant(
       of: find.byType(AlertDialog),
-      matching: find.widgetWithText(FilledButton, 'Start kiosk'),
+      matching: find.widgetWithText(FilledButton, 'Lock app'),
     ),
   );
 }
@@ -160,15 +160,12 @@ void main() {
     await _startKioskFromAttendance(tester);
 
     await _tap(tester, find.text('Administrator'));
-    expect(find.text('Leave kiosk mode'), findsOneWidget);
+    expect(find.text('Unlock the app'), findsOneWidget);
     Finder field(String label) => find.widgetWithText(TextFormField, label);
 
     await tester.enterText(field('Username'), ownerUsername);
     await tester.enterText(field('Password'), 'wrong password');
-    await _tap(
-      tester,
-      find.widgetWithText(FilledButton, 'Sign in and leave kiosk'),
-    );
+    await _tap(tester, find.widgetWithText(FilledButton, 'Sign in'));
     expect(find.text('Incorrect username or password.'), findsOneWidget);
 
     await _tap(tester, find.text('Back to the kiosk'));
@@ -177,10 +174,7 @@ void main() {
     await _tap(tester, find.text('Administrator'));
     await tester.enterText(field('Username'), ownerUsername);
     await tester.enterText(field('Password'), ownerPassword);
-    await _tap(
-      tester,
-      find.widgetWithText(FilledButton, 'Sign in and leave kiosk'),
-    );
+    await _tap(tester, find.widgetWithText(FilledButton, 'Sign in'));
 
     expect(find.byType(DashboardScreen), findsOneWidget);
   });
@@ -194,7 +188,7 @@ void main() {
       database: database,
     );
     await tester.runAsync(
-      () => container.read(authControllerProvider.notifier).startKiosk(),
+      () => container.read(authControllerProvider.notifier).lock(),
     );
     await _settle(tester);
     expect(find.byType(KioskScreen), findsOneWidget);
@@ -240,10 +234,7 @@ void main() {
       find.widgetWithText(TextFormField, 'Password'),
       ownerPassword,
     );
-    await _tap(
-      tester,
-      find.widgetWithText(FilledButton, 'Sign in and leave kiosk'),
-    );
+    await _tap(tester, find.widgetWithText(FilledButton, 'Sign in'));
     await tester.tap(find.text('Attendance'));
     await _settle(tester);
 

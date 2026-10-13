@@ -25,6 +25,7 @@ Future<bool> showRestoreBackupDialog(
   required BackupHeader header,
   required RestoreAction restore,
   required bool differentCompany,
+  required bool askPassword,
   required bool passwordRequired,
   bool newInstallation = false,
 }) async {
@@ -35,6 +36,7 @@ Future<bool> showRestoreBackupDialog(
       header: header,
       restore: restore,
       differentCompany: differentCompany,
+      askPassword: askPassword,
       passwordRequired: passwordRequired,
       newInstallation: newInstallation,
     ),
@@ -47,6 +49,7 @@ class _RestoreBackupDialog extends StatefulWidget {
     required this.header,
     required this.restore,
     required this.differentCompany,
+    required this.askPassword,
     required this.passwordRequired,
     required this.newInstallation,
   });
@@ -54,6 +57,12 @@ class _RestoreBackupDialog extends StatefulWidget {
   final BackupHeader header;
   final RestoreAction restore;
   final bool differentCompany;
+
+  /// Whether the backup is password-protected, so a password field is shown.
+  final bool askPassword;
+
+  /// Whether the password must be typed (a file from elsewhere), or may be
+  /// left empty to use this device's backup password.
   final bool passwordRequired;
   final bool newInstallation;
 
@@ -84,7 +93,9 @@ class _RestoreBackupDialogState extends State<_RestoreBackupDialog> {
   bool get _canRestore =>
       !_busy &&
       (!widget.differentCompany || _acknowledged || widget.newInstallation) &&
-      (!widget.passwordRequired || _password.text.isNotEmpty);
+      (!widget.askPassword ||
+          !widget.passwordRequired ||
+          _password.text.isNotEmpty);
 
   Future<void> _restore() async {
     setState(() {
@@ -157,18 +168,24 @@ class _RestoreBackupDialogState extends State<_RestoreBackupDialog> {
               ),
             ],
             if (_error case final message?) FailureBanner(message: message),
-            PasswordField(
-              controller: _password,
-              label: widget.passwordRequired
-                  ? 'Password of this backup'
-                  : 'Password of this backup (optional)',
-              autofillHints: const <String>[],
-              onSubmitted: (_) => _canRestore ? _restore() : null,
-              validator: null,
-            ),
-            if (!widget.passwordRequired)
+            if (widget.askPassword) ...[
+              PasswordField(
+                controller: _password,
+                label: widget.passwordRequired
+                    ? 'Password of this backup'
+                    : 'Password of this backup (optional)',
+                autofillHints: const <String>[],
+                onSubmitted: (_) => _canRestore ? _restore() : null,
+                validator: null,
+              ),
+              if (!widget.passwordRequired)
+                Text(
+                  "Leave it empty to use this device's backup password.",
+                  style: context.textStyles.bodySmall,
+                ),
+            ] else
               Text(
-                "Leave it empty to use this device's backup password.",
+                'This backup has no password, so none is needed.',
                 style: context.textStyles.bodySmall,
               ),
           ],
@@ -226,6 +243,10 @@ class _RestoreBackupDialogState extends State<_RestoreBackupDialog> {
         row('By', header.createdBy),
         row('Contains', describeContents(header.summary)),
         if (latest != null) row('Latest clock', formatBackupTime(latest)),
+        row(
+          'Protection',
+          header.passwordProtected ? 'Password' : 'Standard (no password)',
+        ),
         row('App version', header.appVersion),
       ],
     );

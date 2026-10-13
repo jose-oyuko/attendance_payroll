@@ -79,7 +79,8 @@ class _ImportCardState extends ConsumerState<_ImportCard> {
       context,
       header: info,
       differentCompany: different,
-      passwordRequired: true,
+      askPassword: info.passwordProtected,
+      passwordRequired: info.passwordProtected,
       restore: (password, allow) => service.restore(
         session,
         bytes,
@@ -89,7 +90,12 @@ class _ImportCardState extends ConsumerState<_ImportCard> {
     );
     if (restored) {
       // The administrators come from the restored data: sign in again.
-      ref.read(authControllerProvider.notifier).signOut();
+      await ref
+          .read(authControllerProvider.notifier)
+          .lock(
+            reason: 'The backup was restored. Sign in to continue.',
+            system: true,
+          );
     }
   }
 

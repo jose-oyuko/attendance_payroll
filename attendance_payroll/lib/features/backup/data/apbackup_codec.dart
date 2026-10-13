@@ -57,6 +57,14 @@ final class ApbackupCodec implements BackupCodec {
   /// The cipher of the first backups of the app, still readable.
   static const String gcmCipher = 'aes-256-gcm';
 
+  /// The secret behind "standard protection": backups the administrator did
+  /// not protect with a password. It is public on purpose (it is in the app
+  /// and in this file): it makes the file unreadable as a plain database and
+  /// tamper-evident, but anyone with the app can open such a backup. A
+  /// password is what keeps a backup private from someone who has the file.
+  static const String standardSecret =
+      'attendance-payroll/standard-protection/v1';
+
   static const int _fixedBytes = 9;
   static const int _keyLength = 32;
   static const int _saltLength = 16;
@@ -81,12 +89,15 @@ final class ApbackupCodec implements BackupCodec {
   Future<Uint8List> encode({
     required BackupHeader header,
     required Uint8List snapshot,
-    required String password,
+    String? password,
   }) {
+    final secret = header.passwordProtected
+        ? (password ?? (throw BackupFailures.noPassword))
+        : standardSecret;
     final job = _EncodeJob(
       header: headerToJson(header),
       snapshot: snapshot,
-      password: password,
+      password: secret,
       iterations: iterations,
       salt: _randomBytes(_saltLength),
       iv: _randomBytes(_ivLength),
@@ -95,10 +106,13 @@ final class ApbackupCodec implements BackupCodec {
   }
 
   @override
-  Future<Uint8List> decode(Uint8List file, String password) {
+  Future<Uint8List> decode(Uint8List file, String? password) {
     // Fail on a bad or newer file before spending time on the key.
-    readHeader(file);
-    return _run(_decode, _DecodeJob(file: file, password: password));
+    final header = readHeader(file);
+    final secret = header.passwordProtected
+        ? (password ?? (throw BackupFailures.noPassword))
+        : standardSecret;
+    return _run(_decode, _DecodeJob(file: file, password: secret));
   }
 
   Future<R> _run<J, R>(R Function(J job) work, J job) {

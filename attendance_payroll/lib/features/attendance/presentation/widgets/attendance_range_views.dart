@@ -229,14 +229,30 @@ class AttendanceRangeList extends StatelessWidget {
                     onTap: () =>
                         context.go(AttendanceRoutes.employee(d.employee.id)),
                     title: Text(formatLocalDate(context, d.date)),
-                    subtitle: Text(
-                      [
-                        if (d.sessions.isNotEmpty)
-                          '${_sessions(context, zone, d)} · ${_worked(d)}',
-                        if (d.issues.isNotEmpty) _issues(d),
-                      ].join('\n'),
-                    ),
-                    trailing: _StatusLabel(day: d),
+                    // The status sits at the end of the row, or under the
+                    // details when large text leaves no room beside the date.
+                    subtitle: context.largeText
+                        ? Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                [
+                                  if (d.sessions.isNotEmpty)
+                                    '${_sessions(context, zone, d)} · ${_worked(d)}',
+                                  if (d.issues.isNotEmpty) _issues(d),
+                                ].join('\n'),
+                              ),
+                              _StatusLabel(day: d),
+                            ],
+                          )
+                        : Text(
+                            [
+                              if (d.sessions.isNotEmpty)
+                                '${_sessions(context, zone, d)} · ${_worked(d)}',
+                              if (d.issues.isNotEmpty) _issues(d),
+                            ].join('\n'),
+                          ),
+                    trailing: context.largeText ? null : _StatusLabel(day: d),
                   ),
               ],
             ),

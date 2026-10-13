@@ -3,12 +3,22 @@ import 'package:attendance_payroll/features/audit/data/audit_providers.dart';
 import 'package:attendance_payroll/features/authentication/data/authentication_providers.dart';
 import 'package:attendance_payroll/features/company/data/company_providers.dart';
 import 'package:attendance_payroll/features/employees/data/employee_providers.dart';
+import 'package:attendance_payroll/features/kiosk/data/drift_app_lock_settings_repository.dart';
 import 'package:attendance_payroll/features/kiosk/data/drift_kiosk_mode_repository.dart';
+import 'package:attendance_payroll/features/kiosk/domain/app_lock_service.dart';
 import 'package:attendance_payroll/features/kiosk/domain/kiosk_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final kioskModeRepositoryProvider = Provider<KioskModeRepository>(
   (ref) => DriftKioskModeRepository(ref.watch(appDatabaseProvider)),
+);
+
+final appLockServiceProvider = Provider<AppLockService>(
+  (ref) => AppLockService(
+    settings: DriftAppLockSettingsRepository(ref.watch(appDatabaseProvider)),
+    audit: ref.watch(auditLogRepositoryProvider),
+    transactions: ref.watch(transactionRunnerProvider),
+  ),
 );
 
 final kioskServiceProvider = Provider<KioskService>(

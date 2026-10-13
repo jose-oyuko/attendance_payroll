@@ -5,8 +5,11 @@ import 'package:attendance_payroll/core/database/app_database.dart';
 import 'package:attendance_payroll/features/authentication/presentation/auth_controller.dart';
 import 'package:attendance_payroll/features/backup/data/backup_providers.dart';
 import 'package:attendance_payroll/features/backup/data/drift_backup_database.dart';
+import 'package:attendance_payroll/features/backup/data/drift_backup_settings_repository.dart';
+import 'package:attendance_payroll/features/backup/domain/backup_models.dart';
 import 'package:attendance_payroll/features/backup/presentation/backup_view_providers.dart';
 import 'package:attendance_payroll/features/employees/data/employee_providers.dart';
+import 'package:attendance_payroll/features/kiosk/presentation/kiosk_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart' show Override;
@@ -109,17 +112,28 @@ void main() {
     fixture = _Fixture(temp);
   });
 
+  /// Opens the app over the fixture. Automatic backups are off unless asked
+  /// for: with them on, the app makes one as soon as it opens, which would
+  /// get in the way of the steps being tested.
   Future<ProviderContainer> openApp(
     WidgetTester tester, {
     Size size = tabletSize,
     bool signedIn = true,
-  }) => pumpApp(
-    tester,
-    size: size,
-    signedIn: signedIn,
-    database: fixture.db,
-    overrides: fixture.overrides,
-  );
+    bool automatic = false,
+  }) async {
+    await tester.runAsync(
+      () => DriftBackupSettingsRepository(
+        fixture.db,
+      ).save(BackupSettings(automaticEnabled: automatic)),
+    );
+    return pumpApp(
+      tester,
+      size: size,
+      signedIn: signedIn,
+      database: fixture.db,
+      overrides: fixture.overrides,
+    );
+  }
 
   Future<ProviderContainer> openBackups(
     WidgetTester tester, {
@@ -155,18 +169,40 @@ void main() {
     return other.storage.files[info.fileName]!;
   }
 
-  testWidgets('starts empty and asks for a password before the first backup', (
+  testWidgets('a first backup needs nothing: it is encrypted anyway', (
     tester,
   ) async {
     await openBackups(tester);
 
     expect(find.text('No backup yet'), findsOneWidget);
     expect(find.textContaining('No backups yet'), findsOneWidget);
-    expect(find.text('Set backup password'), findsOneWidget);
+    expect(find.text('Add a backup password'), findsOneWidget);
+    expect(find.textContaining('Backups are always encrypted'), findsOneWidget);
 
-    await _tap(tester, find.widgetWithText(FilledButton, 'Back up now'));
-    expect(find.text('Set a backup password'), findsOneWidget);
+    await _tap(
+      tester,
+      find.widgetWithText(FilledButton, 'Back up now'),
+      until: () => fixture.storage.files.isNotEmpty,
+    );
+    await _work(tester);
 
+    expect(fixture.storage.files, hasLength(1));
+    expect(fixture.secrets.password, isNull);
+    expect(find.text('No backup yet'), findsNothing);
+    expect(find.textContaining('Manual ·'), findsOneWidget);
+    expect(find.textContaining('Standard protection'), findsWidgets);
+    // Encrypted: not a readable database.
+    expect(
+      String.fromCharCodes(fixture.storage.files.values.single),
+      isNot(contains('SQLite format')),
+    );
+  });
+
+  testWidgets('a password can be added, and removed again', (tester) async {
+    await openBackups(tester);
+
+    await _tap(tester, find.text('Add a backup password'));
+    expect(find.text('Add a backup password'), findsWidgets);
     await tester.enterText(
       find.widgetWithText(TextFormField, 'Backup password'),
       'short',
@@ -188,19 +224,34 @@ void main() {
       find.widgetWithText(TextFormField, 'Confirm the password'),
       'my backup password',
     );
-    // The password is saved and the backup is made straight away.
     await _tap(
       tester,
       find.widgetWithText(FilledButton, 'Save password'),
+      until: () => fixture.secrets.password != null,
+    );
+    expect(find.text('Change backup password'), findsOneWidget);
+    expect(find.textContaining('protected with your backup'), findsOneWidget);
+
+    await _tap(
+      tester,
+      find.widgetWithText(FilledButton, 'Back up now'),
       until: () => fixture.storage.files.isNotEmpty,
     );
     await _work(tester);
+    expect(find.textContaining('· Password'), findsOneWidget);
 
-    expect(fixture.secrets.password, 'my backup password');
-    expect(fixture.storage.files, hasLength(1));
-    expect(find.text('No backup yet'), findsNothing);
-    expect(find.textContaining('Manual ·'), findsOneWidget);
-    expect(find.text('Change backup password'), findsOneWidget);
+    await _tap(tester, find.text('Use standard protection'));
+    expect(find.text('Stop using a backup password?'), findsOneWidget);
+    await _tap(tester, find.text('Cancel'));
+    expect(fixture.secrets.password, isNotNull);
+
+    await _tap(tester, find.text('Use standard protection'));
+    await _tap(
+      tester,
+      find.widgetWithText(FilledButton, 'Use standard protection'),
+      until: () => fixture.secrets.password == null,
+    );
+    expect(find.text('Add a backup password'), findsOneWidget);
   });
 
   testWidgets('exports a backup through the share sheet', (tester) async {
@@ -267,8 +318,9 @@ void main() {
     await _tap(tester, find.text('Continue'));
 
     expect(await tester.runAsync(fixture.employees), 0);
-    // Back at sign-in, where the restored administrators can sign in.
-    expect(find.text('Sign in'), findsWidgets);
+    // The app is locked, showing the kiosk; the restored administrators
+    // sign in from there.
+    expect(find.byType(KioskScreen), findsOneWidget);
     expect(find.text('Reports'), findsNothing);
     expect(
       fixture.storage.files.keys.where((n) => n.endsWith('-safety.apbackup')),
@@ -341,10 +393,11 @@ void main() {
   });
 
   testWidgets('settings are saved as they are changed', (tester) async {
+    // The fixture starts with automatic backups off.
     await openBackups(tester);
     expect(
       tester.widget<SwitchListTile>(find.byType(SwitchListTile)).value,
-      isTrue,
+      isFalse,
     );
 
     await _tap(tester, find.byType(SwitchListTile));
@@ -355,10 +408,10 @@ void main() {
           .customSelect('SELECT automatic_enabled AS a FROM backup_settings')
           .getSingle(),
     );
-    expect(row!.read<bool>('a'), isFalse);
+    expect(row!.read<bool>('a'), isTrue);
     expect(
       tester.widget<SwitchListTile>(find.byType(SwitchListTile)).value,
-      isFalse,
+      isTrue,
     );
   });
 
@@ -400,17 +453,17 @@ void main() {
     );
     await _tap(tester, find.text('Continue'));
 
-    // The restored company exists, so setup is over: its owner signs in.
+    // The restored company exists, so setup is over: the app starts locked,
+    // and its owner signs in from the kiosk.
     expect(await tester.runAsync(fixture.employees), 1);
     expect(find.text('Set up your company'), findsNothing);
-    expect(find.text('Sign in'), findsWidgets);
+    expect(find.byType(KioskScreen), findsOneWidget);
   });
 
   testWidgets('the automatic backup is made when the app is opened', (
     tester,
   ) async {
-    fixture.secrets.password = 'my backup password';
-    await openApp(tester);
+    await openApp(tester, automatic: true);
 
     await _work(
       tester,
@@ -420,5 +473,33 @@ void main() {
     );
 
     expect(fixture.storage.files, hasLength(1));
+  });
+  testWidgets('a backup file without a password is restored without asking', (
+    tester,
+  ) async {
+    final other = BackupTestDevice(TestEnv(), temp);
+    final session = (await tester.runAsync(other.env.setUpOwner))!;
+    other.secrets.password = null;
+    await tester.runAsync(() => other.env.addEmployee(session));
+    final info = (await tester.runAsync(
+      () => other.service.create(session),
+    ))!.unwrap();
+    fixture.picked = other.storage.files[info.fileName]!;
+    await openBackups(tester);
+
+    await _tap(tester, find.text('Choose backup file'));
+
+    expect(find.text('Replace all data?'), findsOneWidget);
+    expect(find.text('Password of this backup'), findsNothing);
+    expect(find.textContaining('has no password'), findsOneWidget);
+    await _tap(tester, find.byType(Checkbox));
+    await _tap(
+      tester,
+      find.widgetWithText(FilledButton, 'Restore'),
+      until: _shown('Backup restored'),
+    );
+    await _tap(tester, find.text('Continue'));
+
+    expect(await tester.runAsync(fixture.employees), 1);
   });
 }

@@ -19,7 +19,8 @@ abstract final class BackupFailures {
 
   static const BusinessRuleFailure noPassword = BusinessRuleFailure(
     rule: noPasswordRule,
-    userMessage: 'Set a backup password first. Backups are encrypted with it.',
+    userMessage:
+        'This backup is protected with a password. Enter it to continue.',
   );
 
   static const BusinessRuleFailure wrongPassword = BusinessRuleFailure(
@@ -58,7 +59,7 @@ abstract final class BackupFailures {
   static const BusinessRuleFailure kioskActive = BusinessRuleFailure(
     rule: kioskActiveRule,
     userMessage:
-        'This device is an attendance kiosk. Leave kiosk mode before '
+        'The app is locked. Unlock it with an administrator account before '
         'restoring a backup.',
   );
 

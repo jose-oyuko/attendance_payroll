@@ -13,6 +13,7 @@ Map<String, Object?> headerToJson(BackupHeader header) => {
   'deviceId': header.deviceId,
   'companyId': header.companyId,
   'companyName': header.companyName,
+  'protection': header.passwordProtected ? 'password' : 'standard',
   'summary': {
     'employees': header.summary.employees,
     'attendanceEvents': header.summary.attendanceEvents,
@@ -73,6 +74,8 @@ BackupHeader headerFromJson(
     deviceId: field<String>(json, 'deviceId'),
     companyId: field<String>(json, 'companyId'),
     companyName: field<String>(json, 'companyName'),
+    // Missing in the first backups, which all needed a password.
+    passwordProtected: json['protection'] != 'standard',
     summary: BackupSummary(
       employees: field<int>(summary, 'employees'),
       attendanceEvents: field<int>(summary, 'attendanceEvents'),

@@ -73,6 +73,9 @@ class InMemorySecretStore implements BackupSecretStore {
 
   @override
   Future<void> write(String password) async => this.password = password;
+
+  @override
+  Future<void> clear() async => password = null;
 }
 
 /// The real file format with a cheap key derivation, run inline.

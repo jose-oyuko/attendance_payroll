@@ -117,10 +117,8 @@ final class BackupService {
       return Err(denied);
     }
     return Result.guard(() async {
-      final password =
-          await _secrets.read() ?? (throw BackupFailures.noPassword);
       final info = await _write(
-        password: password,
+        password: await _secrets.read(),
         kind: kind,
         createdBy: kind == BackupKind.automatic
             ? automaticAuthor
@@ -142,8 +140,8 @@ final class BackupService {
     });
   }
 
-  /// Makes an automatic backup if the newest is older than a day, automatic
-  /// backups are on, and a password is set. `null` when none was due.
+  /// Makes an automatic backup if the newest is older than a day and
+  /// automatic backups are on. `null` when none was due.
   /// Failures are remembered for the Backup screen, not thrown at whoever
   /// opened the app.
   Future<Result<BackupInfo?>> runAutomaticIfDue(AdminSession session) async {
@@ -152,7 +150,7 @@ final class BackupService {
     }
     final due = await Result.guard<bool>(() async {
       final settings = (await _settings.load()).unwrap();
-      if (!settings.automaticEnabled || await _secrets.read() == null) {
+      if (!settings.automaticEnabled) {
         return false;
       }
       final now = _clock();
@@ -333,7 +331,7 @@ final class BackupService {
   /// a signed-in administrator can restore.
   Future<Result<RestoreOutcome>> restoreOnNewInstallation(
     Uint8List file, {
-    required String password,
+    String? password,
   }) {
     return Result.guard(() async {
       if (await _database.currentCompanyId() != null) {
@@ -364,7 +362,11 @@ final class BackupService {
       throw BackupFailures.differentCompany;
     }
     final stored = await _secrets.read();
-    final key = password ?? stored ?? (throw BackupFailures.noPassword);
+    // A backup without a password opens without one; otherwise the one typed,
+    // or else this device's own.
+    final key = header.passwordProtected
+        ? (password ?? stored ?? (throw BackupFailures.noPassword))
+        : null;
     // Everything that can be checked without touching the data is checked
     // before anything is changed.
     final snapshot = await _codec.decode(file, key);
@@ -372,8 +374,10 @@ final class BackupService {
 
     BackupInfo? safety;
     if (current != null) {
+      // The data being replaced is protected the way this device protects
+      // its backups, whatever the backup being restored used.
       safety = await _write(
-        password: stored ?? key,
+        password: stored,
         kind: BackupKind.safety,
         createdBy: safetyAuthor,
       );
@@ -409,9 +413,9 @@ final class BackupService {
 
   // Password and settings ----------------------------------------------
 
-  /// Sets the password future backups are encrypted with. Existing backups
-  /// keep the password they were made with. The password is never stored in
-  /// the database or the audit log.
+  /// Sets the password new backups are protected with. Existing backups keep
+  /// the protection they were made with. The password is never stored in the
+  /// database or the audit log.
   Future<Result<void>> setPassword(
     AdminSession session,
     String password,
@@ -437,6 +441,27 @@ final class BackupService {
           actorType: AuditActorType.admin,
           actorId: session.admin.id,
           action: AuditAction.backupPasswordChanged,
+          entityType: 'backup_settings',
+          entityId: null,
+        ),
+      )).unwrap();
+    });
+  }
+
+  /// Goes back to standard protection for new backups (encrypted with the
+  /// app's built-in key). Backups already made keep their password.
+  Future<Result<void>> removePassword(AdminSession session) async {
+    if (session.check(Permission.manageBackups) case final denied?) {
+      return Err(denied);
+    }
+    return Result.guard(() async {
+      await _secrets.clear();
+      (await _audit.record(
+        AuditEntry(
+          companyId: session.companyId,
+          actorType: AuditActorType.admin,
+          actorId: session.admin.id,
+          action: AuditAction.backupPasswordRemoved,
           entityType: 'backup_settings',
           entityId: null,
         ),
@@ -515,7 +540,7 @@ final class BackupService {
   /// Takes a snapshot, encrypts it, checks that the result really decrypts
   /// to a sound database, and only then keeps it.
   Future<BackupInfo> _write({
-    required String password,
+    required String? password,
     required BackupKind kind,
     required String createdBy,
   }) async {
@@ -531,6 +556,7 @@ final class BackupService {
       companyId: snapshot.companyId,
       companyName: snapshot.companyName,
       summary: snapshot.summary,
+      passwordProtected: password != null,
     );
     final file = await _codec.encode(
       header: header,

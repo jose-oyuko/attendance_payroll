@@ -325,4 +325,79 @@ void main() {
     expect(back.length, big.length);
     expect(watch.elapsed, lessThan(const Duration(seconds: 20)));
   }, timeout: const Timeout(Duration(minutes: 2)));
+  group('standard protection (no password)', () {
+    BackupHeader standard() => BackupHeader(
+      backupVersion: 1,
+      appVersion: '1.0.0',
+      schemaVersion: 10,
+      createdAt: DateTime.utc(2026, 10, 13, 8),
+      kind: BackupKind.automatic,
+      createdBy: 'Automatic backup',
+      deviceId: 'device-1',
+      companyId: 'company-1',
+      companyName: 'Acme Ltd',
+      summary: const BackupSummary(
+        employees: 1,
+        attendanceEvents: 2,
+        payrollPeriods: 0,
+      ),
+      passwordProtected: false,
+    );
+
+    test('is encrypted and opens without a password', () async {
+      final text = Uint8List.fromList(utf8.encode('SECRET PAYROLL ' * 500));
+
+      final file = await codec.encode(header: standard(), snapshot: text);
+
+      expect(latin1.decode(file), isNot(contains('SECRET PAYROLL')));
+      expect(await codec.decode(file, null), text);
+      expect(codec.readHeader(file).passwordProtected, isFalse);
+    });
+
+    test('a password given for it is ignored, not needed', () async {
+      final file = await codec.encode(
+        header: standard(),
+        snapshot: snapshot,
+        password: 'ignored',
+      );
+
+      expect(await codec.decode(file, 'anything'), snapshot);
+      expect(await codec.decode(file, null), snapshot);
+    });
+
+    test('is still tamper-evident', () async {
+      final file = await codec.encode(header: standard(), snapshot: snapshot);
+
+      expect(
+        await failureRule(
+          () => codec.decode(flipped(file, file.length - 40), null),
+        ),
+        BackupFailures.wrongPasswordRule,
+      );
+    });
+
+    test('a password-protected backup refuses to open without one', () async {
+      final file = await encoded();
+
+      expect(
+        await failureRule(() => codec.decode(file, null)),
+        BackupFailures.noPasswordRule,
+      );
+      expect(
+        await failureRule(
+          () => codec.encode(header: header(), snapshot: snapshot),
+        ),
+        BackupFailures.noPasswordRule,
+      );
+    });
+
+    test(
+      'backups made before the choice existed count as password-protected',
+      () {
+        final json = headerToJson(header())..remove('protection');
+
+        expect(headerFromJson(json, supported: 1).passwordProtected, isTrue);
+      },
+    );
+  });
 }

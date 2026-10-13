@@ -81,6 +81,7 @@ class _BackupsCardState extends ConsumerState<BackupsCard> {
       context,
       header: info.header,
       differentCompany: different,
+      askPassword: info.header.passwordProtected,
       passwordRequired: false,
       restore: (password, allow) => service.restoreStored(
         session,
@@ -91,7 +92,12 @@ class _BackupsCardState extends ConsumerState<BackupsCard> {
     );
     if (restored) {
       // The administrators come from the restored data: sign in again.
-      ref.read(authControllerProvider.notifier).signOut();
+      await ref
+          .read(authControllerProvider.notifier)
+          .lock(
+            reason: 'The backup was restored. Sign in to continue.',
+            system: true,
+          );
     }
   }
 
@@ -214,7 +220,9 @@ class _BackupTile extends StatelessWidget {
       title: Text(formatBackupTime(header.createdAt)),
       subtitle: Text(
         '${header.kind.label} · ${header.createdBy} · '
-        '${formatBytes(info.sizeBytes)}\n${describeContents(header.summary)}',
+        '${formatBytes(info.sizeBytes)} · '
+        '${header.passwordProtected ? 'Password' : 'Standard protection'}\n'
+        '${describeContents(header.summary)}',
       ),
       isThreeLine: true,
       trailing: PopupMenuButton<_TileAction>(

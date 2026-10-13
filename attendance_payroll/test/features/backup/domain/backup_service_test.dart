@@ -25,6 +25,16 @@ void main() {
     return failure is BusinessRuleFailure ? failure.rule : null;
   }
 
+  /// The rule of the failure a future ends with, or `null`.
+  Future<String?> ruleOfFailure(Future<Object?> Function() action) async {
+    try {
+      await action();
+    } on BusinessRuleFailure catch (failure) {
+      return failure.rule;
+    }
+    return null;
+  }
+
   Future<List<BackupInfo>> backups() async =>
       (await service.list(admin)).unwrap().backups;
 
@@ -68,13 +78,32 @@ void main() {
       expect(row.entityType, 'backup');
     });
 
-    test('needs a password first', () async {
+    test('works without a password, with standard protection', () async {
       device.secrets.password = null;
+      await env.addEmployee(admin);
 
-      final result = await service.create(admin);
+      final info = (await service.create(admin)).unwrap();
 
-      expect(ruleOf(result), BackupFailures.noPasswordRule);
-      expect(device.storage.files, isEmpty);
+      expect(info.header.passwordProtected, isFalse);
+      // Still encrypted: not a readable database.
+      final bytes = device.storage.files[info.fileName]!;
+      expect(String.fromCharCodes(bytes), isNot(contains('SQLite format')));
+      expect(String.fromCharCodes(bytes), isNot(contains('John')));
+      // And it opens without a password.
+      final snapshot = await fastCodec().decode(bytes, null);
+      expect(snapshot, isNotEmpty);
+    });
+
+    test('with a password, the backup is marked as protected by it', () async {
+      final info = (await service.create(admin)).unwrap();
+
+      expect(info.header.passwordProtected, isTrue);
+      expect(
+        ruleOfFailure(
+          () => fastCodec().decode(device.storage.files[info.fileName]!, null),
+        ),
+        completion(BackupFailures.noPasswordRule),
+      );
     });
 
     test('keeps nothing when the folder cannot be written', () async {
@@ -364,6 +393,109 @@ void main() {
     });
   });
 
+  group('standard protection', () {
+    test('a backup without a password restores without one', () async {
+      device.secrets.password = null;
+      await env.addEmployee(admin);
+      final backup = (await service.create(admin)).unwrap();
+      await env.addEmployee(admin, employeeNumber: 'E0002');
+
+      (await service.restore(
+        admin,
+        device.storage.files[backup.fileName]!,
+      )).unwrap();
+
+      expect(await device.employees(), 1);
+    });
+
+    test('the device password is not needed for it, nor in the way', () async {
+      device.secrets.password = null;
+      final backup = (await service.create(admin)).unwrap();
+      (await service.setPassword(admin, 'a-brand-new-password')).unwrap();
+
+      final result = await service.restore(
+        admin,
+        device.storage.files[backup.fileName]!,
+      );
+
+      expect(result.isOk, isTrue);
+    });
+
+    test('a password-protected backup asks for its password', () async {
+      final backup = (await service.create(admin)).unwrap();
+      device.secrets.password = null;
+
+      final without = await service.restore(
+        admin,
+        device.storage.files[backup.fileName]!,
+      );
+      final withIt = await service.restore(
+        admin,
+        device.storage.files[backup.fileName]!,
+        password: 'backup-pass-123',
+      );
+
+      expect(ruleOf(without), BackupFailures.noPasswordRule);
+      expect(withIt.isOk, isTrue);
+    });
+
+    test(
+      'the safety backup follows the device, not the restored file',
+      () async {
+        final protected = (await service.create(admin)).unwrap();
+        device.secrets.password = null;
+
+        final outcome = (await service.restore(
+          admin,
+          device.storage.files[protected.fileName]!,
+          password: 'backup-pass-123',
+        )).unwrap();
+
+        expect(outcome.safetyBackup!.header.passwordProtected, isFalse);
+      },
+    );
+
+    test(
+      'stopping the password makes new backups standard, and is audited',
+      () async {
+        final before = (await service.create(admin)).unwrap();
+
+        (await service.removePassword(admin)).unwrap();
+        final after = (await service.create(admin)).unwrap();
+
+        expect(device.secrets.password, isNull);
+        expect(before.header.passwordProtected, isTrue);
+        expect(after.header.passwordProtected, isFalse);
+        expect((await service.status(admin)).unwrap().hasPassword, isFalse);
+        expect(await env.auditActions(), contains('backup.password_removed'));
+        // The backup made with the password still needs it.
+        expect(
+          ruleOf(
+            await service.restore(
+              admin,
+              device.storage.files[before.fileName]!,
+            ),
+          ),
+          BackupFailures.noPasswordRule,
+        );
+      },
+    );
+
+    test('restores on a new installation without a password', () async {
+      device.secrets.password = null;
+      await env.addEmployee(admin);
+      final backup = (await service.create(admin)).unwrap();
+      final fresh = BackupTestDevice(TestEnv(), temp);
+
+      final outcome = await fresh.service.restoreOnNewInstallation(
+        device.storage.files[backup.fileName]!,
+      );
+
+      expect(outcome.isOk, isTrue);
+      expect(await fresh.employees(), 1);
+    });
+  });
+
   group('the password', () {
     test('must be long enough', () async {
       final result = await service.setPassword(admin, 'short');
@@ -513,24 +645,25 @@ void main() {
       expect((await service.runAutomaticIfDue(admin)).unwrap(), isNotNull);
     });
 
-    test('are skipped when switched off or without a password', () async {
+    test('are skipped when switched off', () async {
       (await service.updateSettings(
         admin,
         automaticEnabled: false,
         retentionCount: 10,
         reminderDays: 7,
       )).unwrap();
-      expect((await service.runAutomaticIfDue(admin)).unwrap(), isNull);
 
-      (await service.updateSettings(
-        admin,
-        automaticEnabled: true,
-        retentionCount: 10,
-        reminderDays: 7,
-      )).unwrap();
-      device.secrets.password = null;
       expect((await service.runAutomaticIfDue(admin)).unwrap(), isNull);
       expect(device.storage.files, isEmpty);
+    });
+
+    test('need no password: they use standard protection', () async {
+      device.secrets.password = null;
+
+      final made = (await service.runAutomaticIfDue(admin)).unwrap();
+
+      expect(made, isNotNull);
+      expect(made!.header.passwordProtected, isFalse);
     });
 
     test('a failure is remembered, not retried straight away', () async {
@@ -579,6 +712,7 @@ void main() {
       await service.delete(stranger, backup.fileName),
       await service.restore(stranger, file),
       await service.setPassword(stranger, 'long-enough-password'),
+      await service.removePassword(stranger),
       await service.settings(stranger),
       await service.updateSettings(
         stranger,

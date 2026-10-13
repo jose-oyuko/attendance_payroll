@@ -46,22 +46,14 @@ void main() {
     const auth = AsyncData<AuthState>(NeedsSetup());
 
     expect(redirectForAuth(auth, employees), AppRoutes.setup);
-    expect(redirectForAuth(auth, AppRoutes.signIn), AppRoutes.setup);
+    expect(redirectForAuth(auth, AppRoutes.kiosk), AppRoutes.setup);
     expect(redirectForAuth(auth, AppRoutes.setup), isNull);
   });
 
-  test('signed out, administrator screens are unreachable', () {
-    const auth = AsyncData<AuthState>(SignedOut());
-
-    expect(redirectForAuth(auth, employees), AppRoutes.signIn);
-    expect(redirectForAuth(auth, AppRoutes.setup), AppRoutes.signIn);
-    expect(redirectForAuth(auth, AppRoutes.signIn), isNull);
-  });
-
-  test('signed in, signed-out screens lead to the dashboard', () {
+  test('signed in, the startup and setup screens lead to the dashboard', () {
     expect(redirectForAuth(signedIn, employees), isNull);
     expect(
-      redirectForAuth(signedIn, AppRoutes.signIn),
+      redirectForAuth(signedIn, AppRoutes.starting),
       AdminDestination.dashboard.path,
     );
     expect(
@@ -87,7 +79,7 @@ void main() {
       for (final location in [
         AdminDestination.dashboard.path,
         employees,
-        AppRoutes.signIn,
+        AppRoutes.starting,
         AppRoutes.setup,
         '/kioskx',
       ]) {
@@ -99,18 +91,31 @@ void main() {
       }
     });
 
-    test('kiosk locations need kiosk mode', () {
+    test('kiosk locations are for a locked app only', () {
       expect(
         redirectForAuth(signedIn, AppRoutes.kiosk),
         AdminDestination.dashboard.path,
       );
       expect(
-        redirectForAuth(
-          const AsyncData<AuthState>(SignedOut()),
-          AppRoutes.kiosk,
-        ),
-        AppRoutes.signIn,
+        redirectForAuth(signedIn, AppRoutes.kioskUnlock),
+        AdminDestination.dashboard.path,
       );
+    });
+
+    test('a lock notice does not change where anyone may go', () {
+      final locked = AsyncData<AuthState>(
+        KioskMode(
+          KioskContext(
+            companyId: 'c',
+            companyName: 'Acme',
+            timeZone: CompanyTimeZone('Africa/Nairobi'),
+          ),
+          notice: 'The app locked after 5 minutes without activity.',
+        ),
+      );
+
+      expect(redirectForAuth(locked, employees), AppRoutes.kiosk);
+      expect(redirectForAuth(locked, AppRoutes.kioskUnlock), isNull);
     });
   });
 }

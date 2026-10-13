@@ -11,14 +11,14 @@ is safe enough for their business.
 |---|---|
 | Employee, attendance and payroll data | SQLite database in the app's private storage |
 | Administrator passwords, employee PINs | Only as salted PBKDF2 hashes in the database |
-| Backup password | Android Keystore (secure storage) |
+| Backup password (optional) | Android Keystore (secure storage) |
 | Backups | Encrypted files, in the app's private folder or wherever the administrator exports them |
 
 ## Who might attack, and what stops them
 
 | Threat | Protection |
 |---|---|
-| A colleague uses the unlocked app while the administrator is away | Automatic sign-out after 15 minutes without a touch, and after 15 minutes in the background (`SessionTimeoutGuard`). The kiosk is separate and exposes no administrative function |
+| A colleague uses the unlocked app while the administrator is away | The app locks itself after a time the administrator chooses (15 minutes by default; never is possible but not recommended), and when it has been in the background that long. Locked shows the attendance kiosk, which exposes no administrative function; an administrator's password unlocks it. The app also starts locked (`SessionTimeoutGuard`, `KioskService`) |
 | Someone guesses a password or PIN | PBKDF2-HMAC-SHA256 hashes; lockout after 5 wrong attempts, doubling up to an hour, enforced in the domain layer, for administrators and employees alike. A locked credential is not even checked |
 | Someone takes over an unattended signed-in account | Changing the password asks for the current one and shares the lockout; the change is audited |
 | An employee tries to read others' data or reach admin screens | Every service checks the session's permission itself (`Permission`); hiding UI is never the protection. The kiosk has its own service that only accepts that company's employees |
@@ -60,8 +60,17 @@ is safe enough for their business.
    administrator password is recoverable only by restoring a backup made
    before it was changed (which restores the old password), or reinstalling.
    Keep a backup and write the owner password down somewhere safe.
-3. **The backup password cannot be recovered**, by design. The Backup screen
-   says so before it is set.
+3. **Backups without a password are encrypted with a key built into the
+   app** ("standard protection", the default). That keeps the file from being
+   read as a plain database, detects tampering, and lets a backup be
+   restored on any phone with the app, with no password to lose. It does
+   **not** keep a backup private from someone who has both the file and the
+   app, because the key is in the app. An administrator who exports backups
+   (e-mail, cloud storage, a shared folder) should add a backup password,
+   and the Backup screen says so.
+   **A backup password, once set, cannot be recovered**, by design: the
+   screen says so before it is saved. Backups made with it need it; losing it
+   loses those backups.
 4. **One role.** V1 has a single all-powerful `owner` role. The permission
    model is in place for finer roles (payroll administrator, supervisor,
    auditor) without changing the services.

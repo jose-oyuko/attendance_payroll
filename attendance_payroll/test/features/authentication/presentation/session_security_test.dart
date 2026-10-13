@@ -1,6 +1,7 @@
 import 'package:attendance_payroll/features/authentication/presentation/session_timeout_guard.dart';
-import 'package:attendance_payroll/features/authentication/presentation/sign_in_screen.dart';
 import 'package:attendance_payroll/features/dashboard/presentation/dashboard_screen.dart';
+import 'package:attendance_payroll/features/kiosk/presentation/kiosk_screen.dart';
+import 'package:attendance_payroll/features/kiosk/presentation/kiosk_unlock_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -15,25 +16,45 @@ void main() {
 
   setUp(() => now = DateTime.utc(2026, 10, 12, 9));
 
-  Future<void> open(WidgetTester tester) async {
+  Future<void> open(WidgetTester tester, {Duration? limit = _limit}) async {
     await pumpApp(
       tester,
       size: tabletSize,
       overrides: [
-        inactivityLimitProvider.overrideWithValue(_limit),
+        inactivityLimitProvider.overrideWithValue(limit),
         sessionClockProvider.overrideWithValue(() => now),
       ],
     );
     expect(find.byType(DashboardScreen), findsOneWidget);
   }
 
+  /// Lets the real work behind a frame finish (locking writes to the
+  /// database) without moving the test's clock.
+  Future<void> flush(WidgetTester tester) async {
+    for (var i = 0; i < 10; i++) {
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 20)),
+      );
+      await tester.pump();
+    }
+  }
+
   Future<void> idle(WidgetTester tester, Duration time) async {
     await tester.pump(time);
+    await flush(tester);
+  }
+
+  /// The administrator's way back in, from the kiosk.
+  Future<void> openUnlock(WidgetTester tester) async {
+    await tester.tap(find.text('Administrator'));
     await tester.pumpAndSettle();
+    expect(find.byType(KioskUnlockScreen), findsOneWidget);
   }
 
   group('inactivity', () {
-    testWidgets('signs the administrator out and says why', (tester) async {
+    testWidgets('locks the app, showing the kiosk, and says why', (
+      tester,
+    ) async {
       await open(tester);
 
       await idle(tester, _limit - const Duration(seconds: 1));
@@ -41,10 +62,13 @@ void main() {
 
       await idle(tester, const Duration(seconds: 2));
 
-      expect(find.byType(SignInScreen), findsOneWidget);
+      // Employees can use the kiosk straight away.
+      expect(find.byType(KioskScreen), findsOneWidget);
       expect(find.byType(DashboardScreen), findsNothing);
+      // The administrator is told why when they come to unlock it.
+      await openUnlock(tester);
       expect(
-        find.textContaining('after 5 minutes without activity'),
+        find.textContaining('locked after 5 minutes without activity'),
         findsOneWidget,
       );
     });
@@ -60,14 +84,13 @@ void main() {
       expect(find.byType(DashboardScreen), findsOneWidget);
 
       await idle(tester, _limit + const Duration(seconds: 1));
-      expect(find.byType(SignInScreen), findsOneWidget);
+      expect(find.byType(KioskScreen), findsOneWidget);
     });
 
-    testWidgets('signing in again works and clears the message', (
-      tester,
-    ) async {
+    testWidgets('unlocking works and the message goes away', (tester) async {
       await open(tester);
       await idle(tester, _limit + const Duration(seconds: 1));
+      await openUnlock(tester);
       expect(find.textContaining('without activity'), findsOneWidget);
 
       await tester.enterText(
@@ -79,14 +102,46 @@ void main() {
         ownerPassword,
       );
       await tester.tap(find.widgetWithText(FilledButton, 'Sign in'));
-      await tester.runAsync(() => Future<void>.delayed(Duration.zero));
+      await flush(tester);
       await tester.pumpAndSettle();
 
       expect(find.byType(DashboardScreen), findsOneWidget);
       expect(find.textContaining('without activity'), findsNothing);
     });
 
-    testWidgets('nothing runs while nobody is signed in', (tester) async {
+    testWidgets('after unlocking, it locks again after the same wait', (
+      tester,
+    ) async {
+      await open(tester);
+      await idle(tester, _limit + const Duration(seconds: 1));
+      await openUnlock(tester);
+      await tester.enterText(
+        find.widgetWithText(TextFormField, 'Username'),
+        ownerUsername,
+      );
+      await tester.enterText(
+        find.widgetWithText(TextFormField, 'Password'),
+        ownerPassword,
+      );
+      await tester.tap(find.widgetWithText(FilledButton, 'Sign in'));
+      await flush(tester);
+      await tester.pumpAndSettle();
+      expect(find.byType(DashboardScreen), findsOneWidget);
+
+      await idle(tester, _limit + const Duration(seconds: 1));
+
+      expect(find.byType(KioskScreen), findsOneWidget);
+    });
+
+    testWidgets('never locks when the time is set to never', (tester) async {
+      await open(tester, limit: null);
+
+      await idle(tester, const Duration(hours: 12));
+
+      expect(find.byType(DashboardScreen), findsOneWidget);
+    });
+
+    testWidgets('nothing runs on a brand new install', (tester) async {
       await pumpApp(
         tester,
         size: tabletSize,
@@ -97,7 +152,18 @@ void main() {
       await idle(tester, _limit * 3);
 
       expect(tester.takeException(), isNull);
-      expect(find.byType(SignInScreen), findsNothing);
+      expect(find.byType(KioskScreen), findsNothing);
+    });
+
+    testWidgets('the kiosk itself is never locked out', (tester) async {
+      await open(tester);
+      await idle(tester, _limit + const Duration(seconds: 1));
+      expect(find.byType(KioskScreen), findsOneWidget);
+
+      await idle(tester, _limit * 4);
+
+      expect(find.byType(KioskScreen), findsOneWidget);
+      expect(tester.takeException(), isNull);
     });
   });
 
@@ -105,7 +171,9 @@ void main() {
     void lifecycle(WidgetTester tester, AppLifecycleState state) =>
         tester.binding.handleAppLifecycleStateChanged(state);
 
-    testWidgets('staying away too long signs out on return', (tester) async {
+    testWidgets('staying away too long locks the app on return', (
+      tester,
+    ) async {
       await open(tester);
 
       lifecycle(tester, AppLifecycleState.inactive);
@@ -116,9 +184,10 @@ void main() {
       lifecycle(tester, AppLifecycleState.hidden);
       lifecycle(tester, AppLifecycleState.inactive);
       lifecycle(tester, AppLifecycleState.resumed);
-      await tester.pumpAndSettle();
+      await flush(tester);
 
-      expect(find.byType(SignInScreen), findsOneWidget);
+      expect(find.byType(KioskScreen), findsOneWidget);
+      await openUnlock(tester);
       expect(find.textContaining('without activity'), findsOneWidget);
     });
 
@@ -132,11 +201,22 @@ void main() {
       lifecycle(tester, AppLifecycleState.hidden);
       lifecycle(tester, AppLifecycleState.inactive);
       lifecycle(tester, AppLifecycleState.resumed);
-      await tester.pumpAndSettle();
+      await flush(tester);
 
       expect(find.byType(DashboardScreen), findsOneWidget);
       // And the wait starts again from the return.
       await idle(tester, _limit - const Duration(seconds: 1));
+      expect(find.byType(DashboardScreen), findsOneWidget);
+    });
+
+    testWidgets('with no limit, being away never locks', (tester) async {
+      await open(tester, limit: null);
+
+      lifecycle(tester, AppLifecycleState.paused);
+      now = now.add(const Duration(days: 2));
+      lifecycle(tester, AppLifecycleState.resumed);
+      await flush(tester);
+
       expect(find.byType(DashboardScreen), findsOneWidget);
     });
   });

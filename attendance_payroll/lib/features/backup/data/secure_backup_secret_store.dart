@@ -25,4 +25,7 @@ final class SecureBackupSecretStore implements BackupSecretStore {
   @override
   Future<void> write(String password) =>
       _storage.write(key: _key, value: password);
+
+  @override
+  Future<void> clear() => _storage.delete(key: _key);
 }

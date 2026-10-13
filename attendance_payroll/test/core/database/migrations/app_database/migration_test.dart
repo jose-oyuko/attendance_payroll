@@ -1,5 +1,5 @@
 import 'package:attendance_payroll/core/database/app_database.dart';
-import 'package:drift/drift.dart';
+import 'package:drift/drift.dart' hide isNull;
 import 'package:drift/native.dart';
 import 'package:drift_dev/api/migrations_native.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'generated/schema.dart';
 import 'generated/schema_v1.dart' as v1;
 import 'generated/schema_v10.dart' as v10;
+import 'generated/schema_v11.dart' as v11;
 import 'generated/schema_v2.dart' as v2;
 import 'generated/schema_v3.dart' as v3;
 import 'generated/schema_v4.dart' as v4;
@@ -592,6 +593,43 @@ void main() {
           v10.PrinterSettingsData.fromJson(printer.toJson()),
         ]);
         expect(await newDb.select(newDb.backupSettings).get(), isEmpty);
+      },
+    );
+  });
+  test('v10 → v11 keeps the kiosk setting and adds the lock time', () async {
+    const at = '2026-10-13T05:00:00.000Z';
+    const company = v10.CompaniesData(
+      id: 'co-1',
+      createdAt: at,
+      updatedAt: at,
+      version: 1,
+      syncState: 'localOnly',
+      name: 'Acme Ltd',
+      currencyCode: 'KES',
+      timezone: 'Africa/Nairobi',
+    );
+    const settings = v10.DeviceSettingsData(
+      id: 'this_device',
+      kioskCompanyId: 'co-1',
+      updatedAt: at,
+    );
+
+    await verifier.testWithDataIntegrity(
+      oldVersion: 10,
+      newVersion: 11,
+      createOld: v10.DatabaseAtV10.new,
+      createNew: v11.DatabaseAtV11.new,
+      openTestedDatabase: AppDatabase.new,
+      createItems: (batch, oldDb) {
+        batch
+          ..insert(oldDb.companies, company)
+          ..insert(oldDb.deviceSettings, settings);
+      },
+      validateItems: (newDb) async {
+        final rows = await newDb.select(newDb.deviceSettings).get();
+        expect(rows.single.kioskCompanyId, 'co-1');
+        // Nobody has chosen a lock time yet: the default applies.
+        expect(rows.single.lockAfterMinutes, isNull);
       },
     );
   });
